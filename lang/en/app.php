@@ -195,4 +195,21 @@ return [
     'change_password_section' => 'Change Password (Optional)',
     'current_password_incorrect' => 'The provided current password does not match your current password.',
     'profile_updated_successfully' => 'Profile updated successfully!',
+
+    // Email Verification
+    'email_verified' => 'Email is verified',
+    'email_unverified' => 'Email is not verified',
+    'verify_email_badge' => 'Verified',
+    'unverified_email_badge' => 'Unverified',
+    'send_verification_link' => 'Send verification link ✉️',
+    'resend_verification_link' => 'Resend verification link ✉️',
+    'verification_link_sent' => 'A new verification link has been sent to your email address!',
+    'email_already_verified' => 'Your email address is already verified.',
+    'email_verified_successfully' => 'Thank you! Your email has been successfully verified! ✓',
+    'verify_email_subject' => 'Verify Your Email Address - Planner',
+    'verify_email_greeting' => 'Hello, :name!',
+    'verify_email_line1' => 'Please click the button below to verify your email address.',
+    'verify_email_action' => 'Verify Email Address ✉️',
+    'verify_email_line2' => 'This verification link will expire in :count minutes.',
+    'verify_email_line3' => 'If you did not create an account, no further action is required.',
 ];

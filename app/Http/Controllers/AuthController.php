@@ -112,6 +112,7 @@ class AuthController extends Controller
         }
 
         Auth::login($user);
+        event(new \Illuminate\Auth\Events\Registered($user));
         session(['current_tenant_id' => $currentTenantId]);
 
         return redirect()->route('ideas.index');

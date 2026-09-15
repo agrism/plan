@@ -194,4 +194,21 @@ return [
     'change_password_section' => 'Paroles maiņa (pēc izvēles)',
     'current_password_incorrect' => 'Norādītā pašreizējā parole nav pareiza.',
     'profile_updated_successfully' => 'Profila dati veiksmīgi saglabāti!',
+
+    // Email Verification
+    'email_verified' => 'E-pasts ir apstiprināts',
+    'email_unverified' => 'E-pasts nav apstiprināts',
+    'verify_email_badge' => 'Apstiprināts',
+    'unverified_email_badge' => 'Neapstiprināts',
+    'send_verification_link' => 'Nosūtīt apstiprinājuma saiti ✉️',
+    'resend_verification_link' => 'Nosūtīt saiti vēlreiz ✉️',
+    'verification_link_sent' => 'Jauna apstiprinājuma saite ir nosūtīta uz jūsu e-pastu!',
+    'email_already_verified' => 'Jūsu e-pasts jau ir apstiprināts.',
+    'email_verified_successfully' => 'Paldies! Jūsu e-pasts ir veiksmīgi apstiprināts! ✓',
+    'verify_email_subject' => 'Apstipriniet savu e-pasta adresi - Plānotājs',
+    'verify_email_greeting' => 'Sveiki, :name!',
+    'verify_email_line1' => 'Lūdzu, noklikšķiniet uz zemāk esošās pogas, lai apstiprinātu savu e-pasta adresi.',
+    'verify_email_action' => 'Apstiprināt e-pasta adresi ✉️',
+    'verify_email_line2' => 'Šī apstiprinājuma saite būs derīga :count minūtes.',
+    'verify_email_line3' => 'Ja jūs neizveidojāt šo kontu, nekādas papildu darbības nav nepieciešamas.',
 ];

@@ -173,6 +173,20 @@
 
     <!-- Main Content Area -->
     <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8">
+        <!-- Global Flash Status Notification -->
+        @if (session('status'))
+            <div x-data="{ show: true }" x-show="show" x-transition
+                 class="mb-6 p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-900 flex items-center justify-between gap-3 shadow-sm">
+                <div class="flex items-center gap-2.5 text-xs font-bold">
+                    <span class="text-base">✓</span>
+                    <span>{{ session('status') }}</span>
+                </div>
+                <button type="button" @click="show = false" class="text-emerald-700 hover:text-emerald-950 p-1 rounded-lg">
+                    ✕
+                </button>
+            </div>
+        @endif
+
         @yield('content')
     </main>
 

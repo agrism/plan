@@ -25,6 +25,13 @@
             </button>
         </div>
 
+        @if (session('status'))
+            <div class="p-3.5 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold rounded-2xl flex items-center gap-2">
+                <span>✓</span>
+                <span>{{ session('status') }}</span>
+            </div>
+        @endif
+
         @if ($errors->any())
             <div class="p-3.5 bg-rose-50 border border-rose-200 text-rose-800 text-xs font-bold rounded-2xl space-y-1">
                 @foreach ($errors->all() as $error)
@@ -48,12 +55,38 @@
                        class="w-full px-3.5 py-2.5 bg-white border border-slate-300 focus:border-amber-500 rounded-xl text-slate-900 text-xs font-bold">
             </div>
 
-            <!-- Email -->
+            <!-- Email & Verification Status -->
             <div>
-                <label class="block text-xs font-bold text-slate-700 mb-1">{{ __('app.email') }}</label>
+                <div class="flex items-center justify-between mb-1">
+                    <label class="block text-xs font-bold text-slate-700">{{ __('app.email') }}</label>
+                    @if($user->hasVerifiedEmail())
+                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                            ✓ {{ __('app.verify_email_badge') }}
+                        </span>
+                    @else
+                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
+                            ⚠️ {{ __('app.unverified_email_badge') }}
+                        </span>
+                    @endif
+                </div>
                 <input type="email" name="email" value="{{ old('email', $user->email) }}" required
                        placeholder="{{ __('app.email_placeholder') }}"
                        class="w-full px-3.5 py-2.5 bg-white border border-slate-300 focus:border-amber-500 rounded-xl text-slate-900 text-xs font-bold">
+                
+                @if(!$user->hasVerifiedEmail())
+                    <div class="mt-2 p-2.5 bg-amber-50/80 border border-amber-200/80 rounded-xl flex items-center justify-between gap-2">
+                        <div class="text-[11px] font-medium text-amber-900">
+                            <span>{{ __('app.email_unverified') }}</span>
+                        </div>
+                        <button type="button"
+                                hx-post="{{ route('verification.send') }}"
+                                hx-target="#profile-modal-slot"
+                                hx-swap="innerHTML"
+                                class="px-2.5 py-1 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-[11px] rounded-lg shadow-sm transition active:scale-95 whitespace-nowrap">
+                            {{ __('app.send_verification_link') }}
+                        </button>
+                    </div>
+                @endif
             </div>
 
             <!-- Avatar Emoji Selector -->

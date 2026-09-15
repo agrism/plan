@@ -40,7 +40,17 @@ class ProfileController extends Controller
         if (isset($validated['avatar'])) {
             $user->avatar = $validated['avatar'];
         }
+
+        $emailChanged = $user->isDirty('email');
+        if ($emailChanged) {
+            $user->email_verified_at = null;
+        }
+
         $user->save();
+
+        if ($emailChanged) {
+            $user->sendEmailVerificationNotification();
+        }
 
         if ($request->header('HX-Request')) {
             return redirect()->route('ideas.index');
