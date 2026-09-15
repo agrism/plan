@@ -200,6 +200,8 @@
             </div>
 
             <form action="{{ route('ideas.store') }}" method="POST"
+                  enctype="multipart/form-data"
+                  hx-encoding="multipart/form-data"
                   hx-post="{{ route('ideas.store') }}"
                   hx-target="body"
                   @htmx:after-request="showAddModal = false"
@@ -239,6 +241,26 @@
                             <input type="radio" name="category" value="citi" class="hidden">
                             <span>✨</span> <span class="font-semibold">Citi</span>
                         </label>
+                    </div>
+                </div>
+
+                <!-- Optional Image Upload to Hetzner S3 -->
+                <div x-data="{ imagePreview: null }">
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Pievienot attēlu (Hetzner S3)</label>
+                    <div class="flex items-center gap-3">
+                        <label class="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-slate-50 border border-dashed border-slate-300 hover:border-amber-500 rounded-xl cursor-pointer text-xs font-semibold text-slate-600 hover:text-slate-900 transition">
+                            <span>📷</span>
+                            <span x-text="imagePreview ? 'Mainīt attēlu' : 'Izvēlēties no ierīces vai nofotografēt'"></span>
+                            <input type="file" name="image_file" accept="image/*" class="hidden"
+                                   @change="const file = $event.target.files[0]; if (file) { const reader = new FileReader(); reader.onload = (e) => { imagePreview = e.target.result; }; reader.readAsDataURL(file); }">
+                        </label>
+                        <template x-if="imagePreview">
+                            <div class="relative w-12 h-12 rounded-xl overflow-hidden border border-slate-200 shadow-sm flex-shrink-0">
+                                <img :src="imagePreview" class="w-full h-full object-cover">
+                                <button type="button" @click="imagePreview = null"
+                                        class="absolute inset-0 bg-black/40 text-white flex items-center justify-center text-xs font-bold">✕</button>
+                            </div>
+                        </template>
                     </div>
                 </div>
 

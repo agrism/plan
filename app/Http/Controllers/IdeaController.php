@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Task;
 use App\Models\TaskReaction;
+use App\Services\ImageService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
@@ -18,7 +19,7 @@ class IdeaController extends Controller
             return redirect()->route('tenants.create');
         }
 
-        // Calculate upcoming focus days (Friday, Saturday, Sunday or current 3 days)
+        // Calculate upcoming focus days (Friday, Saturday, Sunday)
         $now = Carbon::now();
         $friday = $now->copy()->next(Carbon::FRIDAY)->toDateString();
         if ($now->isFriday()) {
@@ -79,12 +80,13 @@ class IdeaController extends Controller
         ));
     }
 
-    public function store(Request $request)
+    public function store(Request $request, ImageService $imageService)
     {
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'category' => 'nullable|string|in:projekti,steidzami,attistiba,sanaksmes,ikdienas,citi',
             'image_url' => 'nullable|string|max:500',
+            'image_file' => 'nullable|image|max:12288', // up to 12MB
             'scheduled_date' => 'nullable|date',
             'scheduled_time_slot' => 'nullable|string|max:50',
         ]);
@@ -96,8 +98,14 @@ class IdeaController extends Controller
             return response('Darbavieta nav atrasta', 400);
         }
 
-        $imageUrl = $validated['image_url'] ?? null;
-        if (empty($imageUrl)) {
+        $imageUrl = null;
+
+        // Process uploaded image file -> Convert to WebP & upload to Hetzner S3
+        if ($request->hasFile('image_file')) {
+            $imageUrl = $imageService->processAndUpload($request->file('image_file'), 'tasks', 1200, 82);
+        } elseif (!empty($validated['image_url'])) {
+            $imageUrl = $validated['image_url'];
+        } else {
             $category = $validated['category'] ?? 'citi';
             $imageUrl = match ($category) {
                 'projekti' => 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=600&q=80',
@@ -109,7 +117,7 @@ class IdeaController extends Controller
             };
         }
 
-        $task = $tenant->tasks()->create([
+        $tenant->tasks()->create([
             'created_by_id' => $user->id,
             'title' => $validated['title'],
             'category' => $validated['category'] ?? 'citi',

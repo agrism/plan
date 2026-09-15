@@ -2,7 +2,7 @@
 
 Universāls multi-tenant uzdevumu krātuves (Backlog) un dienu plānošanas serviss komandām, uzņēmumiem un personīgai lietošanai.
 
-Built with **Laravel 12**, **PHP 8.3**, **MySQL**, **HTMX**, **Alpine.js**, and **Tailwind CSS**.
+Built with **Laravel 12**, **PHP 8.3**, **MySQL**, **HTMX**, **Alpine.js**, **Hetzner S3 Object Storage**, and **Tailwind CSS**.
 
 ---
 
@@ -10,6 +10,7 @@ Built with **Laravel 12**, **PHP 8.3**, **MySQL**, **HTMX**, **Alpine.js**, and 
 
 - **Multi-Tenancy (Darbavietas)**: Jebkurš var izveidot savu uzņēmuma vai projekta darbavietu, uzaicināt kolēģus un viegli pārslēgties.
 - **Uzdevumu Krātuve (Backlog)**: Ātra darāmo darbu fiksēšana ar universālām kategorijām (💼 *Projekti*, ⚡ *Steidzami*, 🚀 *Attīstība*, 👥 *Sanāksmes*, 📋 *Ikdienas*, ✨ *Citi*).
+- **Hetzner S3 & WebP Apstrāde**: Attēli tiek automātiski konvertēti uz vieglu un ātru **WebP** formātu un saglabāti **Hetzner S3 Object Storage** (`plan-t` lokāli, `plan` produkcijā).
 - **Dienu Plānotājs**: Pārcel uzdevumus no krātuves uz konkrētām dienām ar 1 klikšķi.
 - **Iesaiste & Reakcijas**: Balsojumi un reakcijas 👍 reāllaikā ar HTMX (bez lapas pārlādes).
 - **Autora Fiksēšana**: Skaidri redzams, kurš komandas loceklis uzdevumu ir izveidojis.
@@ -22,6 +23,7 @@ Built with **Laravel 12**, **PHP 8.3**, **MySQL**, **HTMX**, **Alpine.js**, and 
 
 - **Backend**: Laravel 12 (PHP 8.3)
 - **Database**: MySQL 8.0 / 8.4
+- **Object Storage**: Hetzner S3 (`league/flysystem-aws-s3-v3`) + WebP Image Converter (`GD`)
 - **Frontend Interactivity**: HTMX 2.0 & Alpine.js
 - **Styling**: Tailwind CSS
 - **Dev Environment**: Laravel Sail (Docker)
