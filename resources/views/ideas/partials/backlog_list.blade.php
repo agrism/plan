@@ -1,8 +1,8 @@
 @if($backlogIdeas->isEmpty())
     <div class="p-8 text-center rounded-3xl bg-white border border-dashed border-slate-300 text-slate-500 shadow-sm">
         <span class="text-3xl block mb-2">📋</span>
-        <p class="text-sm font-bold text-slate-800">Uzdevumu krātuve pašlaik ir tukša!</p>
-        <p class="text-xs text-slate-500 mt-1">Piespied pogu „Pievienot”, lai ierakstītu jaunu darāmo darbu.</p>
+        <p class="text-sm font-bold text-slate-800">{{ __('app.backlog_empty_title') }}</p>
+        <p class="text-xs text-slate-500 mt-1">{{ __('app.backlog_empty_desc') }}</p>
     </div>
 @else
     @foreach($backlogIdeas as $idea)
@@ -22,7 +22,7 @@
         <div class="group relative rounded-2xl bg-white border border-slate-200/90 hover:border-slate-300 transition p-4 shadow-sm hover:shadow-md flex flex-col gap-2.5"
              x-data="{ expanded: false }">
             
-            <!-- Card Header: Category, Author Badge & Edit Button -->
+            <!-- Card Header: Category, Author Badge, Edit & Delete Buttons -->
             <div class="flex items-center justify-between gap-2">
                 <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg text-xs font-bold border {{ $idea->category_badge_class }}">
                     <span>{{ $idea->category_emoji }}</span>
@@ -30,7 +30,7 @@
                 </span>
 
                 <div class="flex items-center gap-2">
-                    <div class="flex items-center gap-1.5 text-xs text-slate-500 font-medium" title="Izveidoja: {{ $idea->creator->name }}">
+                    <div class="flex items-center gap-1.5 text-xs text-slate-500 font-medium" title="{{ __('app.created_by') }}: {{ $idea->creator->name }}">
                         <span class="text-sm">{{ $idea->creator->avatar ?? '👤' }}</span>
                         <span class="font-bold text-slate-700">{{ explode(' ', $idea->creator->name)[0] }}</span>
                     </div>
@@ -41,7 +41,7 @@
                             hx-swap="innerHTML"
                             @click.stop
                             type="button"
-                            title="Labot uzdevumu"
+                            title="{{ __('app.edit_task') }}"
                             class="p-1 rounded-lg text-slate-400 hover:text-amber-600 hover:bg-amber-50 transition text-xs">
                         ✏️
                     </button>
@@ -49,7 +49,7 @@
                     <!-- Delete with Math Confirmation -->
                     <button type="button"
                             @click.stop="window.openMathDeleteConfirm('{{ addslashes($idea->title) }}', '{{ route('ideas.destroy', $idea->id) }}')"
-                            title="Dzēst uzdevumu"
+                            title="{{ __('app.delete') }}"
                             class="p-1 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition text-xs">
                         🗑️
                     </button>
@@ -69,18 +69,18 @@
                         <div class="flex items-center gap-1.5 flex-wrap pt-0.5 text-[11px] text-slate-400">
                             @if($idea->description)
                                 <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-slate-100 text-slate-600 font-medium">
-                                    <span>📝</span> Apraksts
+                                    <span>📝</span> {{ __('app.description') }}
                                 </span>
                             @endif
                             @if(!empty($idea->links) && count($idea->links) > 0)
                                 <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-slate-100 text-slate-600 font-medium">
                                     <span>{{ $hasYouTube ? '▶️' : '🔗' }}</span>
-                                    <span>{{ count($idea->links) }} {{ count($idea->links) === 1 ? 'saite' : 'saites' }}</span>
+                                    <span>{{ count($idea->links) }} {{ count($idea->links) === 1 ? __('app.link') : __('app.links') }}</span>
                                 </span>
                             @endif
                             @if($idea->image_url)
                                 <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-slate-100 text-slate-600 font-medium">
-                                    <span>🖼️</span> Attēls
+                                    <span>🖼️</span> {{ __('app.image') }}
                                 </span>
                             @endif
                         </div>
@@ -89,7 +89,7 @@
 
                 @if($hasDetails)
                     <button type="button" @click.stop="expanded = !expanded"
-                            title="Rādīt detaļas"
+                            title="{{ __('app.description') }}"
                             class="p-1 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100 transition flex-shrink-0 mt-0.5">
                         <svg class="w-4 h-4 transition-transform duration-200" :class="expanded ? 'rotate-180 text-amber-600' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
@@ -167,7 +167,7 @@
                             type="button"
                             class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-50 hover:bg-amber-100 border border-amber-200 text-amber-800 text-xs font-bold transition">
                         <span>📅</span>
-                        <span>Ieplānot</span>
+                        <span>{{ __('app.schedule') }}</span>
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                     </button>
 
@@ -223,7 +223,7 @@
 
                         <!-- Quick Shortcuts -->
                         <div class="pt-2 border-t border-slate-100 space-y-1">
-                            <div class="text-[10px] font-bold uppercase text-slate-400 px-1">Ātrās izvēles:</div>
+                            <div class="text-[10px] font-bold uppercase text-slate-400 px-1">{{ __('app.quick_picks') }}</div>
                             <div class="grid grid-cols-3 gap-1.5 text-xs">
                                 <form action="{{ route('ideas.schedule', $idea->id) }}" method="POST"
                                       hx-patch="{{ route('ideas.schedule', $idea->id) }}"
@@ -232,7 +232,7 @@
                                     @method('PATCH')
                                     <input type="hidden" name="scheduled_date" value="{{ $today ?? \Carbon\Carbon::now()->toDateString() }}">
                                     <button type="submit" class="w-full py-1 text-center rounded-lg bg-slate-100 hover:bg-amber-100 hover:text-amber-900 text-slate-700 font-medium text-[11px] transition">
-                                        Šodien
+                                        {{ __('app.today') }}
                                     </button>
                                 </form>
 
@@ -243,7 +243,7 @@
                                     @method('PATCH')
                                     <input type="hidden" name="scheduled_date" value="{{ $tomorrow ?? \Carbon\Carbon::tomorrow()->toDateString() }}">
                                     <button type="submit" class="w-full py-1 text-center rounded-lg bg-slate-100 hover:bg-amber-100 hover:text-amber-900 text-slate-700 font-medium text-[11px] transition">
-                                        Rīt
+                                        {{ __('app.tomorrow') }}
                                     </button>
                                 </form>
 
@@ -254,7 +254,7 @@
                                     @method('PATCH')
                                     <input type="hidden" name="scheduled_date" value="{{ $friday }}">
                                     <button type="submit" class="w-full py-1 text-center rounded-lg bg-slate-100 hover:bg-amber-100 hover:text-amber-900 text-slate-700 font-medium text-[11px] transition">
-                                        Piektdiena
+                                        {{ __('app.friday') }}
                                     </button>
                                 </form>
                             </div>
@@ -262,7 +262,7 @@
 
                         <div class="border-t border-slate-100 pt-1.5 flex items-center justify-between text-xs">
                             <button type="button" @click="schedMenu = false" class="px-2 py-1 text-slate-400 hover:text-slate-600 text-[11px]">
-                                Aizvērt
+                                {{ __('app.close') }}
                             </button>
 
                             <!-- Delete button with Math Confirmation -->
@@ -270,7 +270,7 @@
                                     @click.stop="schedMenu = false; window.openMathDeleteConfirm('{{ addslashes($idea->title) }}', '{{ route('ideas.destroy', $idea->id) }}')"
                                     class="px-2 py-1 text-rose-600 hover:bg-rose-50 rounded-lg text-[11px] font-semibold transition flex items-center gap-1">
                                 <span>🗑️</span>
-                                <span>Dzēst</span>
+                                <span>{{ __('app.delete') }}</span>
                             </button>
                         </div>
 
@@ -281,4 +281,3 @@
         </div>
     @endforeach
 @endif
-

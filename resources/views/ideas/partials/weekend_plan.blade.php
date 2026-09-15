@@ -20,9 +20,9 @@
                                 {{ $carbonDate->translatedFormat('l') }}
                             </h3>
                             @if($isToday)
-                                <span class="px-2 py-0.5 rounded-md bg-amber-100 text-amber-900 font-extrabold text-[10px] uppercase tracking-wider border border-amber-300">Šodien</span>
+                                <span class="px-2 py-0.5 rounded-md bg-amber-100 text-amber-900 font-extrabold text-[10px] uppercase tracking-wider border border-amber-300">{{ __('app.today') }}</span>
                             @elseif($isTomorrow)
-                                <span class="px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 font-bold text-[10px] uppercase tracking-wider border border-slate-200">Rīt</span>
+                                <span class="px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 font-bold text-[10px] uppercase tracking-wider border border-slate-200">{{ __('app.tomorrow') }}</span>
                             @endif
                         </div>
                         <p class="text-[11px] text-slate-500 font-medium">{{ $carbonDate->translatedFormat('j. F') }}</p>
@@ -36,7 +36,7 @@
 
             <!-- Day Tasks List -->
             @if($tasksForDay->isEmpty())
-                <p class="text-xs text-slate-400 italic py-2">Nav ieplānotu uzdevumu šai dienai.</p>
+                <p class="text-xs text-slate-400 italic py-2">{{ __('app.no_scheduled_tasks') }}</p>
             @else
                 <div class="space-y-2.5">
                     @foreach($tasksForDay as $task)
@@ -83,7 +83,7 @@
                                         @if($hasDetails)
                                             <div class="flex items-center gap-1.5 flex-wrap text-[10px] text-slate-400 pt-0.5">
                                                 @if($task->description)
-                                                    <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-white text-slate-600 border border-slate-200">📝 Apraksts</span>
+                                                    <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-white text-slate-600 border border-slate-200">📝 {{ __('app.description') }}</span>
                                                 @endif
                                                 @if(!empty($task->links) && count($task->links) > 0)
                                                     <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-white text-slate-600 border border-slate-200">
@@ -105,14 +105,14 @@
                                         <span class="hidden sm:inline">{{ $task->category_name }}</span>
                                     </span>
 
-                                    <span class="text-xs" title="Izveidoja: {{ $task->creator->name }}">{{ $task->creator->avatar ?? '👤' }}</span>
+                                    <span class="text-xs" title="{{ __('app.created_by') }}: {{ $task->creator->name }}">{{ $task->creator->avatar ?? '👤' }}</span>
 
                                     <!-- Edit Button -->
                                     <button hx-get="{{ route('ideas.edit', $task->id) }}"
                                             hx-target="#edit-modal-slot"
                                             hx-swap="innerHTML"
                                             type="button"
-                                            title="Labot uzdevumu"
+                                            title="{{ __('app.edit_task') }}"
                                             class="p-1 rounded-lg text-slate-400 hover:text-amber-600 hover:bg-amber-50 transition text-xs">
                                         ✏️
                                     </button>
@@ -120,7 +120,7 @@
                                     <!-- Delete Button with Math Confirmation -->
                                     <button type="button"
                                             @click.stop="window.openMathDeleteConfirm('{{ addslashes($task->title) }}', '{{ route('ideas.destroy', $task->id) }}')"
-                                            title="Dzēst uzdevumu"
+                                            title="{{ __('app.delete') }}"
                                             class="p-1 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition text-xs">
                                         🗑️
                                     </button>
@@ -129,7 +129,7 @@
                                     <div class="relative" x-data="{ schedMenu: false }">
                                         <button @click="schedMenu = !schedMenu"
                                                 type="button"
-                                                title="Pārcelt uz citu datumu"
+                                                title="{{ __('app.reschedule') }}"
                                                 class="p-1 rounded-lg text-slate-400 hover:text-amber-600 hover:bg-amber-50 transition text-xs">
                                             📅
                                         </button>
@@ -186,7 +186,7 @@
 
                                             <!-- Quick Shortcuts -->
                                             <div class="pt-2 border-t border-slate-100 space-y-1">
-                                                <div class="text-[10px] font-bold uppercase text-slate-400 px-1">Ātrās izvēles:</div>
+                                                <div class="text-[10px] font-bold uppercase text-slate-400 px-1">{{ __('app.quick_picks') }}</div>
                                                 <div class="grid grid-cols-3 gap-1.5 text-xs">
                                                     <form action="{{ route('ideas.schedule', $task->id) }}" method="POST"
                                                           hx-patch="{{ route('ideas.schedule', $task->id) }}"
@@ -195,7 +195,7 @@
                                                         @method('PATCH')
                                                         <input type="hidden" name="scheduled_date" value="{{ $today ?? \Carbon\Carbon::now()->toDateString() }}">
                                                         <button type="submit" class="w-full py-1 text-center rounded-lg bg-slate-100 hover:bg-amber-100 hover:text-amber-900 text-slate-700 font-medium text-[11px] transition">
-                                                            Šodien
+                                                            {{ __('app.today') }}
                                                         </button>
                                                     </form>
 
@@ -206,7 +206,7 @@
                                                         @method('PATCH')
                                                         <input type="hidden" name="scheduled_date" value="{{ $tomorrow ?? \Carbon\Carbon::tomorrow()->toDateString() }}">
                                                         <button type="submit" class="w-full py-1 text-center rounded-lg bg-slate-100 hover:bg-amber-100 hover:text-amber-900 text-slate-700 font-medium text-[11px] transition">
-                                                            Rīt
+                                                            {{ __('app.tomorrow') }}
                                                         </button>
                                                     </form>
 
@@ -217,7 +217,7 @@
                                                         @method('PATCH')
                                                         <input type="hidden" name="scheduled_date" value="{{ $friday }}">
                                                         <button type="submit" class="w-full py-1 text-center rounded-lg bg-slate-100 hover:bg-amber-100 hover:text-amber-900 text-slate-700 font-medium text-[11px] transition">
-                                                            Piektdiena
+                                                            {{ __('app.friday') }}
                                                         </button>
                                                     </form>
                                                 </div>
@@ -232,7 +232,7 @@
                                                     @method('PATCH')
                                                     <input type="hidden" name="scheduled_date" value="null">
                                                     <button type="submit" class="text-[11px] font-semibold text-slate-600 hover:text-amber-700 flex items-center gap-1">
-                                                        <span>↩️</span> Uz krātuvi
+                                                        <span>↩️</span> {{ __('app.to_backlog') }}
                                                     </button>
                                                 </form>
 
@@ -240,11 +240,11 @@
                                                     <button type="button"
                                                             @click.stop="schedMenu = false; window.openMathDeleteConfirm('{{ addslashes($task->title) }}', '{{ route('ideas.destroy', $task->id) }}')"
                                                             class="px-2 py-1 text-rose-600 hover:bg-rose-50 rounded-lg text-[11px] font-semibold transition flex items-center gap-1">
-                                                        <span>🗑️</span> Dzēst
+                                                        <span>🗑️</span> {{ __('app.delete') }}
                                                     </button>
 
                                                     <button type="button" @click="schedMenu = false" class="px-2 py-1 text-slate-400 hover:text-slate-600 text-[11px]">
-                                                        Aizvērt
+                                                        {{ __('app.close') }}
                                                     </button>
                                                 </div>
                                             </div>
@@ -259,7 +259,7 @@
                                         @csrf
                                         @method('PATCH')
                                         <input type="hidden" name="scheduled_date" value="null">
-                                        <button type="submit" title="Pārcelt atpakaļ uz Uzdevumu krātuvi" class="text-slate-400 hover:text-amber-600 p-1 text-xs transition rounded-lg hover:bg-slate-100">
+                                        <button type="submit" title="{{ __('app.move_to_backlog_tooltip') }}" class="text-slate-400 hover:text-amber-600 p-1 text-xs transition rounded-lg hover:bg-slate-100">
                                             ↩️
                                         </button>
                                     </form>
@@ -267,7 +267,7 @@
                                     <!-- Expand arrow button if details exist -->
                                     @if($hasDetails)
                                         <button type="button" @click.stop="expanded = !expanded"
-                                                title="Rādīt detaļas"
+                                                title="{{ __('app.description') }}"
                                                 class="p-1 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100 transition">
                                             <svg class="w-3.5 h-3.5 transition-transform duration-200" :class="expanded ? 'rotate-180 text-amber-600' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
@@ -332,8 +332,8 @@
     @empty
         <div class="p-8 text-center rounded-3xl bg-white border border-dashed border-slate-300 text-slate-500 shadow-sm">
             <span class="text-3xl block mb-2">📅</span>
-            <p class="text-sm font-bold text-slate-800">Nav ieplānotu uzdevumu!</p>
-            <p class="text-xs text-slate-500 mt-1">Izvēlies uzdevumu no uzdevumu krātuves un ieplāno to ar kalendāru.</p>
+            <p class="text-sm font-bold text-slate-800">{{ __('app.no_scheduled_tasks_empty') }}</p>
+            <p class="text-xs text-slate-500 mt-1">{{ __('app.no_scheduled_tasks_hint') }}</p>
         </div>
     @endforelse
 </div>

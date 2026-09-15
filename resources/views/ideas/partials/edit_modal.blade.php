@@ -16,8 +16,8 @@
             <div class="flex items-center gap-2">
                 <span class="text-2xl">✏️</span>
                 <div>
-                    <h3 class="text-lg font-bold text-slate-900">Labot uzdevumu</h3>
-                    <p class="text-xs text-slate-500">Izveidoja: {{ $task->creator->name }} ({{ $task->created_at->translatedFormat('j. M H:i') }})</p>
+                    <h3 class="text-lg font-bold text-slate-900">{{ __('app.edit_task') }}</h3>
+                    <p class="text-xs text-slate-500">{{ __('app.created_by') }}: {{ $task->creator->name }} ({{ $task->created_at->translatedFormat('j. M H:i') }})</p>
                 </div>
             </div>
             <button type="button" @click="document.getElementById('edit-modal-wrapper')?.remove()" class="p-1.5 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-100">
@@ -36,21 +36,21 @@
 
             <!-- Title -->
             <div>
-                <label class="block text-xs font-bold text-slate-700 mb-1">Nosaukums</label>
+                <label class="block text-xs font-bold text-slate-700 mb-1">{{ __('app.task_title') }}</label>
                 <input type="text" name="title" value="{{ $task->title }}" required
                        class="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 focus:border-amber-500 focus:bg-white rounded-xl text-slate-900 font-semibold text-sm">
             </div>
 
             <!-- Optional Description -->
             <div>
-                <label class="block text-xs font-bold text-slate-700 mb-1">Apraksts (Pēc izvēles)</label>
-                <textarea name="description" rows="3" placeholder="Pievieno papildu piezīmes, aprakstu vai detaļas..."
+                <label class="block text-xs font-bold text-slate-700 mb-1">{{ __('app.description') }} ({{ __('app.optional') }})</label>
+                <textarea name="description" rows="3" placeholder="{{ __('app.description_placeholder') }}"
                           class="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 focus:border-amber-500 focus:bg-white rounded-xl text-slate-900 text-xs resize-none">{{ $task->description }}</textarea>
             </div>
 
             <!-- Category -->
             <div>
-                <label class="block text-xs font-bold text-slate-700 mb-1.5">Kategorija</label>
+                <label class="block text-xs font-bold text-slate-700 mb-1.5">{{ __('app.category') }}</label>
                 <div class="grid grid-cols-3 gap-2 text-xs max-h-36 overflow-y-auto p-0.5">
                     @if(isset($categories) && count($categories) > 0)
                         @foreach($categories as $cat)
@@ -73,45 +73,45 @@
             <!-- Dynamic Links & YouTube Video Input (Infinitely addable) -->
             <div class="space-y-2">
                 <div class="flex items-center justify-between">
-                    <label class="block text-xs font-bold text-slate-700">Saites & YouTube video</label>
-                    <span class="text-[11px] text-slate-400">YouTube video tiks automātiski atskaņoti</span>
+                    <label class="block text-xs font-bold text-slate-700">{{ __('app.links_and_youtube') }}</label>
+                    <span class="text-[11px] text-slate-400">{{ __('app.links_hint') }}</span>
                 </div>
                 
                 <div class="space-y-2">
                     <template x-for="(link, index) in editLinks" :key="index">
                         <div class="flex items-center gap-2">
                             <span class="text-slate-400 text-xs">🔗</span>
-                            <input type="text" :name="'links[' + index + ']'" x-model="editLinks[index]" placeholder="https://youtube.com/watch?v=... vai tīmekļa saite"
+                            <input type="text" :name="'links[' + index + ']'" x-model="editLinks[index]" placeholder="{{ __('app.links_placeholder') }}"
                                    class="flex-1 px-3 py-2 bg-slate-50 border border-slate-300 focus:border-amber-500 focus:bg-white rounded-xl text-slate-900 text-xs">
-                            <button type="button" @click="editLinks.splice(index, 1)" class="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-rose-50 text-xs" title="Noņemt">✕</button>
+                            <button type="button" @click="editLinks.splice(index, 1)" class="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-rose-50 text-xs" title="{{ __('app.delete') }}">✕</button>
                         </div>
                     </template>
                 </div>
 
                 <button type="button" @click="editLinks.push('')"
                         class="text-xs font-bold text-amber-700 hover:text-amber-800 flex items-center gap-1 py-1">
-                    <span>➕</span> Pievienot vēl vienu saiti
+                    <span>➕</span> {{ __('app.add_another_link') }}
                 </button>
             </div>
 
             <!-- Scheduled Date (Optional) -->
             <div>
-                <label class="block text-xs font-bold text-slate-700 mb-1">Ieplānotais datums (Kalendārs)</label>
+                <label class="block text-xs font-bold text-slate-700 mb-1">{{ __('app.schedule_date') }}</label>
                 <input type="date" name="scheduled_date" value="{{ $task->scheduled_date ? $task->scheduled_date->toDateString() : '' }}"
                        class="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 focus:border-amber-500 focus:bg-white rounded-xl text-slate-900 text-xs">
-                <p class="text-[10px] text-slate-400 mt-1">Atstāj tukšu, ja vēlies saglabāt to uzdevumu krātuvē.</p>
+                <p class="text-[10px] text-slate-400 mt-1">{{ __('app.schedule_date_hint') }}</p>
             </div>
 
             <!-- Image Management -->
             <div>
-                <label class="block text-xs font-bold text-slate-700 mb-1">Attēls</label>
+                <label class="block text-xs font-bold text-slate-700 mb-1">{{ __('app.image') }}</label>
                 
                 @if($task->image_url)
                     <div x-show="!removeImage" class="relative rounded-2xl overflow-hidden bg-slate-100 border border-slate-200 mb-2 p-2 flex items-center justify-between gap-3">
-                        <img src="{{ $task->image_url }}" alt="Attēls" class="w-16 h-12 object-cover rounded-xl">
-                        <div class="flex-1 text-xs text-slate-500 truncate">Esošais attēls</div>
+                        <img src="{{ $task->image_url }}" alt="{{ __('app.image') }}" class="w-16 h-12 object-cover rounded-xl">
+                        <div class="flex-1 text-xs text-slate-500 truncate">{{ __('app.existing_image') }}</div>
                         <button type="button" @click="removeImage = true" class="px-2.5 py-1 bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-bold rounded-lg transition">
-                            🗑️ Noņemt
+                            🗑️ {{ __('app.remove_image') }}
                         </button>
                         <input type="hidden" name="remove_image" :value="removeImage ? 1 : 0">
                     </div>
@@ -120,7 +120,7 @@
                 <div class="flex items-center gap-3">
                     <label class="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-slate-50 border border-dashed border-slate-300 hover:border-amber-500 rounded-xl cursor-pointer text-xs font-semibold text-slate-600 hover:text-slate-900 transition">
                         <span>📷</span>
-                        <span x-text="newImagePreview ? 'Mainīt jauno attēlu' : 'Augšupielādēt jaunu attēlu'"></span>
+                        <span x-text="newImagePreview ? '{{ __('app.change_image') }}' : '{{ __('app.upload_new_image') }}'"></span>
                         <input type="file" name="image_file" accept="image/*" class="hidden"
                                @change="const file = $event.target.files[0]; if (file) { const reader = new FileReader(); reader.onload = (e) => { newImagePreview = e.target.result; removeImage = false; }; reader.readAsDataURL(file); }">
                     </label>
@@ -138,15 +138,15 @@
                 <button type="button"
                         @click="window.openMathDeleteConfirm('{{ addslashes($task->title) }}', '{{ route('ideas.destroy', $task->id) }}')"
                         class="px-3 py-2 text-rose-600 hover:bg-rose-50 rounded-xl text-xs font-bold transition flex items-center gap-1.5">
-                    <span>🗑️</span> Dzēst
+                    <span>🗑️</span> {{ __('app.delete') }}
                 </button>
 
                 <div class="flex items-center gap-2">
                     <button type="button" @click="document.getElementById('edit-modal-wrapper')?.remove()" class="px-4 py-2 text-xs font-bold text-slate-500 hover:text-slate-800">
-                        Atcelt
+                        {{ __('app.cancel') }}
                     </button>
                     <button type="submit" class="px-6 py-2.5 bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 text-slate-950 font-bold text-xs rounded-xl shadow-md shadow-amber-500/20 active:scale-95 transition">
-                        Saglabāt Izmaiņas 💾
+                        {{ __('app.save_changes') }} 💾
                     </button>
                 </div>
             </div>

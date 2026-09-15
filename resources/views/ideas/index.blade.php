@@ -8,13 +8,13 @@
         <button @click="mobileTab = 'ideas'"
                 class="flex-1 py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5"
                 :class="mobileTab === 'ideas' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600 hover:text-slate-900'">
-            <span>💡 Uzdevumu Krātuve</span>
+            <span>💡 {{ __('app.task_backlog') }}</span>
             <span class="px-1.5 py-0.5 rounded-full text-[10px]" :class="mobileTab === 'ideas' ? 'bg-amber-100 text-amber-900 font-extrabold' : 'bg-slate-300 text-slate-700'">{{ $backlogIdeas->count() }}</span>
         </button>
         <button @click="mobileTab = 'weekend'"
                 class="flex-1 py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5"
                 :class="mobileTab === 'weekend' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600 hover:text-slate-900'">
-            <span>📅 Dienu Plāns</span>
+            <span>📅 {{ __('app.daily_plan') }}</span>
             <span class="px-1.5 py-0.5 rounded-full text-[10px]" :class="mobileTab === 'weekend' ? 'bg-amber-100 text-amber-900 font-extrabold' : 'bg-slate-300 text-slate-700'">{{ $weekendTasksCount }}</span>
         </button>
     </div>
@@ -31,17 +31,17 @@
                 <div>
                     <h2 class="text-xl font-extrabold text-slate-900 flex items-center gap-2">
                         <span>💡</span>
-                        <span>Uzdevumu Krātuve</span>
+                        <span>{{ __('app.task_backlog') }}</span>
                         <span class="text-xs font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-300">
                             {{ $backlogIdeas->count() }}
                         </span>
                     </h2>
-                    <p class="text-xs text-slate-500">Ienākošie uzdevumi, iniciatīvas un plāni</p>
+                    <p class="text-xs text-slate-500">{{ __('app.task_backlog_subtitle') }}</p>
                 </div>
                 
                 <button @click="showAddModal = true"
                         class="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs shadow-sm shadow-amber-500/20 transition">
-                    <span>➕</span> Pievienot
+                    <span>➕</span> {{ __('app.add') }}
                 </button>
             </div>
 
@@ -51,7 +51,7 @@
                    hx-get="{{ route('ideas.index', ['category' => 'all']) }}"
                    hx-target="#backlog-container"
                    class="px-2.5 py-1 rounded-xl whitespace-nowrap transition {{ !$categoryFilter || $categoryFilter === 'all' ? 'bg-slate-900 text-white font-bold' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-100 hover:text-slate-900' }}">
-                    Visi
+                    {{ __('app.all') }}
                 </a>
                 @foreach($categories as $cat)
                     <a href="{{ route('ideas.index', ['category' => $cat->slug]) }}"
@@ -67,8 +67,8 @@
                 <button @click="showCategoryModal = true"
                         type="button"
                         class="px-2.5 py-1 rounded-xl whitespace-nowrap transition flex items-center gap-1 bg-slate-100 hover:bg-amber-100 border border-slate-200 hover:border-amber-300 text-slate-600 hover:text-amber-900 font-bold"
-                        title="Izveidot jaunu kategoriju">
-                    <span>➕</span> Jauna
+                        title="{{ __('app.create_new_category') }}">
+                    <span>➕</span> {{ __('app.new') }}
                 </button>
 
                 <!-- Manage All Categories & Workspace Button -->
@@ -77,8 +77,8 @@
                         hx-swap="innerHTML"
                         type="button"
                         class="px-2.5 py-1 rounded-xl whitespace-nowrap transition flex items-center gap-1 bg-slate-100 hover:bg-amber-100 border border-slate-200 hover:border-amber-300 text-slate-600 hover:text-amber-900 font-bold"
-                        title="Pārvaldīt un labot kategorijas">
-                    <span>⚙️</span> Pārvaldīt
+                        title="{{ __('app.workspace_and_categories') }}">
+                    <span>⚙️</span> {{ __('app.manage') }}
                 </button>
             </div>
 
@@ -97,14 +97,14 @@
                 <div>
                     <h2 class="text-xl font-extrabold text-slate-900 flex items-center gap-2">
                         <span>📅</span>
-                        <span>Dienu Plāns</span>
+                        <span>{{ __('app.daily_plan') }}</span>
                     </h2>
-                    <p class="text-xs text-slate-500">Ieplānotie uzdevumi konkrētajām dienām</p>
+                    <p class="text-xs text-slate-500">{{ __('app.daily_plan_subtitle') }}</p>
                 </div>
 
                 <!-- Progress Pill -->
                 <div class="flex items-center gap-2 px-3 py-1 rounded-xl bg-white border border-slate-200 shadow-sm text-xs">
-                    <span class="text-slate-500">Paveikts:</span>
+                    <span class="text-slate-500">{{ __('app.completed') }}:</span>
                     <span class="font-bold text-amber-600">{{ $weekendCompletedCount }} / {{ $weekendTasksCount }}</span>
                 </div>
             </div>

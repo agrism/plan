@@ -1,15 +1,15 @@
 <!DOCTYPE html>
-<html lang="lv" class="h-full bg-slate-50 text-slate-800">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="h-full bg-slate-50 text-slate-800">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="theme-color" content="#ffffff">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="Plānotājs">
+    <meta name="apple-mobile-web-app-title" content="{{ config('app.name', 'Plan') }}">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'Plānotājs') }}</title>
+    <title>{{ config('app.name', 'Plan') }}</title>
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -65,7 +65,7 @@
                 <div class="relative" x-data="{ open: false }">
                     <button @click="open = !open" type="button" class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200/80 border border-slate-200 transition text-sm font-bold text-slate-800">
                         <span class="text-base">💼</span>
-                        <span class="truncate max-w-[140px] sm:max-w-[200px] text-amber-700">{{ $tenant->name ?? 'Darbavieta' }}</span>
+                        <span class="truncate max-w-[140px] sm:max-w-[200px] text-amber-700">{{ $tenant->name ?? __('app.workspace') }}</span>
                         <svg class="w-4 h-4 text-slate-500 transition" :class="{'rotate-180': open}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                         </svg>
@@ -74,7 +74,7 @@
                     <!-- Dropdown Menu -->
                     <div x-show="open" @click.outside="open = false" x-cloak
                          class="absolute left-0 mt-2 w-72 bg-white border border-slate-200 rounded-2xl shadow-xl p-2 z-50">
-                        <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400 px-3 py-1.5">Tavas Darbavietas</div>
+                        <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400 px-3 py-1.5">{{ __('app.your_workspaces') }}</div>
                         @if(auth()->check())
                             @foreach(auth()->user()->tenants as $t)
                                 <form action="{{ route('tenants.switch', $t->id) }}" method="POST">
@@ -82,7 +82,7 @@
                                     <button type="submit" class="w-full text-left flex items-center justify-between px-3 py-2 rounded-xl text-sm transition {{ $tenant->id === $t->id ? 'bg-amber-50 text-amber-900 font-bold border border-amber-200' : 'text-slate-700 hover:bg-slate-100' }}">
                                         <span class="truncate">{{ $t->name }}</span>
                                         @if($tenant->id === $t->id)
-                                            <span class="text-amber-600 text-xs">✓ Aktīva</span>
+                                            <span class="text-amber-600 text-xs">✓ {{ __('app.active') }}</span>
                                         @endif
                                     </button>
                                 </form>
@@ -95,10 +95,10 @@
                                 @click="open = false"
                                 type="button"
                                 class="w-full text-left flex items-center gap-2 px-3 py-2 text-xs font-bold text-slate-700 hover:bg-amber-50 hover:text-amber-900 rounded-xl transition">
-                            <span>⚙️</span> Pārvaldīt kategorijas & darbavietu
+                            <span>⚙️</span> {{ __('app.workspace_and_categories') }}
                         </button>
                         <button @click="open = false; showTenantModal = true" class="w-full text-left flex items-center gap-2 px-3 py-2 text-xs font-bold text-amber-600 hover:bg-amber-50 rounded-xl transition">
-                            <span>➕</span> Izveidot jaunu darbavietu
+                            <span>➕</span> {{ __('app.create_workspace') }}
                         </button>
                     </div>
                 </div>
@@ -108,20 +108,20 @@
                         hx-target="#settings-modal-slot"
                         hx-swap="innerHTML"
                         type="button"
-                        title="Darbavietas un kategoriju iestatījumi"
+                        title="{{ __('app.workspace_and_categories') }}"
                         class="p-2 rounded-xl bg-slate-100 hover:bg-amber-100 hover:text-amber-900 text-slate-600 border border-slate-200 transition text-xs font-bold flex items-center gap-1.5">
                     <span>⚙️</span>
-                    <span class="hidden lg:inline">Iestatījumi</span>
+                    <span class="hidden lg:inline">{{ __('app.settings') }}</span>
                 </button>
             </div>
 
             <!-- Center: Team Member Avatars & Quick Switcher -->
             <div class="hidden sm:flex items-center gap-1.5 bg-slate-100 p-1.5 rounded-2xl border border-slate-200">
-                <span class="text-xs text-slate-500 font-medium pl-2 pr-1">Komanda:</span>
+                <span class="text-xs text-slate-500 font-medium pl-2 pr-1">{{ __('app.team') }}:</span>
                 @if(isset($tenant))
                     @foreach($tenant->users as $member)
                         <a href="{{ route('login.quick', $member->id) }}"
-                           title="Pārslēgties uz {{ $member->name }}"
+                           title="{{ __('app.switch_user') }}: {{ $member->name }}"
                            class="flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-medium transition {{ auth()->id() === $member->id ? 'bg-amber-500 text-slate-950 font-bold shadow-sm' : 'text-slate-700 hover:bg-slate-200' }}">
                             <span>{{ $member->avatar ?? '👤' }}</span>
                             <span>{{ explode(' ', $member->name)[0] }}</span>
@@ -130,15 +130,33 @@
                 @endif
             </div>
 
-            <!-- Right: Current User & Logout -->
-            <div class="flex items-center gap-3">
+            <!-- Right: Language Switcher, User & Logout -->
+            <div class="flex items-center gap-2.5 sm:gap-3">
+                
+                <!-- Language Switcher (LV / EN) -->
+                <div class="flex items-center bg-slate-100 p-0.5 rounded-xl border border-slate-200 text-xs font-bold">
+                    <a href="{{ route('locale.switch', 'lv') }}"
+                       title="Latviešu valoda"
+                       class="px-2 py-1 rounded-lg transition flex items-center gap-1 {{ app()->getLocale() === 'lv' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-800' }}">
+                        <span>🇱🇻</span>
+                        <span class="text-[11px]">LV</span>
+                    </a>
+                    <a href="{{ route('locale.switch', 'en') }}"
+                       title="English"
+                       class="px-2 py-1 rounded-lg transition flex items-center gap-1 {{ app()->getLocale() === 'en' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-800' }}">
+                        <span>🇬🇧</span>
+                        <span class="text-[11px]">EN</span>
+                    </a>
+                </div>
+
                 <div class="flex items-center gap-2 text-right">
                     <span class="text-xl">{{ auth()->user()->avatar ?? '👤' }}</span>
                     <span class="hidden md:inline text-xs font-bold text-slate-800">{{ auth()->user()->name }}</span>
                 </div>
+                
                 <form action="{{ route('logout') }}" method="POST">
                     @csrf
-                    <button type="submit" title="Iziet" class="p-2 rounded-xl bg-slate-100 hover:bg-rose-50 hover:text-rose-600 text-slate-500 border border-slate-200 transition text-xs">
+                    <button type="submit" title="{{ __('app.logout') }}" class="p-2 rounded-xl bg-slate-100 hover:bg-rose-50 hover:text-rose-600 text-slate-500 border border-slate-200 transition text-xs">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
                     </button>
                 </form>
@@ -158,7 +176,7 @@
                 class="flex flex-col items-center gap-1 py-1 px-3 rounded-xl tap-highlight-transparent transition"
                 :class="mobileTab === 'ideas' ? 'text-amber-600 font-bold' : 'text-slate-500 hover:text-slate-800'">
             <span class="text-xl">💡</span>
-            <span class="text-[10px]">Uzdevumi</span>
+            <span class="text-[10px]">{{ __('app.task_backlog') }}</span>
         </button>
 
         <!-- Tab 2: Plan -->
@@ -166,7 +184,7 @@
                 class="flex flex-col items-center gap-1 py-1 px-3 rounded-xl tap-highlight-transparent transition"
                 :class="mobileTab === 'weekend' ? 'text-amber-600 font-bold' : 'text-slate-500 hover:text-slate-800'">
             <span class="text-xl">📅</span>
-            <span class="text-[10px]">Plāns</span>
+            <span class="text-[10px]">{{ __('app.daily_plan') }}</span>
         </button>
 
         <!-- Big Central Add Button -->
@@ -185,8 +203,8 @@
 
             <!-- Member Switcher Popup -->
             <div x-show="memberMenu" @click.outside="memberMenu = false" x-cloak
-                 class="absolute bottom-14 right-0 w-48 bg-white border border-slate-200 rounded-2xl shadow-xl p-2 z-50">
-                <div class="text-[10px] font-bold uppercase text-slate-400 px-2 py-1">Pārslēgt lietotāju:</div>
+                 class="absolute bottom-14 right-0 w-52 bg-white border border-slate-200 rounded-2xl shadow-xl p-2 z-50 space-y-1">
+                <div class="text-[10px] font-bold uppercase text-slate-400 px-2 py-1">{{ __('app.switch_user') }}:</div>
                 @if(isset($tenant))
                     @foreach($tenant->users as $member)
                         <a href="{{ route('login.quick', $member->id) }}" class="flex items-center gap-2 px-2.5 py-1.5 text-xs rounded-xl text-slate-700 hover:bg-slate-100 transition {{ auth()->id() === $member->id ? 'bg-amber-50 text-amber-800 font-bold' : '' }}">
@@ -214,7 +232,7 @@
             <div class="flex items-center justify-between mb-4">
                 <div class="flex items-center gap-2">
                     <span class="text-2xl">✨</span>
-                    <h3 class="text-lg font-bold text-slate-900">Pievienot jaunu uzdevumu</h3>
+                    <h3 class="text-lg font-bold text-slate-900">{{ __('app.add_new_task') }}</h3>
                 </div>
                 <button @click="showAddModal = false" class="p-1.5 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-100">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
@@ -232,23 +250,23 @@
                 @csrf
 
                 <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">Uzdevuma nosaukums</label>
-                    <input type="text" name="title" required autofocus placeholder="Piem., Sagatavot atskaiti, Servera atjauninājumi..."
+                    <label class="block text-xs font-bold text-slate-700 mb-1">{{ __('app.task_title') }}</label>
+                    <input type="text" name="title" required autofocus placeholder="{{ __('app.task_title_placeholder') }}"
                            class="w-full px-4 py-3 bg-slate-50 border border-slate-300 focus:border-amber-500 focus:bg-white focus:ring-1 focus:ring-amber-500 rounded-xl text-slate-900 placeholder-slate-400 text-sm">
                 </div>
 
                 <!-- Optional Description -->
                 <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">Apraksts (Pēc izvēles)</label>
-                    <textarea name="description" rows="2" placeholder="Pievieno papildu piezīmes vai aprakstu..."
+                    <label class="block text-xs font-bold text-slate-700 mb-1">{{ __('app.description') }} ({{ __('app.optional') }})</label>
+                    <textarea name="description" rows="2" placeholder="{{ __('app.description_placeholder') }}"
                               class="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 focus:border-amber-500 focus:bg-white rounded-xl text-slate-900 text-xs resize-none"></textarea>
                 </div>
 
                 <div>
                     <div class="flex items-center justify-between mb-1.5">
-                        <label class="block text-xs font-bold text-slate-700">Kategorija</label>
+                        <label class="block text-xs font-bold text-slate-700">{{ __('app.category') }}</label>
                         <button type="button" @click="showCategoryModal = true" class="text-[11px] font-bold text-amber-700 hover:text-amber-800 flex items-center gap-1">
-                            <span>➕</span> Jauna kategorija
+                            <span>➕</span> {{ __('app.new_category') }}
                         </button>
                     </div>
                     <div class="grid grid-cols-3 gap-2 text-xs max-h-36 overflow-y-auto p-0.5">
@@ -264,50 +282,50 @@
                             <label class="flex items-center gap-1.5 p-2 rounded-xl bg-slate-50 border border-slate-200 cursor-pointer hover:border-amber-400 has-[:checked]:border-amber-500 has-[:checked]:bg-amber-50 has-[:checked]:text-amber-950 font-semibold truncate transition">
                                 <input type="radio" name="category" value="citi" checked class="hidden">
                                 <span class="text-sm flex-shrink-0">✨</span>
-                                <span class="truncate">Citi</span>
+                                <span class="truncate">{{ __('app.all') }}</span>
                             </label>
                         @endif
                     </div>
                 </div>
 
-                <!-- Dynamic Links & YouTube Video Input (Infinitely addable) -->
+                <!-- Dynamic Links & YouTube Video Input -->
                 <div class="space-y-2">
                     <div class="flex items-center justify-between">
-                        <label class="block text-xs font-bold text-slate-700">Saites & YouTube video</label>
-                        <span class="text-[11px] text-slate-400">YouTube video tiks atskaņoti embed veidā</span>
+                        <label class="block text-xs font-bold text-slate-700">{{ __('app.links_and_youtube') }}</label>
+                        <span class="text-[11px] text-slate-400">{{ __('app.links_hint') }}</span>
                     </div>
                     
                     <div class="space-y-2">
                         <template x-for="(link, index) in formLinks" :key="index">
                             <div class="flex items-center gap-2">
                                 <span class="text-slate-400 text-xs">🔗</span>
-                                <input type="text" :name="'links[' + index + ']'" x-model="formLinks[index]" placeholder="https://youtube.com/watch?v=... vai saite"
+                                <input type="text" :name="'links[' + index + ']'" x-model="formLinks[index]" placeholder="{{ __('app.links_placeholder') }}"
                                        class="flex-1 px-3 py-2 bg-slate-50 border border-slate-300 focus:border-amber-500 focus:bg-white rounded-xl text-slate-900 text-xs">
-                                <button type="button" @click="formLinks.splice(index, 1)" class="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-rose-50 text-xs" title="Noņemt">✕</button>
+                                <button type="button" @click="formLinks.splice(index, 1)" class="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-rose-50 text-xs" title="{{ __('app.remove_image') }}">✕</button>
                             </div>
                         </template>
                     </div>
 
                     <button type="button" @click="formLinks.push('')"
                             class="text-xs font-bold text-amber-700 hover:text-amber-800 flex items-center gap-1 py-0.5">
-                        <span>➕</span> Pievienot vēl vienu saiti
+                        <span>➕</span> {{ __('app.add_another_link') }}
                     </button>
                 </div>
 
                 <!-- Optional Date -->
                 <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">Ieplānot konkrētam datumam (Pēc izvēles)</label>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">{{ __('app.schedule_date_optional') }}</label>
                     <input type="date" name="scheduled_date"
                            class="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 focus:border-amber-500 focus:bg-white rounded-xl text-slate-900 text-xs">
                 </div>
 
                 <!-- Optional Image Upload -->
                 <div x-data="{ imagePreview: null }">
-                    <label class="block text-xs font-bold text-slate-700 mb-1">Pievienot attēlu</label>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">{{ __('app.add_image') }}</label>
                     <div class="flex items-center gap-3">
                         <label class="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-slate-50 border border-dashed border-slate-300 hover:border-amber-500 rounded-xl cursor-pointer text-xs font-semibold text-slate-600 hover:text-slate-900 transition">
                             <span>📷</span>
-                            <span x-text="imagePreview ? 'Mainīt attēlu' : 'Izvēlēties no ierīces vai nofotografēt'"></span>
+                            <span x-text="imagePreview ? '{{ __('app.change_image') }}' : '{{ __('app.upload_image') }}'"></span>
                             <input type="file" name="image_file" accept="image/*" class="hidden"
                                    @change="const file = $event.target.files[0]; if (file) { const reader = new FileReader(); reader.onload = (e) => { imagePreview = e.target.result; }; reader.readAsDataURL(file); }">
                         </label>
@@ -323,7 +341,7 @@
 
                 <div class="pt-2">
                     <button type="submit" class="w-full py-3.5 bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 text-slate-950 font-bold text-sm rounded-xl shadow-md shadow-amber-500/20 active:scale-[0.98] transition">
-                        Pievienot Uzdevumu Krātuvei 💡
+                        {{ __('app.add_to_backlog_btn') }} 💡
                     </button>
                 </div>
             </form>
@@ -333,17 +351,17 @@
     <!-- Create Workspace Modal -->
     <div x-show="showTenantModal" x-cloak class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm">
         <div @click.outside="showTenantModal = false" class="w-full max-w-md bg-white border border-slate-200 rounded-3xl p-6 shadow-2xl">
-            <h3 class="text-lg font-bold text-slate-900 mb-4">Izveidot jaunu darbavietu</h3>
+            <h3 class="text-lg font-bold text-slate-900 mb-4">{{ __('app.create_workspace') }}</h3>
             <form action="{{ route('tenants.store') }}" method="POST" class="space-y-4">
                 @csrf
                 <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">Nosaukums</label>
-                    <input type="text" name="name" required placeholder="Piem., Mārketinga Komanda 🚀"
+                    <label class="block text-xs font-bold text-slate-700 mb-1">{{ __('app.workspace_name') }}</label>
+                    <input type="text" name="name" required placeholder="Piem., Marketing Team 🚀"
                            class="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 text-sm focus:border-amber-500">
                 </div>
                 <div class="flex gap-2 justify-end">
-                    <button type="button" @click="showTenantModal = false" class="px-4 py-2 text-xs font-semibold text-slate-500 hover:text-slate-800">Atcelt</button>
-                    <button type="submit" class="px-4 py-2 text-xs font-bold bg-amber-500 text-slate-950 rounded-xl hover:bg-amber-400">Izveidot</button>
+                    <button type="button" @click="showTenantModal = false" class="px-4 py-2 text-xs font-semibold text-slate-500 hover:text-slate-800">{{ __('app.cancel') }}</button>
+                    <button type="submit" class="px-4 py-2 text-xs font-bold bg-amber-500 text-slate-950 rounded-xl hover:bg-amber-400">{{ __('app.create') }}</button>
                 </div>
             </form>
         </div>
@@ -356,7 +374,7 @@
             <div class="flex items-center justify-between pb-2 border-b border-slate-100">
                 <div class="flex items-center gap-2">
                     <span class="text-2xl" x-text="selectedEmoji"></span>
-                    <h3 class="text-lg font-bold text-slate-900">Izveidot jaunu kategoriju</h3>
+                    <h3 class="text-lg font-bold text-slate-900">{{ __('app.create_new_category') }}</h3>
                 </div>
                 <button type="button" @click="showCategoryModal = false" class="p-1.5 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-100">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
@@ -371,13 +389,13 @@
                 @csrf
                 
                 <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">Kategorijas nosaukums</label>
-                    <input type="text" name="name" required placeholder="Piem., Mārketings, Loģistika, Finanses..."
+                    <label class="block text-xs font-bold text-slate-700 mb-1">{{ __('app.category_name') }}</label>
+                    <input type="text" name="name" required placeholder="{{ __('app.category_name_placeholder') }}"
                            class="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 text-sm focus:border-amber-500 font-semibold">
                 </div>
 
                 <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1.5">Ikona (Emoji)</label>
+                    <label class="block text-xs font-bold text-slate-700 mb-1.5">{{ __('app.icon_emoji') }}</label>
                     <input type="hidden" name="emoji" :value="selectedEmoji">
                     <div class="flex flex-wrap gap-2 text-base p-2 bg-slate-50 border border-slate-200 rounded-2xl max-h-28 overflow-y-auto">
                         <template x-for="em in ['💼', '⚡', '🚀', '👥', '📋', '🎯', '🎨', '📊', '🛠️', '💡', '💰', '🔒', '📦', '🏷️', '📢', '💻', '🍕', '✨', '📝', '🛒', '🔧', '📈', '🤝', '⚙️']">
@@ -391,7 +409,7 @@
                 </div>
 
                 <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1.5">Krāsa</label>
+                    <label class="block text-xs font-bold text-slate-700 mb-1.5">{{ __('app.color') }}</label>
                     <input type="hidden" name="color" :value="selectedColor">
                     <div class="flex flex-wrap gap-2.5 p-2 bg-slate-50 border border-slate-200 rounded-2xl">
                         <template x-for="c in [
@@ -414,8 +432,8 @@
                 </div>
 
                 <div class="flex gap-2 justify-end pt-2 border-t border-slate-100">
-                    <button type="button" @click="showCategoryModal = false" class="px-4 py-2 text-xs font-semibold text-slate-500 hover:text-slate-800">Atcelt</button>
-                    <button type="submit" class="px-5 py-2 text-xs font-bold bg-amber-500 text-slate-950 rounded-xl hover:bg-amber-400 shadow-sm active:scale-95 transition">Izveidot kategoriju ✨</button>
+                    <button type="button" @click="showCategoryModal = false" class="px-4 py-2 text-xs font-semibold text-slate-500 hover:text-slate-800">{{ __('app.cancel') }}</button>
+                    <button type="submit" class="px-5 py-2 text-xs font-bold bg-amber-500 text-slate-950 rounded-xl hover:bg-amber-400 shadow-sm active:scale-95 transition">{{ __('app.add_category_btn') }}</button>
                 </div>
             </form>
         </div>
@@ -446,7 +464,7 @@
         },
         init() {
             window.addEventListener('open-math-delete-confirm', (e) => {
-                this.itemTitle = e.detail?.title || 'šo uzdevumu';
+                this.itemTitle = e.detail?.title || '{{ __('app.task_title') }}';
                 this.actionUrl = e.detail?.actionUrl || '';
                 this.generateMath();
                 this.showModal = true;
@@ -490,9 +508,9 @@
                         🗑️
                     </div>
                     <div class="flex-1">
-                        <h3 class="text-base font-extrabold text-slate-900">Dzēšanas apstiprinājums</h3>
+                        <h3 class="text-base font-extrabold text-slate-900">{{ __('app.delete_confirmation') }}</h3>
                         <p class="text-xs text-slate-500 mt-0.5">
-                            Vai tiešām vēlies neatgriezeniski dzēst uzdevumu <span class="font-bold text-slate-800" x-text="'«' + itemTitle + '»'"></span>?
+                            {{ __('app.delete_confirm_text', ['title' => '']) }} <span class="font-bold text-slate-800" x-text="'«' + itemTitle + '»'"></span>?
                         </p>
                     </div>
                 </div>
@@ -502,15 +520,15 @@
                     <div class="flex items-center justify-between">
                         <label class="text-xs font-bold text-amber-950 flex items-center gap-1.5">
                             <span>🧮</span>
-                            <span>Drošības aprēķins:</span>
+                            <span>{{ __('app.security_math_calc') }}</span>
                         </label>
                         <button type="button" @click="generateMath(); $nextTick(() => $refs.mathInput?.focus())" class="text-[11px] font-semibold text-amber-700 hover:text-amber-900 hover:underline flex items-center gap-1">
-                            <span>🔄</span> Cits piemērs
+                            <span>🔄</span> {{ __('app.another_example') }}
                         </button>
                     </div>
                     
                     <p class="text-[11px] text-amber-800">
-                        Lai novērstu nejaušu dzēšanu, lūdzu, ievadi viena cipara rezultātu:
+                        {{ __('app.math_hint') }}
                     </p>
 
                     <form @submit.prevent="submitDelete()">
@@ -542,14 +560,14 @@
                                 <template x-if="isCorrect">
                                     <span class="inline-flex items-center gap-1 text-emerald-600 font-bold">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
-                                        Pareizi!
+                                        {{ __('app.correct') }}
                                     </span>
                                 </template>
                                 <template x-if="userAnswer !== '' && !isCorrect">
-                                    <span class="text-[11px] font-semibold text-rose-600 leading-tight block">Nepareizs cipars</span>
+                                    <span class="text-[11px] font-semibold text-rose-600 leading-tight block">{{ __('app.incorrect_digit') }}</span>
                                 </template>
                                 <template x-if="userAnswer === ''">
-                                    <span class="text-[11px] text-amber-700/80 leading-tight block">Ievadi 1 ciparu</span>
+                                    <span class="text-[11px] text-amber-700/80 leading-tight block">{{ __('app.enter_1_digit') }}</span>
                                 </template>
                             </div>
                         </div>
@@ -560,7 +578,7 @@
                 <div class="flex items-center justify-end gap-2.5 pt-1">
                     <button type="button" @click="showModal = false"
                             class="px-4 py-2.5 text-xs font-bold text-slate-600 hover:text-slate-800 hover:bg-slate-100 rounded-xl transition">
-                        Atcelt
+                        {{ __('app.cancel') }}
                     </button>
                     
                     <button type="button"
@@ -569,7 +587,7 @@
                             class="px-5 py-2.5 rounded-xl font-bold text-xs shadow-sm transition flex items-center gap-1.5"
                             :class="isCorrect ? 'bg-rose-600 hover:bg-rose-700 text-white shadow-rose-500/30 cursor-pointer active:scale-95' : 'bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed'">
                         <span>🗑️</span>
-                        <span>Dzēst uzdevumu</span>
+                        <span>{{ __('app.delete_task_btn') }}</span>
                     </button>
                 </div>
 
@@ -588,12 +606,18 @@
             let initD = initialDate ? new Date(initialDate) : new Date();
             if (isNaN(initD.getTime())) initD = new Date();
             
+            const isLv = '{{ app()->getLocale() }}' === 'lv';
+            
             return {
                 currentMonth: initD.getMonth(),
                 currentYear: initD.getFullYear(),
                 selectedDate: initialDate,
-                monthNames: ['Janvāris', 'Februāris', 'Marts', 'Aprīlis', 'Maijs', 'Jūnijs', 'Jūlijs', 'Augusts', 'Septembris', 'Oktobris', 'Novembris', 'Decembris'],
-                dayNames: ['P', 'O', 'T', 'C', 'Pk', 'S', 'Sv'],
+                monthNames: isLv 
+                    ? ['Janvāris', 'Februāris', 'Marts', 'Aprīlis', 'Maijs', 'Jūnijs', 'Jūlijs', 'Augusts', 'Septembris', 'Oktobris', 'Novembris', 'Decembris']
+                    : ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+                dayNames: isLv
+                    ? ['P', 'O', 'T', 'C', 'Pk', 'S', 'Sv']
+                    : ['M', 'Tu', 'W', 'Th', 'F', 'Sa', 'Su'],
                 
                 get monthYearString() {
                     return this.monthNames[this.currentMonth] + ' ' + this.currentYear;

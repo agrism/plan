@@ -17,7 +17,7 @@
                     ⚙️
                 </div>
                 <div>
-                    <h3 class="text-lg font-extrabold text-slate-900">Darbavietas un Kategoriju Pārvaldība</h3>
+                    <h3 class="text-lg font-extrabold text-slate-900">{{ __('app.workspace_and_categories') }}</h3>
                     <p class="text-xs text-slate-500 font-medium">{{ $tenant->name }}</p>
                 </div>
             </div>
@@ -32,14 +32,14 @@
                     @click="activeTab = 'categories'"
                     class="flex-1 py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5"
                     :class="activeTab === 'categories' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600 hover:text-slate-900'">
-                <span>🏷️ Kategoriju Pārvaldība</span>
+                <span>🏷️ {{ __('app.categories_management') }}</span>
                 <span class="px-1.5 py-0.5 rounded-full text-[10px] bg-amber-100 text-amber-900 font-extrabold">{{ $categories->count() }}</span>
             </button>
             <button type="button"
                     @click="activeTab = 'workspace'"
                     class="flex-1 py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5"
                     :class="activeTab === 'workspace' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600 hover:text-slate-900'">
-                <span>🏢 Darbavietas Iestatījumi</span>
+                <span>🏢 {{ __('app.workspace_settings') }}</span>
             </button>
         </div>
 
@@ -49,8 +49,8 @@
             <!-- Existing Categories List -->
             <div class="space-y-2.5">
                 <div class="flex items-center justify-between">
-                    <h4 class="text-xs font-extrabold uppercase text-slate-400 tracking-wider">Esošās Kategorijas</h4>
-                    <span class="text-[11px] text-slate-500 font-medium">Kopā: {{ $categories->count() }}</span>
+                    <h4 class="text-xs font-extrabold uppercase text-slate-400 tracking-wider">{{ __('app.existing_categories') }}</h4>
+                    <span class="text-[11px] text-slate-500 font-medium">{{ __('app.total_count', ['count' => $categories->count()]) }}</span>
                 </div>
 
                 <div class="divide-y divide-slate-100 border border-slate-200 rounded-2xl overflow-hidden bg-slate-50/50">
@@ -68,7 +68,7 @@
                                         </span>
                                     </div>
                                     <p class="text-[10px] text-slate-400 font-medium">
-                                        {{ $cat->tasks_count }} {{ $cat->tasks_count === 1 ? 'piesaistīts uzdevums' : 'piesaistīti uzdevumi' }}
+                                        {{ $cat->tasks_count === 1 ? __('app.assigned_tasks_single', ['count' => $cat->tasks_count]) : __('app.assigned_tasks', ['count' => $cat->tasks_count]) }}
                                     </p>
                                 </div>
                             </div>
@@ -79,24 +79,24 @@
                                         hx-target="#category-edit-slot"
                                         hx-swap="innerHTML"
                                         type="button"
-                                        title="Labot kategoriju"
+                                        title="{{ __('app.edit_category') }}"
                                         class="px-2.5 py-1.5 rounded-xl bg-slate-100 hover:bg-amber-100 hover:text-amber-900 text-slate-700 text-xs font-semibold transition flex items-center gap-1">
                                     <span>✏️</span>
-                                    <span class="hidden sm:inline">Labot</span>
+                                    <span class="hidden sm:inline">{{ __('app.edit') }}</span>
                                 </button>
 
                                 <!-- Delete Category with Single Digit Math Confirmation -->
                                 <button type="button"
-                                        @click="window.openMathDeleteConfirm('Kategorija: {{ addslashes($cat->name) }}', '{{ route('categories.destroy', $cat->id) }}')"
-                                        title="Dzēst kategoriju"
+                                        @click="window.openMathDeleteConfirm('{{ __('app.category_prefix', ['name' => addslashes($cat->name)]) }}', '{{ route('categories.destroy', $cat->id) }}')"
+                                        title="{{ __('app.delete') }}"
                                         class="px-2.5 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-semibold transition flex items-center gap-1">
                                     <span>🗑️</span>
-                                    <span class="hidden sm:inline">Dzēst</span>
+                                    <span class="hidden sm:inline">{{ __('app.delete') }}</span>
                                 </button>
                             </div>
                         </div>
                     @empty
-                        <div class="p-6 text-center text-xs text-slate-400 italic">Nav definētu kategoriju.</div>
+                        <div class="p-6 text-center text-xs text-slate-400 italic">{{ __('app.no_categories') }}</div>
                     @endforelse
                 </div>
             </div>
@@ -105,7 +105,7 @@
             <div class="p-4 rounded-2xl bg-amber-50/50 border border-amber-200/80 space-y-3">
                 <div class="flex items-center gap-2">
                     <span class="text-lg">➕</span>
-                    <h4 class="text-xs font-extrabold text-slate-900">Izveidot jaunu kategoriju</h4>
+                    <h4 class="text-xs font-extrabold text-slate-900">{{ __('app.create_new_category') }}</h4>
                 </div>
 
                 <form action="{{ route('categories.store') }}" method="POST"
@@ -116,13 +116,13 @@
                     @csrf
 
                     <div>
-                        <label class="block text-xs font-bold text-slate-700 mb-1">Nosaukums</label>
-                        <input type="text" name="name" required placeholder="Piem., Finanses, Pārdošana, Dizains..."
+                        <label class="block text-xs font-bold text-slate-700 mb-1">{{ __('app.category_name') }}</label>
+                        <input type="text" name="name" required placeholder="{{ __('app.category_name_placeholder') }}"
                                class="w-full px-3.5 py-2 bg-white border border-slate-300 focus:border-amber-500 rounded-xl text-slate-900 text-xs font-semibold">
                     </div>
 
                     <div>
-                        <label class="block text-xs font-bold text-slate-700 mb-1">Ikona (Emoji)</label>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">{{ __('app.icon_emoji') }}</label>
                         <input type="hidden" name="emoji" :value="newEmoji">
                         <div class="flex flex-wrap gap-1.5 p-2 bg-white border border-slate-200 rounded-xl max-h-24 overflow-y-auto">
                             <template x-for="em in ['💼', '⚡', '🚀', '👥', '📋', '🎯', '🎨', '📊', '🛠️', '💡', '💰', '🔒', '📦', '🏷️', '📢', '💻', '🍕', '✨', '📝', '🛒', '🔧', '📈', '🤝', '⚙️', '📂', '🧪', '📱', '🏆', '🔔']">
@@ -136,7 +136,7 @@
                     </div>
 
                     <div>
-                        <label class="block text-xs font-bold text-slate-700 mb-1">Krāsa</label>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">{{ __('app.color') }}</label>
                         <input type="hidden" name="color" :value="newColor">
                         <div class="flex flex-wrap gap-2 p-2 bg-white border border-slate-200 rounded-xl">
                             <template x-for="c in [
@@ -160,7 +160,7 @@
 
                     <div class="pt-1">
                         <button type="submit" class="w-full py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs rounded-xl shadow-sm active:scale-95 transition">
-                            Pievienot kategoriju ✨
+                            {{ __('app.add_category_btn') }}
                         </button>
                     </div>
                 </form>
@@ -181,16 +181,16 @@
 
                 <div class="flex items-center gap-2">
                     <span class="text-lg">🏢</span>
-                    <h4 class="text-xs font-extrabold text-slate-900">Mainīt darbavietas nosaukumu</h4>
+                    <h4 class="text-xs font-extrabold text-slate-900">{{ __('app.change_workspace_name') }}</h4>
                 </div>
 
                 <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">Darbavietas nosaukums</label>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">{{ __('app.workspace_name') }}</label>
                     <div class="flex gap-2">
                         <input type="text" name="name" value="{{ $tenant->name }}" required
                                class="flex-1 px-3.5 py-2.5 bg-white border border-slate-300 focus:border-amber-500 rounded-xl text-slate-900 text-xs font-bold">
                         <button type="submit" class="px-5 py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs rounded-xl shadow-sm active:scale-95 transition">
-                            Saglabāt 💾
+                            {{ __('app.save') }} 💾
                         </button>
                     </div>
                 </div>
@@ -202,9 +202,9 @@
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-2">
                         <span class="text-lg">🔑</span>
-                        <h4 class="text-xs font-extrabold text-slate-900">Komandas Ielūguma Kods</h4>
+                        <h4 class="text-xs font-extrabold text-slate-900">{{ __('app.team_invite_code') }}</h4>
                     </div>
-                    <span class="text-[10px] text-slate-400 font-medium">Citi var pievienoties ar šo kodu</span>
+                    <span class="text-[10px] text-slate-400 font-medium">{{ __('app.invite_code_hint') }}</span>
                 </div>
 
                 <div class="flex items-center gap-2">
@@ -213,14 +213,14 @@
                     <button type="button"
                             @click="navigator.clipboard.writeText('{{ $tenant->invite_code }}'); copied = true; setTimeout(() => copied = false, 2000)"
                             class="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-800 text-xs font-bold rounded-xl transition flex items-center gap-1.5">
-                        <span x-text="copied ? '✓ Nokopēts!' : 'Kopēt kodu'"></span>
+                        <span x-text="copied ? '✓ {{ __('app.copied') }}' : '{{ __('app.copy_code') }}'"></span>
                     </button>
                 </div>
             </div>
 
             <!-- Team Members List -->
             <div class="space-y-2">
-                <h4 class="text-xs font-extrabold uppercase text-slate-400 tracking-wider">Darbavietas Dalībnieki ({{ $tenant->users->count() }})</h4>
+                <h4 class="text-xs font-extrabold uppercase text-slate-400 tracking-wider">{{ __('app.workspace_members', ['count' => $tenant->users->count()]) }}</h4>
                 <div class="divide-y divide-slate-100 border border-slate-200 rounded-2xl overflow-hidden bg-white">
                     @foreach($tenant->users as $member)
                         <div class="p-3 flex items-center justify-between">

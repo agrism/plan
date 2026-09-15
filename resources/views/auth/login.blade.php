@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="lv" class="h-full bg-slate-50 text-slate-800">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="h-full bg-slate-50 text-slate-800">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Pieslēgties - Plānotājs</title>
+    <title>{{ __('app.sign_in') }} - {{ __('app.planner') }}</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -16,20 +16,36 @@
         }
     </script>
 </head>
-<body class="min-h-full bg-slate-50 flex items-center justify-center p-4">
+<body class="min-h-full bg-slate-50 flex items-center justify-center p-4 relative">
+    <!-- Language Switcher in Top Right -->
+    <div class="absolute top-4 right-4 flex items-center bg-white/80 backdrop-blur-sm border border-slate-200 rounded-full p-0.5 shadow-sm">
+        <a href="{{ route('locale.switch', 'lv') }}"
+           class="px-2.5 py-1 rounded-full text-xs font-bold transition flex items-center gap-1 {{ app()->getLocale() === 'lv' ? 'bg-amber-500 text-slate-950 shadow-sm' : 'text-slate-500 hover:text-slate-900' }}"
+           title="Latviešu">
+            <span>🇱🇻</span>
+            <span>LV</span>
+        </a>
+        <a href="{{ route('locale.switch', 'en') }}"
+           class="px-2.5 py-1 rounded-full text-xs font-bold transition flex items-center gap-1 {{ app()->getLocale() === 'en' ? 'bg-amber-500 text-slate-950 shadow-sm' : 'text-slate-500 hover:text-slate-900' }}"
+           title="English">
+            <span>🇬🇧</span>
+            <span>EN</span>
+        </a>
+    </div>
+
     <div class="w-full max-w-md bg-white border border-slate-200/90 rounded-3xl p-6 sm:p-8 shadow-xl space-y-6">
         
         <!-- Header -->
         <div class="text-center space-y-2">
             <span class="text-4xl">💼</span>
-            <h1 class="text-2xl font-extrabold text-slate-900">Plānotājs</h1>
-            <p class="text-xs text-slate-500">Pieslēdzies savai darbavietai vai komandai</p>
+            <h1 class="text-2xl font-extrabold text-slate-900">{{ __('app.planner') }}</h1>
+            <p class="text-xs text-slate-500">{{ __('app.login_subtitle') }}</p>
         </div>
 
         <!-- Quick One-Click Login for Demo/Team Members -->
         @if(isset($demoUsers) && $demoUsers->isNotEmpty())
             <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2.5">
-                <div class="text-[11px] font-bold uppercase tracking-wider text-amber-700 text-center">⚡ Ātrā Pieslēgšanās (Demo Komanda)</div>
+                <div class="text-[11px] font-bold uppercase tracking-wider text-amber-700 text-center">{{ __('app.quick_login_demo') }}</div>
                 <div class="grid grid-cols-2 gap-2">
                     @foreach($demoUsers as $du)
                         <a href="{{ route('login.quick', $du->id) }}"
@@ -46,25 +62,25 @@
         <form action="{{ route('login') }}" method="POST" class="space-y-4">
             @csrf
             <div>
-                <label class="block text-xs font-bold text-slate-700 mb-1">E-pasts</label>
+                <label class="block text-xs font-bold text-slate-700 mb-1">{{ __('app.email') }}</label>
                 <input type="email" name="email" value="{{ old('email', 'janis@komanda.lv') }}" required
                        class="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 text-sm focus:border-amber-500 focus:bg-white focus:ring-1 focus:ring-amber-500">
                 @error('email') <p class="text-xs text-rose-600 mt-1">{{ $message }}</p> @enderror
             </div>
 
             <div>
-                <label class="block text-xs font-bold text-slate-700 mb-1">Parole</label>
+                <label class="block text-xs font-bold text-slate-700 mb-1">{{ __('app.password') }}</label>
                 <input type="password" name="password" value="password" required
                        class="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 text-sm focus:border-amber-500 focus:bg-white focus:ring-1 focus:ring-amber-500">
             </div>
 
             <button type="submit" class="w-full py-3 bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 text-slate-950 font-bold text-sm rounded-xl shadow-md shadow-amber-500/20 active:scale-[0.98] transition">
-                Pieslēgties
+                {{ __('app.sign_in') }}
             </button>
         </form>
 
         <div class="text-center pt-2 border-t border-slate-100">
-            <p class="text-xs text-slate-500">Nav konta? <a href="{{ route('register') }}" class="text-amber-600 font-bold hover:underline">Reģistrē jaunu darbavietu</a></p>
+            <p class="text-xs text-slate-500">{{ __('app.no_account') }} <a href="{{ route('register') }}" class="text-amber-600 font-bold hover:underline">{{ __('app.register_workspace_link') }}</a></p>
         </div>
     </div>
 </body>

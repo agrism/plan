@@ -6,6 +6,14 @@ use App\Http\Controllers\TenantController;
 use App\Http\Middleware\EnsureCurrentTenant;
 use Illuminate\Support\Facades\Route;
 
+// Locale Switcher Route
+Route::get('/locale/{locale}', function (string $locale) {
+    if (in_array($locale, ['lv', 'en'], true)) {
+        session(['locale' => $locale]);
+    }
+    return back();
+})->name('locale.switch');
+
 // Auth Routes
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
