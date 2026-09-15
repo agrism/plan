@@ -39,8 +39,9 @@
         }
     </script>
 
-    <!-- HTMX 2.0 & Alpine.js -->
+    <!-- HTMX 2.0, Alpine Collapse & Alpine.js -->
     <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+    <script defer src="https://unpkg.com/@alpinejs/collapse@3.14.8/dist/cdn.min.js"></script>
     <script defer src="https://unpkg.com/alpinejs@3.14.8/dist/cdn.min.js"></script>
 
     <style>

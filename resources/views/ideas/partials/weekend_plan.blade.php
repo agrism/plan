@@ -18,15 +18,30 @@
         @if($fridayTasks->isEmpty())
             <p class="text-xs text-slate-400 italic py-2">Nav ieplānotu uzdevumu piektdienai.</p>
         @else
-            <div class="space-y-3">
+            <div class="space-y-2.5">
                 @foreach($fridayTasks as $task)
-                    <div class="p-3.5 rounded-2xl bg-slate-50/80 border border-slate-200/80 hover:border-slate-300 hover:bg-white transition space-y-2.5 {{ $task->is_completed ? 'opacity-65 bg-slate-100/60' : '' }}">
+                    @php
+                        $hasDetails = !empty($task->description) || !empty($task->links) || !empty($task->image_url);
+                        $hasYouTube = false;
+                        if (!empty($task->processed_links)) {
+                            foreach ($task->processed_links as $pl) {
+                                if (!empty($pl['embed_url'])) {
+                                    $hasYouTube = true;
+                                    break;
+                                }
+                            }
+                        }
+                    @endphp
+
+                    <div class="p-3.5 rounded-2xl bg-slate-50/80 border border-slate-200/80 hover:border-slate-300 hover:bg-white transition space-y-2.5 {{ $task->is_completed ? 'opacity-65 bg-slate-100/60' : '' }}"
+                         x-data="{ expanded: false }">
                         
                         <!-- Top row: Checkbox, Title, Badges, Edit & Unschedule -->
                         <div class="flex items-start justify-between gap-3">
                             <div class="flex items-start gap-2.5 flex-1 min-w-0">
                                 <button hx-patch="{{ route('ideas.toggle', $task->id) }}"
                                         hx-target="body"
+                                        @click.stop
                                         type="button"
                                         class="mt-0.5 w-5 h-5 rounded-lg border flex-shrink-0 flex items-center justify-center transition {{ $task->is_completed ? 'bg-emerald-500 border-emerald-500 text-white font-bold' : 'border-slate-300 hover:border-amber-500 bg-white' }}">
                                     @if($task->is_completed)
@@ -34,17 +49,37 @@
                                     @endif
                                 </button>
 
-                                <div class="min-w-0 flex-1">
-                                    <span class="text-xs sm:text-sm font-semibold {{ $task->is_completed ? 'line-through text-slate-400' : 'text-slate-900' }} leading-snug">
+                                <div @click="{{ $hasDetails ? 'expanded = !expanded' : '' }}"
+                                     class="min-w-0 flex-1 space-y-1 {{ $hasDetails ? 'cursor-pointer select-none' : '' }}">
+                                    <span class="text-xs sm:text-sm font-semibold {{ $task->is_completed ? 'line-through text-slate-400' : 'text-slate-900' }} leading-snug block">
                                         {{ $task->title }}
                                     </span>
+                                    
                                     @if($task->scheduled_time_slot)
-                                        <span class="text-[10px] text-amber-700 block font-bold mt-0.5">🕒 {{ $task->scheduled_time_slot }}</span>
+                                        <span class="text-[10px] text-amber-700 block font-bold">🕒 {{ $task->scheduled_time_slot }}</span>
+                                    @endif
+
+                                    <!-- Quick indicators for details -->
+                                    @if($hasDetails)
+                                        <div class="flex items-center gap-1.5 flex-wrap text-[10px] text-slate-400 pt-0.5">
+                                            @if($task->description)
+                                                <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-white text-slate-600 border border-slate-200">📝 Apraksts</span>
+                                            @endif
+                                            @if(!empty($task->links) && count($task->links) > 0)
+                                                <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-white text-slate-600 border border-slate-200">
+                                                    <span>{{ $hasYouTube ? '▶️' : '🔗' }}</span>
+                                                    <span>{{ count($task->links) }}</span>
+                                                </span>
+                                            @endif
+                                            @if($task->image_url)
+                                                <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-white text-slate-600 border border-slate-200">🖼️</span>
+                                            @endif
+                                        </div>
                                     @endif
                                 </div>
                             </div>
 
-                            <div class="flex items-center gap-1.5 flex-shrink-0">
+                            <div class="flex items-center gap-1.5 flex-shrink-0" @click.stop>
                                 <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold border {{ $task->category_badge_class }}">
                                     <span>{{ $task->category_emoji }}</span>
                                     <span class="hidden sm:inline">{{ $task->category_name }}</span>
@@ -73,48 +108,64 @@
                                         ↩️
                                     </button>
                                 </form>
+
+                                <!-- Expand arrow button if details exist -->
+                                @if($hasDetails)
+                                    <button type="button" @click.stop="expanded = !expanded"
+                                            title="Rādīt detaļas"
+                                            class="p-1 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100 transition">
+                                        <svg class="w-3.5 h-3.5 transition-transform duration-200" :class="expanded ? 'rotate-180 text-amber-600' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                        </svg>
+                                    </button>
+                                @endif
                             </div>
                         </div>
 
-                        <!-- Optional Image -->
-                        @if($task->image_url)
-                            <div class="w-full h-32 rounded-xl overflow-hidden bg-slate-100 border border-slate-100">
-                                <img src="{{ $task->image_url }}" alt="{{ $task->title }}" class="w-full h-full object-cover">
-                            </div>
-                        @endif
-
-                        <!-- Optional Description -->
-                        @if($task->description)
-                            <p class="text-xs text-slate-600 leading-relaxed whitespace-pre-line bg-white/70 p-2.5 rounded-xl border border-slate-200/60">
-                                {{ $task->description }}
-                            </p>
-                        @endif
-
-                        <!-- Dynamic Links & YouTube Video Embeds -->
-                        @if(!empty($task->processed_links))
-                            <div class="space-y-2 pt-0.5">
-                                @foreach($task->processed_links as $linkItem)
-                                    @if($linkItem['embed_url'])
-                                        <div class="rounded-xl overflow-hidden border border-slate-200 bg-black aspect-video w-full shadow-sm">
-                                            <iframe src="{{ $linkItem['embed_url'] }}"
-                                                    title="YouTube video"
-                                                    class="w-full h-full"
-                                                    frameborder="0"
-                                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                                                    allowfullscreen>
-                                            </iframe>
-                                        </div>
-                                    @endif
-
-                                    <div class="flex items-center gap-1.5 text-xs">
-                                        <a href="{{ $linkItem['url'] }}" target="_blank" rel="noopener noreferrer"
-                                           class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white hover:bg-slate-100 text-slate-700 hover:text-slate-900 border border-slate-200 font-medium truncate max-w-full transition">
-                                            <span>{{ $linkItem['youtube_id'] ? '▶️' : '🔗' }}</span>
-                                            <span class="truncate">{{ $linkItem['domain'] }}</span>
-                                            <svg class="w-3 h-3 text-slate-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
-                                        </a>
+                        <!-- Slide-Down Expandable Details (Description, Links, YouTube Player, Image) -->
+                        @if($hasDetails)
+                            <div x-show="expanded" x-collapse x-cloak class="space-y-2.5 pt-2 border-t border-slate-200/60" @click.stop>
+                                <!-- Optional Image -->
+                                @if($task->image_url)
+                                    <div class="w-full h-36 rounded-xl overflow-hidden bg-slate-100 border border-slate-100">
+                                        <img src="{{ $task->image_url }}" alt="{{ $task->title }}" class="w-full h-full object-cover">
                                     </div>
-                                @endforeach
+                                @endif
+
+                                <!-- Optional Description -->
+                                @if($task->description)
+                                    <div class="text-xs text-slate-600 leading-relaxed whitespace-pre-line bg-white p-3 rounded-xl border border-slate-200/80">
+                                        {{ $task->description }}
+                                    </div>
+                                @endif
+
+                                <!-- Dynamic Links & YouTube Video Embeds -->
+                                @if(!empty($task->processed_links))
+                                    <div class="space-y-2 pt-0.5">
+                                        @foreach($task->processed_links as $linkItem)
+                                            @if($linkItem['embed_url'])
+                                                <div class="rounded-xl overflow-hidden border border-slate-200 bg-black aspect-video w-full shadow-sm">
+                                                    <iframe src="{{ $linkItem['embed_url'] }}"
+                                                            title="YouTube video"
+                                                            class="w-full h-full"
+                                                            frameborder="0"
+                                                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                                            allowfullscreen>
+                                                    </iframe>
+                                                </div>
+                                            @endif
+
+                                            <div class="flex items-center gap-1.5 text-xs">
+                                                <a href="{{ $linkItem['url'] }}" target="_blank" rel="noopener noreferrer"
+                                                   class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white hover:bg-slate-100 text-slate-700 hover:text-slate-900 border border-slate-200 font-medium truncate max-w-full transition">
+                                                    <span>{{ $linkItem['youtube_id'] ? '▶️' : '🔗' }}</span>
+                                                    <span class="truncate">{{ $linkItem['domain'] }}</span>
+                                                    <svg class="w-3 h-3 text-slate-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                                                </a>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                @endif
                             </div>
                         @endif
 
@@ -142,14 +193,29 @@
         @if($saturdayTasks->isEmpty())
             <p class="text-xs text-slate-400 italic py-2">Nav ieplānotu uzdevumu sestdienai.</p>
         @else
-            <div class="space-y-3">
+            <div class="space-y-2.5">
                 @foreach($saturdayTasks as $task)
-                    <div class="p-3.5 rounded-2xl bg-slate-50/80 border border-slate-200/80 hover:border-slate-300 hover:bg-white transition space-y-2.5 {{ $task->is_completed ? 'opacity-65 bg-slate-100/60' : '' }}">
+                    @php
+                        $hasDetails = !empty($task->description) || !empty($task->links) || !empty($task->image_url);
+                        $hasYouTube = false;
+                        if (!empty($task->processed_links)) {
+                            foreach ($task->processed_links as $pl) {
+                                if (!empty($pl['embed_url'])) {
+                                    $hasYouTube = true;
+                                    break;
+                                }
+                            }
+                        }
+                    @endphp
+
+                    <div class="p-3.5 rounded-2xl bg-slate-50/80 border border-slate-200/80 hover:border-slate-300 hover:bg-white transition space-y-2.5 {{ $task->is_completed ? 'opacity-65 bg-slate-100/60' : '' }}"
+                         x-data="{ expanded: false }">
                         
                         <div class="flex items-start justify-between gap-3">
                             <div class="flex items-start gap-2.5 flex-1 min-w-0">
                                 <button hx-patch="{{ route('ideas.toggle', $task->id) }}"
                                         hx-target="body"
+                                        @click.stop
                                         type="button"
                                         class="mt-0.5 w-5 h-5 rounded-lg border flex-shrink-0 flex items-center justify-center transition {{ $task->is_completed ? 'bg-emerald-500 border-emerald-500 text-white font-bold' : 'border-slate-300 hover:border-amber-500 bg-white' }}">
                                     @if($task->is_completed)
@@ -157,17 +223,36 @@
                                     @endif
                                 </button>
 
-                                <div class="min-w-0 flex-1">
-                                    <span class="text-xs sm:text-sm font-semibold {{ $task->is_completed ? 'line-through text-slate-400' : 'text-slate-900' }} leading-snug">
+                                <div @click="{{ $hasDetails ? 'expanded = !expanded' : '' }}"
+                                     class="min-w-0 flex-1 space-y-1 {{ $hasDetails ? 'cursor-pointer select-none' : '' }}">
+                                    <span class="text-xs sm:text-sm font-semibold {{ $task->is_completed ? 'line-through text-slate-400' : 'text-slate-900' }} leading-snug block">
                                         {{ $task->title }}
                                     </span>
+                                    
                                     @if($task->scheduled_time_slot)
-                                        <span class="text-[10px] text-amber-700 block font-bold mt-0.5">🕒 {{ $task->scheduled_time_slot }}</span>
+                                        <span class="text-[10px] text-amber-700 block font-bold">🕒 {{ $task->scheduled_time_slot }}</span>
+                                    @endif
+
+                                    @if($hasDetails)
+                                        <div class="flex items-center gap-1.5 flex-wrap text-[10px] text-slate-400 pt-0.5">
+                                            @if($task->description)
+                                                <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-white text-slate-600 border border-slate-200">📝 Apraksts</span>
+                                            @endif
+                                            @if(!empty($task->links) && count($task->links) > 0)
+                                                <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-white text-slate-600 border border-slate-200">
+                                                    <span>{{ $hasYouTube ? '▶️' : '🔗' }}</span>
+                                                    <span>{{ count($task->links) }}</span>
+                                                </span>
+                                            @endif
+                                            @if($task->image_url)
+                                                <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-white text-slate-600 border border-slate-200">🖼️</span>
+                                            @endif
+                                        </div>
                                     @endif
                                 </div>
                             </div>
 
-                            <div class="flex items-center gap-1.5 flex-shrink-0">
+                            <div class="flex items-center gap-1.5 flex-shrink-0" @click.stop>
                                 <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold border {{ $task->category_badge_class }}">
                                     <span>{{ $task->category_emoji }}</span>
                                     <span class="hidden sm:inline">{{ $task->category_name }}</span>
@@ -196,48 +281,60 @@
                                         ↩️
                                     </button>
                                 </form>
+
+                                @if($hasDetails)
+                                    <button type="button" @click.stop="expanded = !expanded"
+                                            title="Rādīt detaļas"
+                                            class="p-1 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100 transition">
+                                        <svg class="w-3.5 h-3.5 transition-transform duration-200" :class="expanded ? 'rotate-180 text-amber-600' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                        </svg>
+                                    </button>
+                                @endif
                             </div>
                         </div>
 
-                        <!-- Optional Image -->
-                        @if($task->image_url)
-                            <div class="w-full h-32 rounded-xl overflow-hidden bg-slate-100 border border-slate-100">
-                                <img src="{{ $task->image_url }}" alt="{{ $task->title }}" class="w-full h-full object-cover">
-                            </div>
-                        @endif
-
-                        <!-- Optional Description -->
-                        @if($task->description)
-                            <p class="text-xs text-slate-600 leading-relaxed whitespace-pre-line bg-white/70 p-2.5 rounded-xl border border-slate-200/60">
-                                {{ $task->description }}
-                            </p>
-                        @endif
-
-                        <!-- Dynamic Links & YouTube Video Embeds -->
-                        @if(!empty($task->processed_links))
-                            <div class="space-y-2 pt-0.5">
-                                @foreach($task->processed_links as $linkItem)
-                                    @if($linkItem['embed_url'])
-                                        <div class="rounded-xl overflow-hidden border border-slate-200 bg-black aspect-video w-full shadow-sm">
-                                            <iframe src="{{ $linkItem['embed_url'] }}"
-                                                    title="YouTube video"
-                                                    class="w-full h-full"
-                                                    frameborder="0"
-                                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                                                    allowfullscreen>
-                                            </iframe>
-                                        </div>
-                                    @endif
-
-                                    <div class="flex items-center gap-1.5 text-xs">
-                                        <a href="{{ $linkItem['url'] }}" target="_blank" rel="noopener noreferrer"
-                                           class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white hover:bg-slate-100 text-slate-700 hover:text-slate-900 border border-slate-200 font-medium truncate max-w-full transition">
-                                            <span>{{ $linkItem['youtube_id'] ? '▶️' : '🔗' }}</span>
-                                            <span class="truncate">{{ $linkItem['domain'] }}</span>
-                                            <svg class="w-3 h-3 text-slate-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
-                                        </a>
+                        <!-- Slide-Down Expandable Details -->
+                        @if($hasDetails)
+                            <div x-show="expanded" x-collapse x-cloak class="space-y-2.5 pt-2 border-t border-slate-200/60" @click.stop>
+                                @if($task->image_url)
+                                    <div class="w-full h-36 rounded-xl overflow-hidden bg-slate-100 border border-slate-100">
+                                        <img src="{{ $task->image_url }}" alt="{{ $task->title }}" class="w-full h-full object-cover">
                                     </div>
-                                @endforeach
+                                @endif
+
+                                @if($task->description)
+                                    <div class="text-xs text-slate-600 leading-relaxed whitespace-pre-line bg-white p-3 rounded-xl border border-slate-200/80">
+                                        {{ $task->description }}
+                                    </div>
+                                @endif
+
+                                @if(!empty($task->processed_links))
+                                    <div class="space-y-2 pt-0.5">
+                                        @foreach($task->processed_links as $linkItem)
+                                            @if($linkItem['embed_url'])
+                                                <div class="rounded-xl overflow-hidden border border-slate-200 bg-black aspect-video w-full shadow-sm">
+                                                    <iframe src="{{ $linkItem['embed_url'] }}"
+                                                            title="YouTube video"
+                                                            class="w-full h-full"
+                                                            frameborder="0"
+                                                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                                            allowfullscreen>
+                                                    </iframe>
+                                                </div>
+                                            @endif
+
+                                            <div class="flex items-center gap-1.5 text-xs">
+                                                <a href="{{ $linkItem['url'] }}" target="_blank" rel="noopener noreferrer"
+                                                   class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white hover:bg-slate-100 text-slate-700 hover:text-slate-900 border border-slate-200 font-medium truncate max-w-full transition">
+                                                    <span>{{ $linkItem['youtube_id'] ? '▶️' : '🔗' }}</span>
+                                                    <span class="truncate">{{ $linkItem['domain'] }}</span>
+                                                    <svg class="w-3 h-3 text-slate-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                                                </a>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                @endif
                             </div>
                         @endif
 
@@ -265,14 +362,29 @@
         @if($sundayTasks->isEmpty())
             <p class="text-xs text-slate-400 italic py-2">Nav ieplānotu uzdevumu svētdienai.</p>
         @else
-            <div class="space-y-3">
+            <div class="space-y-2.5">
                 @foreach($sundayTasks as $task)
-                    <div class="p-3.5 rounded-2xl bg-slate-50/80 border border-slate-200/80 hover:border-slate-300 hover:bg-white transition space-y-2.5 {{ $task->is_completed ? 'opacity-65 bg-slate-100/60' : '' }}">
+                    @php
+                        $hasDetails = !empty($task->description) || !empty($task->links) || !empty($task->image_url);
+                        $hasYouTube = false;
+                        if (!empty($task->processed_links)) {
+                            foreach ($task->processed_links as $pl) {
+                                if (!empty($pl['embed_url'])) {
+                                    $hasYouTube = true;
+                                    break;
+                                }
+                            }
+                        }
+                    @endphp
+
+                    <div class="p-3.5 rounded-2xl bg-slate-50/80 border border-slate-200/80 hover:border-slate-300 hover:bg-white transition space-y-2.5 {{ $task->is_completed ? 'opacity-65 bg-slate-100/60' : '' }}"
+                         x-data="{ expanded: false }">
                         
                         <div class="flex items-start justify-between gap-3">
                             <div class="flex items-start gap-2.5 flex-1 min-w-0">
                                 <button hx-patch="{{ route('ideas.toggle', $task->id) }}"
                                         hx-target="body"
+                                        @click.stop
                                         type="button"
                                         class="mt-0.5 w-5 h-5 rounded-lg border flex-shrink-0 flex items-center justify-center transition {{ $task->is_completed ? 'bg-emerald-500 border-emerald-500 text-white font-bold' : 'border-slate-300 hover:border-amber-500 bg-white' }}">
                                     @if($task->is_completed)
@@ -280,17 +392,36 @@
                                     @endif
                                 </button>
 
-                                <div class="min-w-0 flex-1">
-                                    <span class="text-xs sm:text-sm font-semibold {{ $task->is_completed ? 'line-through text-slate-400' : 'text-slate-900' }} leading-snug">
+                                <div @click="{{ $hasDetails ? 'expanded = !expanded' : '' }}"
+                                     class="min-w-0 flex-1 space-y-1 {{ $hasDetails ? 'cursor-pointer select-none' : '' }}">
+                                    <span class="text-xs sm:text-sm font-semibold {{ $task->is_completed ? 'line-through text-slate-400' : 'text-slate-900' }} leading-snug block">
                                         {{ $task->title }}
                                     </span>
+                                    
                                     @if($task->scheduled_time_slot)
-                                        <span class="text-[10px] text-amber-700 block font-bold mt-0.5">🕒 {{ $task->scheduled_time_slot }}</span>
+                                        <span class="text-[10px] text-amber-700 block font-bold">🕒 {{ $task->scheduled_time_slot }}</span>
+                                    @endif
+
+                                    @if($hasDetails)
+                                        <div class="flex items-center gap-1.5 flex-wrap text-[10px] text-slate-400 pt-0.5">
+                                            @if($task->description)
+                                                <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-white text-slate-600 border border-slate-200">📝 Apraksts</span>
+                                            @endif
+                                            @if(!empty($task->links) && count($task->links) > 0)
+                                                <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-white text-slate-600 border border-slate-200">
+                                                    <span>{{ $hasYouTube ? '▶️' : '🔗' }}</span>
+                                                    <span>{{ count($task->links) }}</span>
+                                                </span>
+                                            @endif
+                                            @if($task->image_url)
+                                                <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-white text-slate-600 border border-slate-200">🖼️</span>
+                                            @endif
+                                        </div>
                                     @endif
                                 </div>
                             </div>
 
-                            <div class="flex items-center gap-1.5 flex-shrink-0">
+                            <div class="flex items-center gap-1.5 flex-shrink-0" @click.stop>
                                 <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold border {{ $task->category_badge_class }}">
                                     <span>{{ $task->category_emoji }}</span>
                                     <span class="hidden sm:inline">{{ $task->category_name }}</span>
@@ -319,48 +450,60 @@
                                         ↩️
                                     </button>
                                 </form>
+
+                                @if($hasDetails)
+                                    <button type="button" @click.stop="expanded = !expanded"
+                                            title="Rādīt detaļas"
+                                            class="p-1 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100 transition">
+                                        <svg class="w-3.5 h-3.5 transition-transform duration-200" :class="expanded ? 'rotate-180 text-amber-600' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                        </svg>
+                                    </button>
+                                @endif
                             </div>
                         </div>
 
-                        <!-- Optional Image -->
-                        @if($task->image_url)
-                            <div class="w-full h-32 rounded-xl overflow-hidden bg-slate-100 border border-slate-100">
-                                <img src="{{ $task->image_url }}" alt="{{ $task->title }}" class="w-full h-full object-cover">
-                            </div>
-                        @endif
-
-                        <!-- Optional Description -->
-                        @if($task->description)
-                            <p class="text-xs text-slate-600 leading-relaxed whitespace-pre-line bg-white/70 p-2.5 rounded-xl border border-slate-200/60">
-                                {{ $task->description }}
-                            </p>
-                        @endif
-
-                        <!-- Dynamic Links & YouTube Video Embeds -->
-                        @if(!empty($task->processed_links))
-                            <div class="space-y-2 pt-0.5">
-                                @foreach($task->processed_links as $linkItem)
-                                    @if($linkItem['embed_url'])
-                                        <div class="rounded-xl overflow-hidden border border-slate-200 bg-black aspect-video w-full shadow-sm">
-                                            <iframe src="{{ $linkItem['embed_url'] }}"
-                                                    title="YouTube video"
-                                                    class="w-full h-full"
-                                                    frameborder="0"
-                                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                                                    allowfullscreen>
-                                            </iframe>
-                                        </div>
-                                    @endif
-
-                                    <div class="flex items-center gap-1.5 text-xs">
-                                        <a href="{{ $linkItem['url'] }}" target="_blank" rel="noopener noreferrer"
-                                           class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white hover:bg-slate-100 text-slate-700 hover:text-slate-900 border border-slate-200 font-medium truncate max-w-full transition">
-                                            <span>{{ $linkItem['youtube_id'] ? '▶️' : '🔗' }}</span>
-                                            <span class="truncate">{{ $linkItem['domain'] }}</span>
-                                            <svg class="w-3 h-3 text-slate-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
-                                        </a>
+                        <!-- Slide-Down Expandable Details -->
+                        @if($hasDetails)
+                            <div x-show="expanded" x-collapse x-cloak class="space-y-2.5 pt-2 border-t border-slate-200/60" @click.stop>
+                                @if($task->image_url)
+                                    <div class="w-full h-36 rounded-xl overflow-hidden bg-slate-100 border border-slate-100">
+                                        <img src="{{ $task->image_url }}" alt="{{ $task->title }}" class="w-full h-full object-cover">
                                     </div>
-                                @endforeach
+                                @endif
+
+                                @if($task->description)
+                                    <div class="text-xs text-slate-600 leading-relaxed whitespace-pre-line bg-white p-3 rounded-xl border border-slate-200/80">
+                                        {{ $task->description }}
+                                    </div>
+                                @endif
+
+                                @if(!empty($task->processed_links))
+                                    <div class="space-y-2 pt-0.5">
+                                        @foreach($task->processed_links as $linkItem)
+                                            @if($linkItem['embed_url'])
+                                                <div class="rounded-xl overflow-hidden border border-slate-200 bg-black aspect-video w-full shadow-sm">
+                                                    <iframe src="{{ $linkItem['embed_url'] }}"
+                                                            title="YouTube video"
+                                                            class="w-full h-full"
+                                                            frameborder="0"
+                                                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                                            allowfullscreen>
+                                                    </iframe>
+                                                </div>
+                                            @endif
+
+                                            <div class="flex items-center gap-1.5 text-xs">
+                                                <a href="{{ $linkItem['url'] }}" target="_blank" rel="noopener noreferrer"
+                                                   class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white hover:bg-slate-100 text-slate-700 hover:text-slate-900 border border-slate-200 font-medium truncate max-w-full transition">
+                                                    <span>{{ $linkItem['youtube_id'] ? '▶️' : '🔗' }}</span>
+                                                    <span class="truncate">{{ $linkItem['domain'] }}</span>
+                                                    <svg class="w-3 h-3 text-slate-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                                                </a>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                @endif
                             </div>
                         @endif
 

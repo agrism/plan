@@ -6,7 +6,21 @@
     </div>
 @else
     @foreach($backlogIdeas as $idea)
-        <div class="group relative rounded-2xl bg-white border border-slate-200/90 hover:border-slate-300 transition p-4 shadow-sm hover:shadow-md flex flex-col gap-3">
+        @php
+            $hasDetails = !empty($idea->description) || !empty($idea->links) || !empty($idea->image_url);
+            $hasYouTube = false;
+            if (!empty($idea->processed_links)) {
+                foreach ($idea->processed_links as $pl) {
+                    if (!empty($pl['embed_url'])) {
+                        $hasYouTube = true;
+                        break;
+                    }
+                }
+            }
+        @endphp
+
+        <div class="group relative rounded-2xl bg-white border border-slate-200/90 hover:border-slate-300 transition p-4 shadow-sm hover:shadow-md flex flex-col gap-2.5"
+             x-data="{ expanded: false }">
             
             <!-- Card Header: Category, Author Badge & Edit Button -->
             <div class="flex items-center justify-between gap-2">
@@ -25,6 +39,7 @@
                     <button hx-get="{{ route('ideas.edit', $idea->id) }}"
                             hx-target="#edit-modal-slot"
                             hx-swap="innerHTML"
+                            @click.stop
                             type="button"
                             title="Labot uzdevumu"
                             class="p-1 rounded-lg text-slate-400 hover:text-amber-600 hover:bg-amber-50 transition text-xs">
@@ -33,57 +48,101 @@
                 </div>
             </div>
 
-            <!-- Optional Image -->
-            @if($idea->image_url)
-                <div class="w-full h-36 rounded-xl overflow-hidden bg-slate-100 border border-slate-100">
-                    <img src="{{ $idea->image_url }}" alt="{{ $idea->title }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
-                </div>
-            @endif
+            <!-- Clickable Title & Expand Trigger -->
+            <div @click="{{ $hasDetails ? 'expanded = !expanded' : '' }}"
+                 class="flex items-start justify-between gap-2 {{ $hasDetails ? 'cursor-pointer select-none' : '' }}">
+                <div class="space-y-1 flex-1">
+                    <h3 class="text-sm font-bold text-slate-900 leading-snug group-hover:text-amber-900 transition">
+                        {{ $idea->title }}
+                    </h3>
 
-            <!-- Title -->
-            <h3 class="text-sm font-bold text-slate-900 leading-snug">
-                {{ $idea->title }}
-            </h3>
-
-            <!-- Optional Description -->
-            @if($idea->description)
-                <p class="text-xs text-slate-600 leading-relaxed whitespace-pre-line bg-slate-50 p-2.5 rounded-xl border border-slate-100">
-                    {{ $idea->description }}
-                </p>
-            @endif
-
-            <!-- Dynamic Links & YouTube Video Embeds -->
-            @if(!empty($idea->processed_links))
-                <div class="space-y-2 pt-1">
-                    @foreach($idea->processed_links as $linkItem)
-                        <!-- If it's a YouTube video, render responsive embed player above the link -->
-                        @if($linkItem['embed_url'])
-                            <div class="rounded-xl overflow-hidden border border-slate-200 bg-black aspect-video w-full shadow-sm">
-                                <iframe src="{{ $linkItem['embed_url'] }}"
-                                        title="YouTube video"
-                                        class="w-full h-full"
-                                        frameborder="0"
-                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                                        allowfullscreen>
-                                </iframe>
-                            </div>
-                        @endif
-
-                        <!-- Clickable Link Badge -->
-                        <div class="flex items-center gap-1.5 text-xs">
-                            <a href="{{ $linkItem['url'] }}" target="_blank" rel="noopener noreferrer"
-                               class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 font-medium truncate max-w-full transition">
-                                <span>{{ $linkItem['youtube_id'] ? '▶️' : '🔗' }}</span>
-                                <span class="truncate">{{ $linkItem['domain'] }}</span>
-                                <svg class="w-3 h-3 text-slate-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
-                            </a>
+                    <!-- Indicators if task has description, links, or video -->
+                    @if($hasDetails)
+                        <div class="flex items-center gap-1.5 flex-wrap pt-0.5 text-[11px] text-slate-400">
+                            @if($idea->description)
+                                <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-slate-100 text-slate-600 font-medium">
+                                    <span>📝</span> Apraksts
+                                </span>
+                            @endif
+                            @if(!empty($idea->links) && count($idea->links) > 0)
+                                <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-slate-100 text-slate-600 font-medium">
+                                    <span>{{ $hasYouTube ? '▶️' : '🔗' }}</span>
+                                    <span>{{ count($idea->links) }} {{ count($idea->links) === 1 ? 'saite' : 'saites' }}</span>
+                                </span>
+                            @endif
+                            @if($idea->image_url)
+                                <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-slate-100 text-slate-600 font-medium">
+                                    <span>🖼️</span> Attēls
+                                </span>
+                            @endif
                         </div>
-                    @endforeach
+                    @endif
+                </div>
+
+                @if($hasDetails)
+                    <button type="button" @click.stop="expanded = !expanded"
+                            title="Rādīt detaļas"
+                            class="p-1 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100 transition flex-shrink-0 mt-0.5">
+                        <svg class="w-4 h-4 transition-transform duration-200" :class="expanded ? 'rotate-180 text-amber-600' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </button>
+                @endif
+            </div>
+
+            <!-- Slide-Down Expandable Details Section (Description, Links, YouTube Player, Image) -->
+            @if($hasDetails)
+                <div x-show="expanded" x-collapse x-cloak class="space-y-3 pt-2 border-t border-slate-100/90" @click.stop>
+                    
+                    <!-- Optional Image -->
+                    @if($idea->image_url)
+                        <div class="w-full h-40 rounded-xl overflow-hidden bg-slate-100 border border-slate-100">
+                            <img src="{{ $idea->image_url }}" alt="{{ $idea->title }}" class="w-full h-full object-cover">
+                        </div>
+                    @endif
+
+                    <!-- Optional Description -->
+                    @if($idea->description)
+                        <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 text-xs text-slate-700 leading-relaxed whitespace-pre-line">
+                            {{ $idea->description }}
+                        </div>
+                    @endif
+
+                    <!-- Dynamic Links & Embedded YouTube Video Players -->
+                    @if(!empty($idea->processed_links))
+                        <div class="space-y-2 pt-0.5">
+                            @foreach($idea->processed_links as $linkItem)
+                                <!-- YouTube player embed above link if it's a YouTube URL -->
+                                @if($linkItem['embed_url'])
+                                    <div class="rounded-xl overflow-hidden border border-slate-200 bg-black aspect-video w-full shadow-sm">
+                                        <iframe src="{{ $linkItem['embed_url'] }}"
+                                                title="YouTube video"
+                                                class="w-full h-full"
+                                                frameborder="0"
+                                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                                allowfullscreen>
+                                        </iframe>
+                                    </div>
+                                @endif
+
+                                <!-- Clickable Link Badge -->
+                                <div class="flex items-center gap-1.5 text-xs">
+                                    <a href="{{ $linkItem['url'] }}" target="_blank" rel="noopener noreferrer"
+                                       class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 font-medium truncate max-w-full transition">
+                                        <span>{{ $linkItem['youtube_id'] ? '▶️' : '🔗' }}</span>
+                                        <span class="truncate">{{ $linkItem['domain'] }}</span>
+                                        <svg class="w-3 h-3 text-slate-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                                    </a>
+                                </div>
+                            @endforeach
+                        </div>
+                    @endif
+
                 </div>
             @endif
 
             <!-- Card Actions (Reactions & Schedule Button) -->
-            <div class="flex items-center justify-between pt-2 border-t border-slate-100 mt-1">
+            <div class="flex items-center justify-between pt-2 border-t border-slate-100 mt-0.5" @click.stop>
                 
                 <!-- Thumbs Up Reaction -->
                 <button hx-post="{{ route('ideas.react', $idea->id) }}"
@@ -164,3 +223,4 @@
         </div>
     @endforeach
 @endif
+
