@@ -160,11 +160,21 @@ return [
     'delete_comment' => 'Dzēst komentāru',
     'delete_comment_confirm' => 'Vai tiešām vēlies dzēst šo komentāru?',
 
-    // Leave Workspace
+    // Leave Workspace & Remove Members
     'leave_workspace' => 'Pamest darbavietu',
     'leave_workspace_hint' => 'Tu vairs neredzēsi šīs komandas uzdevumus un plānus.',
     'leave_workspace_btn' => 'Pamest darbavietu 🚪',
     'leave_workspace_confirm' => 'Vai tiešām vēlies pamest darbavietu \':name\'?',
+    'member_prefix' => 'Dalībnieks: :name',
+    'remove_member' => 'Izņemt dalībnieku',
+    'remove_member_btn' => 'Izņemt',
+    'remove_member_confirm' => 'Vai tiešām vēlies izņemt dalībnieku :name no šīs darbavietas?',
+    'cannot_remove_owner' => 'Darbavietas īpašnieku nevar izņemt.',
+    'member_removed_success' => 'Lietotājs :name tika veiksmīgi izņemts no darbavietas.',
+    'leave' => 'Pamest',
+    'owner' => 'Īpašnieks',
+    'you' => 'Tu',
+    'not_a_member' => 'Lietotājs nav šīs darbavietas dalībnieks.',
 
     // Forgot & Reset Password
     'forgot_password' => 'Aizmirsi paroli?',

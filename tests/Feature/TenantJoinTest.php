@@ -144,4 +144,78 @@ class TenantJoinTest extends TestCase
         $this->assertNotNull($newTenant);
         $this->assertEquals($newTenant->id, session('current_tenant_id'));
     }
+
+    public function test_owner_can_remove_member_from_workspace(): void
+    {
+        $this->tenant->users()->attach($this->member->id, ['role' => 'member']);
+
+        $response = $this->actingAs($this->owner)
+            ->withSession(['current_tenant_id' => $this->tenant->id])
+            ->delete(route('tenants.members.destroy', [$this->tenant->id, $this->member->id]));
+
+        $response->assertRedirect(route('ideas.index'));
+        $this->assertFalse($this->tenant->users()->where('users.id', $this->member->id)->exists());
+    }
+
+    public function test_admin_can_remove_member_from_workspace(): void
+    {
+        $admin = User::factory()->create([
+            'email' => 'admin@komanda.lv',
+            'name' => 'Admins',
+        ]);
+        $this->tenant->users()->attach($admin->id, ['role' => 'admin']);
+        $this->tenant->users()->attach($this->member->id, ['role' => 'member']);
+
+        $response = $this->actingAs($admin)
+            ->withSession(['current_tenant_id' => $this->tenant->id])
+            ->delete(route('tenants.members.destroy', [$this->tenant->id, $this->member->id]));
+
+        $response->assertRedirect(route('ideas.index'));
+        $this->assertFalse($this->tenant->users()->where('users.id', $this->member->id)->exists());
+    }
+
+    public function test_admin_cannot_remove_workspace_owner(): void
+    {
+        $admin = User::factory()->create([
+            'email' => 'admin@komanda.lv',
+            'name' => 'Admins',
+        ]);
+        $this->tenant->users()->attach($admin->id, ['role' => 'admin']);
+
+        $response = $this->actingAs($admin)
+            ->withSession(['current_tenant_id' => $this->tenant->id])
+            ->delete(route('tenants.members.destroy', [$this->tenant->id, $this->owner->id]));
+
+        $response->assertStatus(403);
+        $this->assertTrue($this->tenant->users()->where('users.id', $this->owner->id)->exists());
+    }
+
+    public function test_regular_member_cannot_remove_another_member(): void
+    {
+        $otherMember = User::factory()->create([
+            'email' => 'other@komanda.lv',
+            'name' => 'Cits dalībnieks',
+        ]);
+        $this->tenant->users()->attach($this->member->id, ['role' => 'member']);
+        $this->tenant->users()->attach($otherMember->id, ['role' => 'member']);
+
+        $response = $this->actingAs($this->member)
+            ->withSession(['current_tenant_id' => $this->tenant->id])
+            ->delete(route('tenants.members.destroy', [$this->tenant->id, $otherMember->id]));
+
+        $response->assertStatus(403);
+        $this->assertTrue($this->tenant->users()->where('users.id', $otherMember->id)->exists());
+    }
+
+    public function test_user_can_remove_themselves_via_destroy_route(): void
+    {
+        $this->tenant->users()->attach($this->member->id, ['role' => 'member']);
+
+        $response = $this->actingAs($this->member)
+            ->withSession(['current_tenant_id' => $this->tenant->id])
+            ->delete(route('tenants.members.destroy', [$this->tenant->id, $this->member->id]));
+
+        $response->assertRedirect(route('ideas.index'));
+        $this->assertFalse($this->tenant->users()->where('users.id', $this->member->id)->exists());
+    }
 }

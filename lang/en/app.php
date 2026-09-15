@@ -161,11 +161,21 @@ return [
     'delete_comment' => 'Delete comment',
     'delete_comment_confirm' => 'Are you sure you want to delete this comment?',
 
-    // Leave Workspace
+    // Leave Workspace & Remove Members
     'leave_workspace' => 'Leave Workspace',
     'leave_workspace_hint' => 'You will no longer have access to this team\'s tasks and plans.',
     'leave_workspace_btn' => 'Leave Workspace 🚪',
     'leave_workspace_confirm' => 'Are you sure you want to leave workspace \':name\'?',
+    'member_prefix' => 'Member: :name',
+    'remove_member' => 'Remove Member',
+    'remove_member_btn' => 'Remove',
+    'remove_member_confirm' => 'Are you sure you want to remove :name from this workspace?',
+    'cannot_remove_owner' => 'Workspace owner cannot be removed.',
+    'member_removed_success' => 'User :name was successfully removed from the workspace.',
+    'leave' => 'Leave',
+    'owner' => 'Owner',
+    'you' => 'You',
+    'not_a_member' => 'User is not a member of this workspace.',
 
     // Forgot & Reset Password
     'forgot_password' => 'Forgot password?',

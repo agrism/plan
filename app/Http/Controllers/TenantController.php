@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Tenant;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class TenantController extends Controller
@@ -161,5 +162,47 @@ class TenantController extends Controller
         session(['current_tenant_id' => $nextTenant->id]);
 
         return redirect()->route('ideas.index');
+    }
+
+    public function removeMember(Request $request, Tenant $tenant, User $user)
+    {
+        $currentUser = auth()->user();
+
+        // Ensure current user is in the tenant
+        if (!$tenant->users()->where('users.id', $currentUser->id)->exists()) {
+            abort(403);
+        }
+
+        // Ensure target user is in the tenant
+        if (!$tenant->users()->where('users.id', $user->id)->exists()) {
+            abort(404, __('app.not_a_member'));
+        }
+
+        // If user is removing themselves, run leave logic
+        if ($user->id === $currentUser->id) {
+            return $this->leave($request, $tenant);
+        }
+
+        // Check if current user is owner or admin
+        $isOwner = ($tenant->owner_id === $currentUser->id);
+        $isAdmin = $tenant->users()->where('users.id', $currentUser->id)->wherePivot('role', 'admin')->exists();
+
+        if (!$isOwner && !$isAdmin) {
+            abort(403, __('app.unauthorized'));
+        }
+
+        // The tenant owner cannot be removed by others
+        if ($tenant->owner_id === $user->id) {
+            abort(403, __('app.cannot_remove_owner'));
+        }
+
+        // Detach target user
+        $tenant->users()->detach($user->id);
+
+        if ($request->header('HX-Request')) {
+            return redirect()->route('ideas.index');
+        }
+
+        return redirect()->route('ideas.index')->with('status', __('app.member_removed_success', ['name' => $user->name]));
     }
 }

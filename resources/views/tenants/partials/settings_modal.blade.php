@@ -226,21 +226,58 @@
             </div>
 
             <!-- Team Members List -->
+            @php
+                $isOwner = ($tenant->owner_id === $user->id);
+                $currentUserPivot = $tenant->users->firstWhere('id', $user->id);
+                $isAdmin = ($isOwner || ($currentUserPivot && $currentUserPivot->pivot->role === 'admin'));
+            @endphp
             <div class="space-y-2">
                 <h4 class="text-xs font-extrabold uppercase text-slate-400 tracking-wider">{{ __('app.workspace_members', ['count' => $tenant->users->count()]) }}</h4>
                 <div class="divide-y divide-slate-100 border border-slate-200 rounded-md overflow-hidden bg-white">
                     @foreach($tenant->users as $member)
-                        <div class="p-3 flex items-center justify-between">
-                            <div class="flex items-center gap-2.5">
-                                <span class="text-xl">{{ $member->avatar ?? '👤' }}</span>
-                                <div>
-                                    <p class="text-xs font-bold text-slate-900">{{ $member->name }}</p>
-                                    <p class="text-[10px] text-slate-500">{{ $member->email }}</p>
+                        <div class="p-3 flex items-center justify-between gap-3">
+                            <div class="flex items-center gap-2.5 min-w-0">
+                                <span class="text-xl flex-shrink-0">{{ $member->avatar ?? '👤' }}</span>
+                                <div class="min-w-0">
+                                    <div class="flex items-center gap-1.5 flex-wrap">
+                                        <p class="text-xs font-bold text-slate-900 truncate">{{ $member->name }}</p>
+                                        @if($member->id === $user->id)
+                                            <span class="px-1.5 py-0.5 rounded text-[9px] font-extrabold bg-amber-100 text-amber-900 border border-amber-300">{{ __('app.you') }}</span>
+                                        @endif
+                                        @if($member->id === $tenant->owner_id)
+                                            <span class="px-1.5 py-0.5 rounded text-[9px] font-extrabold bg-purple-50 text-purple-900 border border-purple-200">👑 {{ __('app.owner') }}</span>
+                                        @endif
+                                    </div>
+                                    <p class="text-[10px] text-slate-500 truncate">{{ $member->email }}</p>
                                 </div>
                             </div>
-                            <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-100 text-slate-600">
-                                {{ $member->pivot->role ?? 'member' }}
-                            </span>
+                            
+                            <div class="flex items-center gap-2 flex-shrink-0">
+                                <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-100 text-slate-600">
+                                    {{ $member->pivot->role ?? 'member' }}
+                                </span>
+
+                                @if($member->id === $user->id)
+                                    <form action="{{ route('tenants.leave', $tenant->id) }}" method="POST"
+                                          onsubmit="return confirm('{{ __('app.leave_workspace_confirm', ['name' => addslashes($tenant->name)]) }}')">
+                                        @csrf
+                                        <button type="submit"
+                                                class="px-2 py-1 bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-bold rounded flex items-center gap-1 transition"
+                                                title="{{ __('app.leave_workspace') }}">
+                                            <span>🚪</span>
+                                            <span class="hidden sm:inline">{{ __('app.leave') }}</span>
+                                        </button>
+                                    </form>
+                                @elseif($isAdmin && $member->id !== $tenant->owner_id)
+                                    <button type="button"
+                                            @click="window.openMathDeleteConfirm('{{ __('app.member_prefix', ['name' => addslashes($member->name)]) }}', '{{ route('tenants.members.destroy', [$tenant->id, $member->id]) }}')"
+                                            class="px-2 py-1 bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-bold rounded flex items-center gap-1 transition"
+                                            title="{{ __('app.remove_member') }}">
+                                        <span>🗑️</span>
+                                        <span class="hidden sm:inline">{{ __('app.remove_member_btn') }}</span>
+                                    </button>
+                                @endif
+                            </div>
                         </div>
                     @endforeach
                 </div>
