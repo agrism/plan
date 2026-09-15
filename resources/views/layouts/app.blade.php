@@ -63,7 +63,7 @@
             <!-- Left: Workspace Switcher Dropdown & Settings Button -->
             <div class="flex items-center gap-2">
                 <div class="relative" x-data="{ open: false }">
-                    <button @click="open = !open" type="button" class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200/80 border border-slate-200 transition text-sm font-bold text-slate-800">
+                    <button @click="open = !open" type="button" class="flex items-center gap-2 px-3 py-1.5 rounded-md bg-slate-100 hover:bg-slate-200/80 border border-slate-200 transition text-sm font-bold text-slate-800">
                         <span class="text-base">💼</span>
                         <span class="truncate max-w-[140px] sm:max-w-[200px] text-amber-700">{{ $tenant->name ?? __('app.workspace') }}</span>
                         <svg class="w-4 h-4 text-slate-500 transition" :class="{'rotate-180': open}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -73,13 +73,13 @@
 
                     <!-- Dropdown Menu -->
                     <div x-show="open" @click.outside="open = false" x-cloak
-                         class="absolute left-0 mt-2 w-72 bg-white border border-slate-200 rounded-xl shadow-xl p-1.5 z-50">
+                         class="absolute left-0 mt-2 w-72 bg-white border border-slate-200 rounded-lg shadow-xl p-1.5 z-50">
                         <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400 px-3 py-1.5">{{ __('app.your_workspaces') }}</div>
                         @if(auth()->check())
                             @foreach(auth()->user()->tenants as $t)
                                 <form action="{{ route('tenants.switch', $t->id) }}" method="POST">
                                     @csrf
-                                    <button type="submit" class="w-full text-left flex items-center justify-between px-3 py-2 rounded-lg text-sm transition {{ $tenant->id === $t->id ? 'bg-amber-50 text-amber-900 font-bold border border-amber-200' : 'text-slate-700 hover:bg-slate-100' }}">
+                                    <button type="submit" class="w-full text-left flex items-center justify-between px-3 py-2 rounded-md text-sm transition {{ $tenant->id === $t->id ? 'bg-amber-50 text-amber-900 font-bold border border-amber-200' : 'text-slate-700 hover:bg-slate-100' }}">
                                         <span class="truncate">{{ $t->name }}</span>
                                         @if($tenant->id === $t->id)
                                             <span class="text-amber-600 text-xs">✓ {{ __('app.active') }}</span>
@@ -94,13 +94,13 @@
                                 hx-swap="innerHTML"
                                 @click="open = false"
                                 type="button"
-                                class="w-full text-left flex items-center gap-2 px-3 py-2 text-xs font-bold text-slate-700 hover:bg-amber-50 hover:text-amber-900 rounded-lg transition">
+                                class="w-full text-left flex items-center gap-2 px-3 py-2 text-xs font-bold text-slate-700 hover:bg-amber-50 hover:text-amber-900 rounded-md transition">
                             <span>⚙️</span> {{ __('app.workspace_and_categories') }}
                         </button>
-                        <button @click="open = false; showJoinModal = true" class="w-full text-left flex items-center gap-2 px-3 py-2 text-xs font-bold text-amber-800 hover:bg-amber-50 rounded-lg transition">
+                        <button @click="open = false; showJoinModal = true" class="w-full text-left flex items-center gap-2 px-3 py-2 text-xs font-bold text-amber-800 hover:bg-amber-50 rounded-md transition">
                             <span>🔑</span> {{ __('app.join_workspace') }}
                         </button>
-                        <button @click="open = false; showTenantModal = true" class="w-full text-left flex items-center gap-2 px-3 py-2 text-xs font-bold text-amber-600 hover:bg-amber-50 rounded-lg transition">
+                        <button @click="open = false; showTenantModal = true" class="w-full text-left flex items-center gap-2 px-3 py-2 text-xs font-bold text-amber-600 hover:bg-amber-50 rounded-md transition">
                             <span>➕</span> {{ __('app.create_workspace') }}
                         </button>
                     </div>
@@ -112,19 +112,19 @@
                         hx-swap="innerHTML"
                         type="button"
                         title="{{ __('app.workspace_and_categories') }}"
-                        class="p-2 rounded-lg bg-slate-100 hover:bg-amber-100 hover:text-amber-900 text-slate-600 border border-slate-200 transition text-xs font-bold flex items-center gap-1.5">
+                        class="p-2 rounded-md bg-slate-100 hover:bg-amber-100 hover:text-amber-900 text-slate-600 border border-slate-200 transition text-xs font-bold flex items-center gap-1.5">
                     <span>⚙️</span>
                     <span class="hidden lg:inline">{{ __('app.settings') }}</span>
                 </button>
             </div>
 
             <!-- Center: Team Member Avatars (Team Info) -->
-            <div class="hidden sm:flex items-center gap-1.5 bg-slate-100 p-1 rounded-xl border border-slate-200">
+            <div class="hidden sm:flex items-center gap-1.5 bg-slate-100 p-1 rounded-md border border-slate-200">
                 <span class="text-xs text-slate-500 font-medium pl-2 pr-1">{{ __('app.team') }}:</span>
                 @if(isset($tenant))
                     @foreach($tenant->users as $member)
                         <div title="{{ $member->name }}"
-                             class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium {{ auth()->id() === $member->id ? 'bg-amber-500 text-slate-950 font-bold shadow-sm' : 'text-slate-700 bg-white/70 border border-slate-200/60' }}">
+                             class="flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-medium {{ auth()->id() === $member->id ? 'bg-amber-500 text-slate-950 font-bold shadow-sm' : 'text-slate-700 bg-white/70 border border-slate-200/60' }}">
                             <span>{{ $member->avatar ?? '👤' }}</span>
                             <span>{{ explode(' ', $member->name)[0] }}</span>
                         </div>
@@ -136,16 +136,16 @@
             <div class="flex items-center gap-2.5 sm:gap-3">
                 
                 <!-- Language Switcher (LV / EN) -->
-                <div class="flex items-center bg-slate-100 p-0.5 rounded-lg border border-slate-200 text-xs font-bold">
+                <div class="flex items-center bg-slate-100 p-0.5 rounded-md border border-slate-200 text-xs font-bold">
                     <a href="{{ route('locale.switch', 'lv') }}"
                        title="Latviešu valoda"
-                       class="px-2 py-1 rounded-md transition flex items-center gap-1 {{ app()->getLocale() === 'lv' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-800' }}">
+                       class="px-2 py-1 rounded transition flex items-center gap-1 {{ app()->getLocale() === 'lv' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-800' }}">
                         <span>🇱🇻</span>
                         <span class="text-[11px]">LV</span>
                     </a>
                     <a href="{{ route('locale.switch', 'en') }}"
                        title="English"
-                       class="px-2 py-1 rounded-md transition flex items-center gap-1 {{ app()->getLocale() === 'en' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-800' }}">
+                       class="px-2 py-1 rounded transition flex items-center gap-1 {{ app()->getLocale() === 'en' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-800' }}">
                         <span>🇬🇧</span>
                         <span class="text-[11px]">EN</span>
                     </a>
@@ -156,14 +156,14 @@
                         hx-swap="innerHTML"
                         type="button"
                         title="{{ __('app.profile_settings') }}"
-                        class="flex items-center gap-2 text-right p-1.5 rounded-lg hover:bg-slate-100 hover:text-amber-900 border border-transparent hover:border-slate-200 transition cursor-pointer">
+                        class="flex items-center gap-2 text-right p-1.5 rounded-md hover:bg-slate-100 hover:text-amber-900 border border-transparent hover:border-slate-200 transition cursor-pointer">
                     <span class="text-xl">{{ auth()->user()->avatar ?? '👤' }}</span>
                     <span class="hidden md:inline text-xs font-bold text-slate-800">{{ auth()->user()->name }}</span>
                 </button>
                 
                 <form action="{{ route('logout') }}" method="POST">
                     @csrf
-                    <button type="submit" title="{{ __('app.logout') }}" class="p-2 rounded-lg bg-slate-100 hover:bg-rose-50 hover:text-rose-600 text-slate-500 border border-slate-200 transition text-xs">
+                    <button type="submit" title="{{ __('app.logout') }}" class="p-2 rounded-md bg-slate-100 hover:bg-rose-50 hover:text-rose-600 text-slate-500 border border-slate-200 transition text-xs">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
                     </button>
                 </form>
@@ -176,12 +176,12 @@
         <!-- Global Flash Status Notification -->
         @if (session('status'))
             <div x-data="{ show: true }" x-show="show" x-transition
-                 class="mb-6 p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-900 flex items-center justify-between gap-3 shadow-sm">
+                 class="mb-6 p-4 rounded-md bg-emerald-500/10 border border-emerald-500/20 text-emerald-900 flex items-center justify-between gap-3 shadow-sm">
                 <div class="flex items-center gap-2.5 text-xs font-bold">
                     <span class="text-base">✓</span>
                     <span>{{ session('status') }}</span>
                 </div>
-                <button type="button" @click="show = false" class="text-emerald-700 hover:text-emerald-950 p-1 rounded-md">
+                <button type="button" @click="show = false" class="text-emerald-700 hover:text-emerald-950 p-1 rounded">
                     ✕
                 </button>
             </div>
@@ -194,7 +194,7 @@
     <nav class="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-lg border-t border-slate-200 px-4 py-2 flex items-center justify-around shadow-2xl">
         <!-- Tab 1: Tasks -->
         <button @click="mobileTab = 'ideas'"
-                class="flex flex-col items-center gap-1 py-1 px-3 rounded-lg tap-highlight-transparent transition"
+                class="flex flex-col items-center gap-1 py-1 px-3 rounded-md tap-highlight-transparent transition"
                 :class="mobileTab === 'ideas' ? 'text-amber-600 font-bold' : 'text-slate-500 hover:text-slate-800'">
             <span class="text-xl">💡</span>
             <span class="text-[10px]">{{ __('app.task_backlog') }}</span>
@@ -202,7 +202,7 @@
 
         <!-- Tab 2: Plan -->
         <button @click="mobileTab = 'weekend'"
-                class="flex flex-col items-center gap-1 py-1 px-3 rounded-lg tap-highlight-transparent transition"
+                class="flex flex-col items-center gap-1 py-1 px-3 rounded-md tap-highlight-transparent transition"
                 :class="mobileTab === 'weekend' ? 'text-amber-600 font-bold' : 'text-slate-500 hover:text-slate-800'">
             <span class="text-xl">📅</span>
             <span class="text-[10px]">{{ __('app.daily_plan') }}</span>
@@ -210,7 +210,7 @@
 
         <!-- Big Central Add Button -->
         <button @click="showAddModal = true"
-                class="flex items-center justify-center w-11 h-11 -mt-5 rounded-xl bg-gradient-to-tr from-amber-500 to-amber-400 text-slate-950 font-extrabold shadow-lg shadow-amber-500/30 active:scale-95 transition tap-highlight-transparent">
+                class="flex items-center justify-center w-11 h-11 -mt-5 rounded-lg bg-gradient-to-tr from-amber-500 to-amber-400 text-slate-950 font-extrabold shadow-lg shadow-amber-500/30 active:scale-95 transition tap-highlight-transparent">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path></svg>
         </button>
 
@@ -218,7 +218,7 @@
         <button hx-get="{{ route('tenants.settings') }}"
                 hx-target="#settings-modal-slot"
                 hx-swap="innerHTML"
-                class="flex flex-col items-center gap-1 py-1 px-3 rounded-lg tap-highlight-transparent text-slate-500 hover:text-slate-800">
+                class="flex flex-col items-center gap-1 py-1 px-3 rounded-md tap-highlight-transparent text-slate-500 hover:text-slate-800">
             <span class="text-xl">{{ auth()->user()->avatar ?? '⚙️' }}</span>
             <span class="text-[10px] font-semibold">{{ __('app.settings') }}</span>
         </button>
@@ -234,14 +234,14 @@
              x-transition:leave="transition ease-in duration-200 transform"
              x-transition:leave-start="translate-y-0 sm:scale-100"
              x-transition:leave-end="translate-y-full sm:translate-y-0 sm:scale-95"
-             class="w-full max-w-lg bg-white border border-slate-200 rounded-t-2xl sm:rounded-2xl p-6 shadow-2xl">
+             class="w-full max-w-lg bg-white border border-slate-200 rounded-t-lg sm:rounded-lg p-6 shadow-2xl">
             
             <div class="flex items-center justify-between mb-4">
                 <div class="flex items-center gap-2">
                     <span class="text-2xl">✨</span>
                     <h3 class="text-lg font-bold text-slate-900">{{ __('app.add_new_task') }}</h3>
                 </div>
-                <button @click="showAddModal = false" class="p-1.5 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100">
+                <button @click="showAddModal = false" class="p-1.5 text-slate-400 hover:text-slate-600 rounded hover:bg-slate-100">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
             </div>
@@ -259,14 +259,14 @@
                 <div>
                     <label class="block text-xs font-bold text-slate-700 mb-1">{{ __('app.task_title') }}</label>
                     <input type="text" name="title" required autofocus placeholder="{{ __('app.task_title_placeholder') }}"
-                           class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 focus:border-amber-500 focus:bg-white focus:ring-1 focus:ring-amber-500 rounded-lg text-slate-900 placeholder-slate-400 text-sm">
+                           class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 focus:border-amber-500 focus:bg-white focus:ring-1 focus:ring-amber-500 rounded-md text-slate-900 placeholder-slate-400 text-sm">
                 </div>
 
                 <!-- Optional Description -->
                 <div>
                     <label class="block text-xs font-bold text-slate-700 mb-1">{{ __('app.description') }} ({{ __('app.optional') }})</label>
                     <textarea name="description" rows="2" placeholder="{{ __('app.description_placeholder') }}"
-                              class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 focus:border-amber-500 focus:bg-white rounded-lg text-slate-900 text-xs resize-none"></textarea>
+                              class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 focus:border-amber-500 focus:bg-white rounded-md text-slate-900 text-xs resize-none"></textarea>
                 </div>
 
                 <div>
@@ -279,14 +279,14 @@
                     <div class="grid grid-cols-3 gap-2 text-xs max-h-36 overflow-y-auto p-0.5">
                         @if(isset($tenant) && $tenant->categories)
                             @foreach($tenant->categories as $idx => $cat)
-                                <label class="flex items-center gap-1.5 p-2 rounded-lg bg-slate-50 border border-slate-200 cursor-pointer hover:border-amber-400 has-[:checked]:border-amber-500 has-[:checked]:bg-amber-50 has-[:checked]:text-amber-950 font-semibold truncate transition">
+                                <label class="flex items-center gap-1.5 p-2 rounded bg-slate-50 border border-slate-200 cursor-pointer hover:border-amber-400 has-[:checked]:border-amber-500 has-[:checked]:bg-amber-50 has-[:checked]:text-amber-950 font-semibold truncate transition">
                                     <input type="radio" name="category_id" value="{{ $cat->id }}" {{ $idx === 0 ? 'checked' : '' }} class="hidden">
                                     <span class="text-sm flex-shrink-0">{{ $cat->emoji }}</span>
                                     <span class="truncate">{{ $cat->name }}</span>
                                 </label>
                             @endforeach
                         @else
-                            <label class="flex items-center gap-1.5 p-2 rounded-lg bg-slate-50 border border-slate-200 cursor-pointer hover:border-amber-400 has-[:checked]:border-amber-500 has-[:checked]:bg-amber-50 has-[:checked]:text-amber-950 font-semibold truncate transition">
+                            <label class="flex items-center gap-1.5 p-2 rounded bg-slate-50 border border-slate-200 cursor-pointer hover:border-amber-400 has-[:checked]:border-amber-500 has-[:checked]:bg-amber-50 has-[:checked]:text-amber-950 font-semibold truncate transition">
                                 <input type="radio" name="category" value="citi" checked class="hidden">
                                 <span class="text-sm flex-shrink-0">✨</span>
                                 <span class="truncate">{{ __('app.all') }}</span>
@@ -307,8 +307,8 @@
                             <div class="flex items-center gap-2">
                                 <span class="text-slate-400 text-xs">🔗</span>
                                 <input type="text" :name="'links[' + index + ']'" x-model="formLinks[index]" placeholder="{{ __('app.links_placeholder') }}"
-                                       class="flex-1 px-3 py-2 bg-slate-50 border border-slate-300 focus:border-amber-500 focus:bg-white rounded-lg text-slate-900 text-xs">
-                                <button type="button" @click="formLinks.splice(index, 1)" class="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-rose-50 text-xs" title="{{ __('app.remove_image') }}">✕</button>
+                                       class="flex-1 px-3 py-2 bg-slate-50 border border-slate-300 focus:border-amber-500 focus:bg-white rounded-md text-slate-900 text-xs">
+                                <button type="button" @click="formLinks.splice(index, 1)" class="p-1.5 text-slate-400 hover:text-rose-600 rounded hover:bg-rose-50 text-xs" title="{{ __('app.remove_image') }}">✕</button>
                             </div>
                         </template>
                     </div>
@@ -323,21 +323,21 @@
                 <div>
                     <label class="block text-xs font-bold text-slate-700 mb-1">{{ __('app.schedule_date_optional') }}</label>
                     <input type="date" name="scheduled_date"
-                           class="w-full px-3.5 py-2 bg-slate-50 border border-slate-300 focus:border-amber-500 focus:bg-white rounded-lg text-slate-900 text-xs">
+                           class="w-full px-3.5 py-2 bg-slate-50 border border-slate-300 focus:border-amber-500 focus:bg-white rounded-md text-slate-900 text-xs">
                 </div>
 
                 <!-- Optional Image Upload -->
                 <div x-data="{ imagePreview: null }">
                     <label class="block text-xs font-bold text-slate-700 mb-1">{{ __('app.add_image') }}</label>
                     <div class="flex items-center gap-3">
-                        <label class="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-slate-50 border border-dashed border-slate-300 hover:border-amber-500 rounded-lg cursor-pointer text-xs font-semibold text-slate-600 hover:text-slate-900 transition">
+                        <label class="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-slate-50 border border-dashed border-slate-300 hover:border-amber-500 rounded-md cursor-pointer text-xs font-semibold text-slate-600 hover:text-slate-900 transition">
                             <span>📷</span>
                             <span x-text="imagePreview ? '{{ __('app.change_image') }}' : '{{ __('app.upload_image') }}'"></span>
                             <input type="file" name="image_file" accept="image/*" class="hidden"
                                    @change="const file = $event.target.files[0]; if (file) { const reader = new FileReader(); reader.onload = (e) => { imagePreview = e.target.result; }; reader.readAsDataURL(file); }">
                         </label>
                         <template x-if="imagePreview">
-                            <div class="relative w-12 h-12 rounded-lg overflow-hidden border border-slate-200 shadow-sm flex-shrink-0">
+                            <div class="relative w-12 h-12 rounded-md overflow-hidden border border-slate-200 shadow-sm flex-shrink-0">
                                 <img :src="imagePreview" class="w-full h-full object-cover">
                                 <button type="button" @click="imagePreview = null"
                                         class="absolute inset-0 bg-black/40 text-white flex items-center justify-center text-xs font-bold">✕</button>
@@ -347,7 +347,7 @@
                 </div>
 
                 <div class="pt-2">
-                    <button type="submit" class="w-full py-3 bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 text-slate-950 font-bold text-sm rounded-lg shadow-md shadow-amber-500/20 active:scale-[0.98] transition">
+                    <button type="submit" class="w-full py-3 bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 text-slate-950 font-bold text-sm rounded-md shadow-md shadow-amber-500/20 active:scale-[0.98] transition">
                         {{ __('app.add_to_backlog_btn') }} 💡
                     </button>
                 </div>
@@ -357,18 +357,18 @@
 
     <!-- Create Workspace Modal -->
     <div x-show="showTenantModal" x-cloak class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm">
-        <div @click.outside="showTenantModal = false" class="w-full max-w-md bg-white border border-slate-200 rounded-2xl p-6 shadow-2xl">
+        <div @click.outside="showTenantModal = false" class="w-full max-w-md bg-white border border-slate-200 rounded-lg p-6 shadow-2xl">
             <h3 class="text-lg font-bold text-slate-900 mb-4">{{ __('app.create_workspace') }}</h3>
             <form action="{{ route('tenants.store') }}" method="POST" class="space-y-4">
                 @csrf
                 <div>
                     <label class="block text-xs font-bold text-slate-700 mb-1">{{ __('app.workspace_name') }}</label>
                     <input type="text" name="name" required placeholder="Piem., Marketing Team 🚀"
-                           class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-lg text-slate-900 text-sm focus:border-amber-500">
+                           class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-md text-slate-900 text-sm focus:border-amber-500">
                 </div>
                 <div class="flex gap-2 justify-end">
                     <button type="button" @click="showTenantModal = false" class="px-4 py-2 text-xs font-semibold text-slate-500 hover:text-slate-800">{{ __('app.cancel') }}</button>
-                    <button type="submit" class="px-4 py-2 text-xs font-bold bg-amber-500 text-slate-950 rounded-lg hover:bg-amber-400">{{ __('app.create') }}</button>
+                    <button type="submit" class="px-4 py-2 text-xs font-bold bg-amber-500 text-slate-950 rounded-md hover:bg-amber-400">{{ __('app.create') }}</button>
                 </div>
             </form>
         </div>
@@ -376,7 +376,7 @@
 
     <!-- Join Workspace Modal -->
     <div x-show="showJoinModal" x-cloak class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
-        <div @click.outside="showJoinModal = false" class="w-full max-w-md bg-white border border-slate-200 rounded-2xl p-6 shadow-2xl space-y-4">
+        <div @click.outside="showJoinModal = false" class="w-full max-w-md bg-white border border-slate-200 rounded-lg p-6 shadow-2xl space-y-4">
             <div class="flex items-center justify-between pb-2 border-b border-slate-100">
                 <div class="flex items-center gap-2.5">
                     <span class="text-2xl">🔑</span>
@@ -385,7 +385,7 @@
                         <p class="text-xs text-slate-500">{{ __('app.join_workspace_subtitle') }}</p>
                     </div>
                 </div>
-                <button type="button" @click="showJoinModal = false" class="p-1.5 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100">
+                <button type="button" @click="showJoinModal = false" class="p-1.5 text-slate-400 hover:text-slate-600 rounded hover:bg-slate-100">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
             </div>
@@ -395,11 +395,11 @@
                 <div>
                     <label class="block text-xs font-bold text-slate-700 mb-1">{{ __('app.enter_invite_code') }}</label>
                     <input type="text" name="invite_code" required autofocus placeholder="{{ __('app.invite_code_placeholder') }}"
-                           class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 focus:border-amber-500 focus:bg-white rounded-lg text-slate-900 font-mono font-bold text-sm">
+                           class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 focus:border-amber-500 focus:bg-white rounded-md text-slate-900 font-mono font-bold text-sm">
                 </div>
                 <div class="flex gap-2 justify-end pt-1">
                     <button type="button" @click="showJoinModal = false" class="px-4 py-2 text-xs font-semibold text-slate-500 hover:text-slate-800">{{ __('app.cancel') }}</button>
-                    <button type="submit" class="px-5 py-2.5 text-xs font-bold bg-amber-500 text-slate-950 rounded-lg hover:bg-amber-400 shadow-sm active:scale-95 transition">{{ __('app.join_btn') }}</button>
+                    <button type="submit" class="px-5 py-2.5 text-xs font-bold bg-amber-500 text-slate-950 rounded-md hover:bg-amber-400 shadow-sm active:scale-95 transition">{{ __('app.join_btn') }}</button>
                 </div>
             </form>
         </div>
@@ -407,14 +407,14 @@
 
     <!-- Create Category Modal -->
     <div x-show="showCategoryModal" x-cloak class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
-        <div @click.outside="showCategoryModal = false" class="w-full max-w-md bg-white border border-slate-200 rounded-2xl p-6 shadow-2xl space-y-4"
+        <div @click.outside="showCategoryModal = false" class="w-full max-w-md bg-white border border-slate-200 rounded-lg p-6 shadow-2xl space-y-4"
              x-data="{ selectedEmoji: '📁', selectedColor: 'blue' }">
             <div class="flex items-center justify-between pb-2 border-b border-slate-100">
                 <div class="flex items-center gap-2">
                     <span class="text-2xl" x-text="selectedEmoji"></span>
                     <h3 class="text-lg font-bold text-slate-900">{{ __('app.create_new_category') }}</h3>
                 </div>
-                <button type="button" @click="showCategoryModal = false" class="p-1.5 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100">
+                <button type="button" @click="showCategoryModal = false" class="p-1.5 text-slate-400 hover:text-slate-600 rounded hover:bg-slate-100">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
             </div>
@@ -429,16 +429,16 @@
                 <div>
                     <label class="block text-xs font-bold text-slate-700 mb-1">{{ __('app.category_name') }}</label>
                     <input type="text" name="name" required placeholder="{{ __('app.category_name_placeholder') }}"
-                           class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-lg text-slate-900 text-sm focus:border-amber-500 font-semibold">
+                           class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-md text-slate-900 text-sm focus:border-amber-500 font-semibold">
                 </div>
 
                 <div>
                     <label class="block text-xs font-bold text-slate-700 mb-1.5">{{ __('app.icon_emoji') }}</label>
                     <input type="hidden" name="emoji" :value="selectedEmoji">
-                    <div class="flex flex-wrap gap-1.5 text-base p-2 bg-slate-50 border border-slate-200 rounded-xl max-h-28 overflow-y-auto">
+                    <div class="flex flex-wrap gap-1.5 text-base p-2 bg-slate-50 border border-slate-200 rounded-md max-h-28 overflow-y-auto">
                         <template x-for="em in ['💼', '⚡', '🚀', '👥', '📋', '🎯', '🎨', '📊', '🛠️', '💡', '💰', '🔒', '📦', '🏷️', '📢', '💻', '🍕', '✨', '📝', '🛒', '🔧', '📈', '🤝', '⚙️']">
                             <button type="button" @click="selectedEmoji = em"
-                                    class="w-8 h-8 rounded-lg flex items-center justify-center transition text-base"
+                                    class="w-8 h-8 rounded flex items-center justify-center transition text-base"
                                     :class="selectedEmoji === em ? 'bg-amber-400 scale-110 shadow-sm' : 'hover:bg-slate-200'">
                                 <span x-text="em"></span>
                             </button>
@@ -449,7 +449,7 @@
                 <div>
                     <label class="block text-xs font-bold text-slate-700 mb-1.5">{{ __('app.color') }}</label>
                     <input type="hidden" name="color" :value="selectedColor">
-                    <div class="flex flex-wrap gap-2.5 p-2 bg-slate-50 border border-slate-200 rounded-xl">
+                    <div class="flex flex-wrap gap-2.5 p-2 bg-slate-50 border border-slate-200 rounded-md">
                         <template x-for="c in [
                             { id: 'blue', bg: 'bg-blue-500' },
                             { id: 'rose', bg: 'bg-rose-500' },
@@ -461,7 +461,7 @@
                             { id: 'slate', bg: 'bg-slate-500' }
                         ]">
                             <button type="button" @click="selectedColor = c.id"
-                                    class="w-7 h-7 rounded-full transition flex items-center justify-center ring-offset-2"
+                                    class="w-7 h-7 rounded-md transition flex items-center justify-center ring-offset-2"
                                     :class="[c.bg, selectedColor === c.id ? 'ring-2 ring-slate-800 scale-110' : 'opacity-80 hover:opacity-100']">
                                 <span x-show="selectedColor === c.id" class="text-white text-xs font-bold">✓</span>
                             </button>
@@ -471,7 +471,7 @@
 
                 <div class="flex gap-2 justify-end pt-2 border-t border-slate-100">
                     <button type="button" @click="showCategoryModal = false" class="px-4 py-2 text-xs font-semibold text-slate-500 hover:text-slate-800">{{ __('app.cancel') }}</button>
-                    <button type="submit" class="px-5 py-2 text-xs font-bold bg-amber-500 text-slate-950 rounded-lg hover:bg-amber-400 shadow-sm active:scale-95 transition">{{ __('app.add_category_btn') }}</button>
+                    <button type="submit" class="px-5 py-2 text-xs font-bold bg-amber-500 text-slate-950 rounded-md hover:bg-amber-400 shadow-sm active:scale-95 transition">{{ __('app.add_category_btn') }}</button>
                 </div>
             </form>
         </div>
@@ -541,11 +541,11 @@
                  x-transition:leave="transition ease-in duration-150 transform"
                  x-transition:leave-start="scale-100 opacity-100"
                  x-transition:leave-end="scale-95 opacity-0"
-                 class="w-full max-w-md bg-white border border-rose-100 rounded-2xl p-6 shadow-2xl space-y-5">
+                 class="w-full max-w-md bg-white border border-rose-100 rounded-lg p-6 shadow-2xl space-y-5">
                 
                 <!-- Icon & Header -->
                 <div class="flex items-start gap-3.5">
-                    <div class="w-11 h-11 rounded-xl bg-rose-50 border border-rose-200 flex items-center justify-center text-xl flex-shrink-0">
+                    <div class="w-11 h-11 rounded-md bg-rose-50 border border-rose-200 flex items-center justify-center text-xl flex-shrink-0">
                         🗑️
                     </div>
                     <div class="flex-1">
@@ -557,7 +557,7 @@
                 </div>
 
                 <!-- Math Challenge Box -->
-                <div class="p-4 rounded-xl bg-amber-50/70 border border-amber-200/80 space-y-2.5">
+                <div class="p-4 rounded-md bg-amber-50/70 border border-amber-200/80 space-y-2.5">
                     <div class="flex items-center justify-between">
                         <label class="text-xs font-bold text-amber-950 flex items-center gap-1.5">
                             <span>🧮</span>
@@ -574,7 +574,7 @@
 
                     <form @submit.prevent="submitDelete()">
                         <div class="flex items-center gap-3 pt-1">
-                            <div class="px-4 py-2 bg-white rounded-lg border border-amber-300 font-extrabold text-base sm:text-lg text-slate-800 shadow-inner flex items-center justify-center min-w-[90px] select-none tracking-wider">
+                            <div class="px-4 py-2 bg-white rounded border border-amber-300 font-extrabold text-base sm:text-lg text-slate-800 shadow-inner flex items-center justify-center min-w-[90px] select-none tracking-wider">
                                 <span x-text="num1"></span>
                                 <span class="mx-1 text-amber-600">+</span>
                                 <span x-text="num2"></span>
@@ -590,7 +590,7 @@
                                    placeholder="?"
                                    autofocus
                                    required
-                                   class="w-20 px-3 py-2 text-center text-xl font-bold bg-white border rounded-lg focus:outline-none transition shadow-sm"
+                                   class="w-20 px-3 py-2 text-center text-xl font-bold bg-white border rounded focus:outline-none transition shadow-sm"
                                    :class="{
                                        'border-emerald-500 ring-2 ring-emerald-400 text-emerald-700 bg-emerald-50/40': isCorrect,
                                        'border-rose-400 text-rose-700 ring-2 ring-rose-200': userAnswer !== '' && !isCorrect,
@@ -618,14 +618,14 @@
                 <!-- Footer Buttons -->
                 <div class="flex items-center justify-end gap-2.5 pt-1">
                     <button type="button" @click="showModal = false"
-                            class="px-4 py-2 text-xs font-bold text-slate-600 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition">
+                            class="px-4 py-2 text-xs font-bold text-slate-600 hover:text-slate-800 hover:bg-slate-100 rounded-md transition">
                         {{ __('app.cancel') }}
                     </button>
                     
                     <button type="button"
                             @click="submitDelete()"
                             :disabled="!isCorrect"
-                            class="px-5 py-2 rounded-lg font-bold text-xs shadow-sm transition flex items-center gap-1.5"
+                            class="px-5 py-2 rounded-md font-bold text-xs shadow-sm transition flex items-center gap-1.5"
                             :class="isCorrect ? 'bg-rose-600 hover:bg-rose-700 text-white shadow-rose-500/30 cursor-pointer active:scale-95' : 'bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed'">
                         <span>🗑️</span>
                         <span>{{ __('app.delete_task_btn') }}</span>
@@ -783,7 +783,7 @@
                  x-transition:leave="transition ease-in duration-150 transform"
                  x-transition:leave-start="scale-100 opacity-100"
                  x-transition:leave-end="scale-95 opacity-0"
-                 class="w-full max-w-sm bg-white border border-slate-200 rounded-2xl p-5 shadow-2xl space-y-4">
+                 class="w-full max-w-sm bg-white border border-slate-200 rounded-lg p-5 shadow-2xl space-y-4">
                 
                 <!-- Header -->
                 <div class="flex items-center justify-between pb-3 border-b border-slate-100">
@@ -794,7 +794,7 @@
                             <p class="text-xs text-slate-500 font-medium truncate" x-text="taskTitle"></p>
                         </div>
                     </div>
-                    <button type="button" @click="showModal = false" class="p-1.5 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100 flex-shrink-0">
+                    <button type="button" @click="showModal = false" class="p-1.5 text-slate-400 hover:text-slate-600 rounded hover:bg-slate-100 flex-shrink-0">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                     </button>
                 </div>
@@ -803,8 +803,8 @@
                 <div class="flex items-center justify-between px-1">
                     <h4 class="text-sm font-extrabold text-slate-900 capitalize" x-text="monthYearString"></h4>
                     <div class="flex items-center gap-1">
-                        <button type="button" @click="prevMonth()" class="w-7 h-7 rounded-lg text-slate-500 hover:bg-slate-100 hover:text-slate-900 flex items-center justify-center font-bold text-xs">◀</button>
-                        <button type="button" @click="nextMonth()" class="w-7 h-7 rounded-lg text-slate-500 hover:bg-slate-100 hover:text-slate-900 flex items-center justify-center font-bold text-xs">▶</button>
+                        <button type="button" @click="prevMonth()" class="w-7 h-7 rounded text-slate-500 hover:bg-slate-100 hover:text-slate-900 flex items-center justify-center font-bold text-xs">◀</button>
+                        <button type="button" @click="nextMonth()" class="w-7 h-7 rounded text-slate-500 hover:bg-slate-100 hover:text-slate-900 flex items-center justify-center font-bold text-xs">▶</button>
                     </div>
                 </div>
 
@@ -822,7 +822,7 @@
                             <template x-if="dayObj.isCurrentMonth">
                                 <button type="button"
                                         @click="selectDate(dayObj.dateString)"
-                                        class="w-full aspect-square rounded-lg text-xs font-semibold flex items-center justify-center transition"
+                                        class="w-full aspect-square rounded text-xs font-semibold flex items-center justify-center transition"
                                         :class="{
                                             'bg-amber-500 text-slate-950 font-bold shadow-sm ring-2 ring-amber-400': dayObj.isSelected,
                                             'border border-amber-300 font-bold text-amber-900 bg-amber-50': dayObj.isToday && !dayObj.isSelected,
@@ -832,7 +832,7 @@
                                 </button>
                             </template>
                             <template x-if="!dayObj.isCurrentMonth">
-                                <span class="w-full aspect-square rounded-lg text-xs text-slate-300 flex items-center justify-center select-none" x-text="dayObj.day"></span>
+                                <span class="w-full aspect-square rounded text-xs text-slate-300 flex items-center justify-center select-none" x-text="dayObj.day"></span>
                             </template>
                         </div>
                     </template>
@@ -843,15 +843,15 @@
                     <div class="text-[10px] font-extrabold uppercase text-slate-400 tracking-wider px-0.5">{{ __('app.quick_picks') }}</div>
                     <div class="grid grid-cols-3 gap-1.5 text-xs">
                         <button type="button" @click="selectDate(todayStr)"
-                                class="py-1.5 px-2 text-center rounded-lg bg-slate-100 hover:bg-amber-100 hover:text-amber-900 text-slate-700 font-bold text-[11px] transition">
+                                class="py-1.5 px-2 text-center rounded bg-slate-100 hover:bg-amber-100 hover:text-amber-900 text-slate-700 font-bold text-[11px] transition">
                             {{ __('app.today') }}
                         </button>
                         <button type="button" @click="selectDate(tomorrowStr)"
-                                class="py-1.5 px-2 text-center rounded-lg bg-slate-100 hover:bg-amber-100 hover:text-amber-900 text-slate-700 font-bold text-[11px] transition">
+                                class="py-1.5 px-2 text-center rounded bg-slate-100 hover:bg-amber-100 hover:text-amber-900 text-slate-700 font-bold text-[11px] transition">
                             {{ __('app.tomorrow') }}
                         </button>
                         <button type="button" @click="selectDate(fridayStr)"
-                                class="py-1.5 px-2 text-center rounded-lg bg-slate-100 hover:bg-amber-100 hover:text-amber-900 text-slate-700 font-bold text-[11px] transition">
+                                class="py-1.5 px-2 text-center rounded bg-slate-100 hover:bg-amber-100 hover:text-amber-900 text-slate-700 font-bold text-[11px] transition">
                             {{ __('app.friday') }}
                         </button>
                     </div>
@@ -861,7 +861,7 @@
                 <div class="pt-2 border-t border-slate-100 flex items-center justify-between text-xs">
                     <template x-if="isScheduled">
                         <button type="button" @click="moveToBacklog()"
-                                class="px-3 py-1.5 text-amber-800 hover:bg-amber-50 rounded-lg font-bold text-xs transition flex items-center gap-1">
+                                class="px-3 py-1.5 text-amber-800 hover:bg-amber-50 rounded-md font-bold text-xs transition flex items-center gap-1">
                             <span>↩️</span>
                             <span>{{ __('app.to_backlog') }}</span>
                         </button>
@@ -871,7 +871,7 @@
                     </template>
 
                     <button type="button" @click="showModal = false"
-                            class="px-4 py-1.5 text-xs font-bold text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition">
+                            class="px-4 py-1.5 text-xs font-bold text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-md transition">
                         {{ __('app.close') }}
                     </button>
                 </div>
