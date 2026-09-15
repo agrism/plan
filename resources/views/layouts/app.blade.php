@@ -273,6 +273,13 @@
                     </button>
                 </div>
 
+                <!-- Optional Date -->
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Ieplānot konkrētam datumam (Pēc izvēles)</label>
+                    <input type="date" name="scheduled_date"
+                           class="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 focus:border-amber-500 focus:bg-white rounded-xl text-slate-900 text-xs">
+                </div>
+
                 <!-- Optional Image Upload -->
                 <div x-data="{ imagePreview: null }">
                     <label class="block text-xs font-bold text-slate-700 mb-1">Pievienot attēlu</label>
@@ -396,12 +403,82 @@
     <!-- Edit Modal Target Slot for HTMX -->
     <div id="edit-modal-slot"></div>
 
-    <!-- Configure HTMX CSRF -->
+    <!-- Configure HTMX CSRF & Calendar Picker -->
     <script>
         document.body.addEventListener('htmx:configRequest', (event) => {
             const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
             event.detail.headers['X-CSRF-TOKEN'] = token;
         });
+
+        function calendarPicker(initialDate = null) {
+            let initD = initialDate ? new Date(initialDate) : new Date();
+            if (isNaN(initD.getTime())) initD = new Date();
+            
+            return {
+                currentMonth: initD.getMonth(),
+                currentYear: initD.getFullYear(),
+                selectedDate: initialDate,
+                monthNames: ['Janvāris', 'Februāris', 'Marts', 'Aprīlis', 'Maijs', 'Jūnijs', 'Jūlijs', 'Augusts', 'Septembris', 'Oktobris', 'Novembris', 'Decembris'],
+                dayNames: ['P', 'O', 'T', 'C', 'Pk', 'S', 'Sv'],
+                
+                get monthYearString() {
+                    return this.monthNames[this.currentMonth] + ' ' + this.currentYear;
+                },
+                
+                prevMonth() {
+                    if (this.currentMonth === 0) {
+                        this.currentMonth = 11;
+                        this.currentYear--;
+                    } else {
+                        this.currentMonth--;
+                    }
+                },
+                
+                nextMonth() {
+                    if (this.currentMonth === 11) {
+                        this.currentMonth = 0;
+                        this.currentYear++;
+                    } else {
+                        this.currentMonth++;
+                    }
+                },
+                
+                get daysInMonth() {
+                    const days = [];
+                    const firstDay = new Date(this.currentYear, this.currentMonth, 1).getDay();
+                    const startOffset = (firstDay === 0 ? 6 : firstDay - 1);
+                    
+                    const prevMonthDays = new Date(this.currentYear, this.currentMonth, 0).getDate();
+                    for (let i = startOffset - 1; i >= 0; i--) {
+                        days.push({ day: prevMonthDays - i, isCurrentMonth: false, dateString: null });
+                    }
+                    
+                    const totalDays = new Date(this.currentYear, this.currentMonth + 1, 0).getDate();
+                    const today = new Date();
+                    const todayStr = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
+                    
+                    for (let i = 1; i <= totalDays; i++) {
+                        const m = String(this.currentMonth + 1).padStart(2, '0');
+                        const d = String(i).padStart(2, '0');
+                        const dStr = `${this.currentYear}-${m}-${d}`;
+                        days.push({
+                            day: i,
+                            isCurrentMonth: true,
+                            dateString: dStr,
+                            isToday: dStr === todayStr,
+                            isSelected: dStr === this.selectedDate
+                        });
+                    }
+                    
+                    const remaining = (7 - (days.length % 7)) % 7;
+                    for (let i = 1; i <= remaining; i++) {
+                        days.push({ day: i, isCurrentMonth: false, dateString: null });
+                    }
+                    
+                    return days;
+                }
+            };
+        }
     </script>
 </body>
 </html>

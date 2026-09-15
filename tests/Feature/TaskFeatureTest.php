@@ -230,4 +230,40 @@ class TaskFeatureTest extends TestCase
         $this->assertEquals('Mārketings', $task->category_name);
         $this->assertStringContainsString('indigo', $task->category_badge_class);
     }
+
+    public function test_it_schedules_to_arbitrary_calendar_date_and_unschedules_to_backlog(): void
+    {
+        $task = Task::create([
+            'tenant_id' => $this->tenant->id,
+            'created_by_id' => $this->user->id,
+            'title' => 'Nākotnes plānošanas darbs',
+            'category' => 'projekti',
+        ]);
+
+        // Schedule to specific future date
+        $scheduleResponse = $this->actingAs($this->user)->patch(route('ideas.schedule', $task->id), [
+            'scheduled_date' => '2026-10-25',
+        ]);
+
+        $task->refresh();
+        $this->assertEquals('2026-10-25', $task->scheduled_date->toDateString());
+
+        // Check it renders on the weekend/plan view
+        $planResponse = $this->actingAs($this->user)->withHeaders([
+            'HX-Request' => 'true',
+            'HX-Target' => 'weekend-container',
+        ])->get(route('ideas.index'));
+
+        $planResponse->assertStatus(200);
+        $planResponse->assertSee('Nākotnes plānošanas darbs');
+        $planResponse->assertSee(\Carbon\Carbon::parse('2026-10-25')->translatedFormat('j. F'));
+
+        // Unschedule back to backlog
+        $unscheduleResponse = $this->actingAs($this->user)->patch(route('ideas.schedule', $task->id), [
+            'scheduled_date' => 'null',
+        ]);
+
+        $task->refresh();
+        $this->assertNull($task->scheduled_date);
+    }
 }

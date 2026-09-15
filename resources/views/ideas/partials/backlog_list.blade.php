@@ -153,7 +153,7 @@
                     <span>{{ $idea->reactions->count() }}</span>
                 </button>
 
-                <!-- Schedule Popup Menu with Alpine -->
+                <!-- Schedule Calendar Dropdown with Alpine -->
                 <div class="relative" x-data="{ schedMenu: false }">
                     <button @click="schedMenu = !schedMenu"
                             type="button"
@@ -163,59 +163,112 @@
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                     </button>
 
-                    <!-- Schedule Dropdown Options -->
+                    <!-- Calendar Popup -->
                     <div x-show="schedMenu" @click.outside="schedMenu = false" x-cloak
-                         class="absolute right-0 bottom-full mb-2 w-48 bg-white border border-slate-200 rounded-2xl shadow-2xl p-1.5 z-50">
-                        <div class="text-[10px] font-bold uppercase text-slate-400 px-2.5 py-1">Pārcelt uz dienu:</div>
+                         x-data="calendarPicker('{{ $idea->scheduled_date ? $idea->scheduled_date->toDateString() : '' }}')"
+                         class="absolute right-0 bottom-full mb-2 w-72 sm:w-80 bg-white border border-slate-200 rounded-3xl shadow-2xl p-3.5 z-50 space-y-3">
                         
-                        <!-- Friday -->
-                        <form action="{{ route('ideas.schedule', $idea->id) }}" method="POST"
-                              hx-patch="{{ route('ideas.schedule', $idea->id) }}"
-                              hx-target="body">
-                            @csrf
-                            @method('PATCH')
-                            <input type="hidden" name="scheduled_date" value="{{ $friday }}">
-                            <button type="submit" class="w-full text-left px-2.5 py-1.5 text-xs text-slate-700 hover:bg-slate-100 rounded-xl transition flex items-center justify-between">
-                                <span>📅 Piektdiena</span>
-                            </button>
-                        </form>
+                        <!-- Header / Month navigation -->
+                        <div class="flex items-center justify-between px-1">
+                            <h4 class="text-xs font-extrabold text-slate-900 capitalize" x-text="monthYearString"></h4>
+                            <div class="flex items-center gap-1">
+                                <button type="button" @click="prevMonth()" class="p-1 rounded-lg text-slate-500 hover:bg-slate-100 hover:text-slate-800 text-xs font-bold">◀</button>
+                                <button type="button" @click="nextMonth()" class="p-1 rounded-lg text-slate-500 hover:bg-slate-100 hover:text-slate-800 text-xs font-bold">▶</button>
+                            </div>
+                        </div>
 
-                        <!-- Saturday -->
-                        <form action="{{ route('ideas.schedule', $idea->id) }}" method="POST"
-                              hx-patch="{{ route('ideas.schedule', $idea->id) }}"
-                              hx-target="body">
-                            @csrf
-                            @method('PATCH')
-                            <input type="hidden" name="scheduled_date" value="{{ $saturday }}">
-                            <button type="submit" class="w-full text-left px-2.5 py-1.5 text-xs text-slate-700 hover:bg-slate-100 rounded-xl transition flex items-center justify-between">
-                                <span>📅 Sestdiena</span>
-                            </button>
-                        </form>
+                        <!-- Weekdays row -->
+                        <div class="grid grid-cols-7 gap-1 text-center text-[10px] font-bold text-slate-400">
+                            <template x-for="dn in dayNames">
+                                <div x-text="dn" class="py-0.5"></div>
+                            </template>
+                        </div>
 
-                        <!-- Sunday -->
-                        <form action="{{ route('ideas.schedule', $idea->id) }}" method="POST"
-                              hx-patch="{{ route('ideas.schedule', $idea->id) }}"
-                              hx-target="body">
-                            @csrf
-                            @method('PATCH')
-                            <input type="hidden" name="scheduled_date" value="{{ $sunday }}">
-                            <button type="submit" class="w-full text-left px-2.5 py-1.5 text-xs text-slate-700 hover:bg-slate-100 rounded-xl transition flex items-center justify-between">
-                                <span>📅 Svētdiena</span>
-                            </button>
-                        </form>
+                        <!-- Days Grid -->
+                        <div class="grid grid-cols-7 gap-1 text-center text-xs">
+                            <template x-for="dayObj in daysInMonth">
+                                <div>
+                                    <template x-if="dayObj.isCurrentMonth">
+                                        <form action="{{ route('ideas.schedule', $idea->id) }}" method="POST"
+                                              hx-patch="{{ route('ideas.schedule', $idea->id) }}"
+                                              hx-target="body">
+                                            @csrf
+                                            @method('PATCH')
+                                            <input type="hidden" name="scheduled_date" :value="dayObj.dateString">
+                                            <button type="submit"
+                                                    class="w-full aspect-square rounded-xl text-xs font-semibold flex items-center justify-center transition"
+                                                    :class="{
+                                                        'bg-amber-500 text-slate-950 font-bold shadow-sm ring-2 ring-amber-400': dayObj.isSelected,
+                                                        'border border-amber-300 font-bold text-amber-900 bg-amber-50': dayObj.isToday && !dayObj.isSelected,
+                                                        'text-slate-700 hover:bg-amber-100 hover:text-amber-900': !dayObj.isSelected && !dayObj.isToday
+                                                    }">
+                                                <span x-text="dayObj.day"></span>
+                                            </button>
+                                        </form>
+                                    </template>
+                                    <template x-if="!dayObj.isCurrentMonth">
+                                        <span class="w-full aspect-square rounded-xl text-xs text-slate-300 flex items-center justify-center select-none" x-text="dayObj.day"></span>
+                                    </template>
+                                </div>
+                            </template>
+                        </div>
 
-                        <div class="border-t border-slate-100 my-1"></div>
+                        <!-- Quick Shortcuts -->
+                        <div class="pt-2 border-t border-slate-100 space-y-1">
+                            <div class="text-[10px] font-bold uppercase text-slate-400 px-1">Ātrās izvēles:</div>
+                            <div class="grid grid-cols-3 gap-1.5 text-xs">
+                                <form action="{{ route('ideas.schedule', $idea->id) }}" method="POST"
+                                      hx-patch="{{ route('ideas.schedule', $idea->id) }}"
+                                      hx-target="body">
+                                    @csrf
+                                    @method('PATCH')
+                                    <input type="hidden" name="scheduled_date" value="{{ $today ?? \Carbon\Carbon::now()->toDateString() }}">
+                                    <button type="submit" class="w-full py-1 text-center rounded-lg bg-slate-100 hover:bg-amber-100 hover:text-amber-900 text-slate-700 font-medium text-[11px] transition">
+                                        Šodien
+                                    </button>
+                                </form>
 
-                        <!-- Delete button -->
-                        <form action="{{ route('ideas.destroy', $idea->id) }}" method="POST"
-                              hx-delete="{{ route('ideas.destroy', $idea->id) }}"
-                              hx-target="body">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="w-full text-left px-2.5 py-1.5 text-xs text-rose-600 hover:bg-rose-50 rounded-xl transition">
-                                🗑️ Dzēst uzdevumu
+                                <form action="{{ route('ideas.schedule', $idea->id) }}" method="POST"
+                                      hx-patch="{{ route('ideas.schedule', $idea->id) }}"
+                                      hx-target="body">
+                                    @csrf
+                                    @method('PATCH')
+                                    <input type="hidden" name="scheduled_date" value="{{ $tomorrow ?? \Carbon\Carbon::tomorrow()->toDateString() }}">
+                                    <button type="submit" class="w-full py-1 text-center rounded-lg bg-slate-100 hover:bg-amber-100 hover:text-amber-900 text-slate-700 font-medium text-[11px] transition">
+                                        Rīt
+                                    </button>
+                                </form>
+
+                                <form action="{{ route('ideas.schedule', $idea->id) }}" method="POST"
+                                      hx-patch="{{ route('ideas.schedule', $idea->id) }}"
+                                      hx-target="body">
+                                    @csrf
+                                    @method('PATCH')
+                                    <input type="hidden" name="scheduled_date" value="{{ $friday }}">
+                                    <button type="submit" class="w-full py-1 text-center rounded-lg bg-slate-100 hover:bg-amber-100 hover:text-amber-900 text-slate-700 font-medium text-[11px] transition">
+                                        Piektdiena
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+
+                        <div class="border-t border-slate-100 pt-1.5 flex items-center justify-between text-xs">
+                            <button type="button" @click="schedMenu = false" class="px-2 py-1 text-slate-400 hover:text-slate-600 text-[11px]">
+                                Aizvērt
                             </button>
-                        </form>
+
+                            <!-- Delete button -->
+                            <form action="{{ route('ideas.destroy', $idea->id) }}" method="POST"
+                                  hx-delete="{{ route('ideas.destroy', $idea->id) }}"
+                                  hx-target="body">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="px-2 py-1 text-rose-600 hover:bg-rose-50 rounded-lg text-[11px] font-semibold transition">
+                                    🗑️ Dzēst
+                                </button>
+                            </form>
+                        </div>
+
                     </div>
                 </div>
 

@@ -52,22 +52,41 @@ class IdeaController extends Controller
 
         $backlogIdeas = $backlogQuery->get();
 
-        // Query scheduled tasks
-        $fridayTasks = $tenant->tasks()->with(['creator', 'reactions', 'categoryRelation'])->whereDate('scheduled_date', $friday)->orderBy('sort_order')->get();
-        $saturdayTasks = $tenant->tasks()->with(['creator', 'reactions', 'categoryRelation'])->whereDate('scheduled_date', $saturday)->orderBy('sort_order')->get();
-        $sundayTasks = $tenant->tasks()->with(['creator', 'reactions', 'categoryRelation'])->whereDate('scheduled_date', $sunday)->orderBy('sort_order')->get();
+        // Query all scheduled tasks (where scheduled_date is NOT NULL)
+        $allScheduledTasks = $tenant->tasks()
+            ->with(['creator', 'reactions', 'categoryRelation'])
+            ->whereNotNull('scheduled_date')
+            ->orderBy('scheduled_date')
+            ->orderBy('sort_order')
+            ->get();
 
-        $weekendTasksCount = $fridayTasks->count() + $saturdayTasks->count() + $sundayTasks->count();
-        $weekendCompletedCount = $fridayTasks->where('is_completed', true)->count() 
-            + $saturdayTasks->where('is_completed', true)->count() 
-            + $sundayTasks->where('is_completed', true)->count();
+        $scheduledTasksByDate = $allScheduledTasks->groupBy(function ($task) {
+            return $task->scheduled_date->toDateString();
+        });
+
+        // Ensure key focus dates are included and sorted
+        $scheduledDates = collect([$friday, $saturday, $sunday])
+            ->merge($scheduledTasksByDate->keys())
+            ->unique()
+            ->sort()
+            ->values();
+
+        $fridayTasks = $scheduledTasksByDate->get($friday, collect());
+        $saturdayTasks = $scheduledTasksByDate->get($saturday, collect());
+        $sundayTasks = $scheduledTasksByDate->get($sunday, collect());
+
+        $weekendTasksCount = $allScheduledTasks->count();
+        $weekendCompletedCount = $allScheduledTasks->where('is_completed', true)->count();
+
+        $today = Carbon::now()->toDateString();
+        $tomorrow = Carbon::now()->addDay()->toDateString();
 
         if ($request->header('HX-Request') && $request->header('HX-Target') === 'backlog-container') {
-            return view('ideas.partials.backlog_list', compact('backlogIdeas', 'tenant', 'user', 'friday', 'saturday', 'sunday', 'categories'));
+            return view('ideas.partials.backlog_list', compact('backlogIdeas', 'tenant', 'user', 'friday', 'saturday', 'sunday', 'today', 'tomorrow', 'categories'));
         }
 
         if ($request->header('HX-Request') && $request->header('HX-Target') === 'weekend-container') {
-            return view('ideas.partials.weekend_plan', compact('fridayTasks', 'saturdayTasks', 'sundayTasks', 'friday', 'saturday', 'sunday', 'tenant', 'user', 'categories'));
+            return view('ideas.partials.weekend_plan', compact('scheduledDates', 'scheduledTasksByDate', 'fridayTasks', 'saturdayTasks', 'sundayTasks', 'friday', 'saturday', 'sunday', 'today', 'tomorrow', 'tenant', 'user', 'categories'));
         }
 
         return view('ideas.index', compact(
@@ -75,12 +94,16 @@ class IdeaController extends Controller
             'user',
             'categories',
             'backlogIdeas',
+            'scheduledDates',
+            'scheduledTasksByDate',
             'fridayTasks',
             'saturdayTasks',
             'sundayTasks',
             'friday',
             'saturday',
             'sunday',
+            'today',
+            'tomorrow',
             'weekendTasksCount',
             'weekendCompletedCount',
             'categoryFilter'
