@@ -7,7 +7,7 @@
 @else
     @foreach($backlogIdeas as $idea)
         @php
-            $hasDetails = !empty($idea->description) || !empty($idea->links) || !empty($idea->image_url);
+            $hasDetails = !empty($idea->description) || !empty($idea->links) || !empty($idea->image_url) || $idea->comments->isNotEmpty();
             $hasYouTube = false;
             if (!empty($idea->processed_links)) {
                 foreach ($idea->processed_links as $pl) {
@@ -146,20 +146,37 @@
                         </div>
                     @endif
 
+                    <!-- Task Comments Section -->
+                    <div class="border-t border-slate-200/80 pt-2 mt-2">
+                        @php $task = $idea; @endphp
+                        @include('ideas.partials.comments_section')
+                    </div>
+
                 </div>
             @endif
 
-            <!-- Card Actions (Reactions & Schedule Button) -->
+            <!-- Card Actions (Reactions, Comments Count & Schedule Button) -->
             <div class="flex items-center justify-between pt-2 border-t border-slate-100 mt-0.5" @click.stop>
                 
-                <!-- Thumbs Up Reaction -->
-                <button hx-post="{{ route('ideas.react', $idea->id) }}"
-                        hx-target="body"
-                        type="button"
-                        class="flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-bold transition {{ $idea->reactions->where('user_id', auth()->id())->isNotEmpty() ? 'bg-amber-100 text-amber-900 border border-amber-300 shadow-sm' : 'bg-slate-100 text-slate-600 hover:text-slate-900 hover:bg-slate-200' }}">
-                    <span>👍</span>
-                    <span>{{ $idea->reactions->count() }}</span>
-                </button>
+                <div class="flex items-center gap-1.5">
+                    <!-- Thumbs Up Reaction -->
+                    <button hx-post="{{ route('ideas.react', $idea->id) }}"
+                            hx-target="body"
+                            type="button"
+                            class="flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-bold transition {{ $idea->reactions->where('user_id', auth()->id())->isNotEmpty() ? 'bg-amber-100 text-amber-900 border border-amber-300 shadow-sm' : 'bg-slate-100 text-slate-600 hover:text-slate-900 hover:bg-slate-200' }}">
+                        <span>👍</span>
+                        <span>{{ $idea->reactions->count() }}</span>
+                    </button>
+
+                    <!-- Comments Badge / Trigger -->
+                    <button @click.stop="expanded = !expanded"
+                            type="button"
+                            title="{{ __('app.comments') }}"
+                            class="flex items-center gap-1 px-2.5 py-1 rounded-xl text-xs font-bold transition {{ $idea->comments->isNotEmpty() ? 'bg-slate-100 text-slate-800 border border-slate-200 shadow-sm' : 'text-slate-400 hover:text-slate-700 hover:bg-slate-100' }}">
+                        <span>💬</span>
+                        <span>{{ $idea->comments->count() }}</span>
+                    </button>
+                </div>
 
                 <!-- Schedule Calendar Modal Trigger -->
                 <button @click.stop="window.openScheduleModal({{ $idea->id }}, '{{ addslashes($idea->title) }}', '{{ $idea->scheduled_date ? $idea->scheduled_date->toDateString() : '' }}', '{{ route('ideas.schedule', $idea->id) }}', false)"

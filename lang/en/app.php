@@ -149,4 +149,15 @@ return [
     'or_join_existing' => 'Or want to join an existing team?',
     'invalid_invite_code' => 'Invite code not found or invalid.',
     'already_member' => 'You are already a member of this workspace!',
+
+    // Comments
+    'comments' => 'Comments',
+    'comments_count' => ':count comments',
+    'comments_count_single' => ':count comment',
+    'add_comment' => 'Add comment',
+    'write_comment_placeholder' => 'Write a comment or note...',
+    'post_comment_btn' => 'Post Comment 💬',
+    'no_comments' => 'No comments yet. Be the first to comment!',
+    'delete_comment' => 'Delete comment',
+    'delete_comment_confirm' => 'Are you sure you want to delete this comment?',
 ];

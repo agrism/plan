@@ -152,5 +152,10 @@
             </div>
         </form>
 
+        <!-- Task Discussion / Comments Section -->
+        <div class="border-t border-slate-200 pt-4 mt-2">
+            @include('ideas.partials.comments_section')
+        </div>
+
     </div>
 </div>

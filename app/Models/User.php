@@ -51,6 +51,11 @@ class User extends Authenticatable
         return $this->hasMany(Task::class, 'created_by_id');
     }
 
+    public function taskComments(): HasMany
+    {
+        return $this->hasMany(TaskComment::class);
+    }
+
     public function currentTenant(): ?Tenant
     {
         $tenantId = session('current_tenant_id');

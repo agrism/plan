@@ -39,7 +39,7 @@ class IdeaController extends Controller
         // Query backlog tasks (scheduled_date is NULL)
         $categoryFilter = $request->query('category');
         $backlogQuery = $tenant->tasks()
-            ->with(['creator', 'reactions', 'categoryRelation'])
+            ->with(['creator', 'reactions', 'categoryRelation', 'comments.user'])
             ->whereNull('scheduled_date')
             ->orderBy('created_at', 'desc');
 
@@ -54,7 +54,7 @@ class IdeaController extends Controller
 
         // Query all scheduled tasks (where scheduled_date is NOT NULL)
         $allScheduledTasks = $tenant->tasks()
-            ->with(['creator', 'reactions', 'categoryRelation'])
+            ->with(['creator', 'reactions', 'categoryRelation', 'comments.user'])
             ->whereNotNull('scheduled_date')
             ->orderBy('scheduled_date')
             ->orderBy('sort_order')
@@ -189,6 +189,8 @@ class IdeaController extends Controller
         $tenant = auth()->user()->currentTenant();
         $tenant->ensureDefaultCategories();
         $categories = $tenant->categories()->get();
+
+        $task->load(['comments.user', 'creator', 'categoryRelation']);
 
         return view('ideas.partials.edit_modal', compact('task', 'categories'));
     }

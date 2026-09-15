@@ -41,7 +41,7 @@
                 <div class="space-y-2.5">
                     @foreach($tasksForDay as $task)
                         @php
-                            $hasDetails = !empty($task->description) || !empty($task->links) || !empty($task->image_url);
+                            $hasDetails = !empty($task->description) || !empty($task->links) || !empty($task->image_url) || $task->comments->isNotEmpty();
                             $hasYouTube = false;
                             if (!empty($task->processed_links)) {
                                 foreach ($task->processed_links as $pl) {
@@ -93,6 +93,9 @@
                                                 @endif
                                                 @if($task->image_url)
                                                     <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-white text-slate-600 border border-slate-200">🖼️</span>
+                                                @endif
+                                                @if($task->comments->isNotEmpty())
+                                                    <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-white text-slate-600 border border-slate-200">💬 {{ $task->comments->count() }}</span>
                                                 @endif
                                             </div>
                                         @endif
@@ -202,6 +205,11 @@
                                             @endforeach
                                         </div>
                                     @endif
+
+                                    <!-- Task Comments Section -->
+                                    <div class="border-t border-slate-200/80 pt-2 mt-2">
+                                        @include('ideas.partials.comments_section')
+                                    </div>
                                 </div>
                             @endif
 

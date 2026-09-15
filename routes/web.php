@@ -1,7 +1,9 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\IdeaController;
+use App\Http\Controllers\TaskCommentController;
 use App\Http\Controllers\TenantController;
 use App\Http\Middleware\EnsureCurrentTenant;
 use Illuminate\Support\Facades\Route;
@@ -36,6 +38,10 @@ Route::middleware(['auth', EnsureCurrentTenant::class])->group(function () {
     Route::patch('/ideas/{task}/toggle', [IdeaController::class, 'toggle'])->name('ideas.toggle');
     Route::post('/ideas/{task}/react', [IdeaController::class, 'react'])->name('ideas.react');
     Route::delete('/ideas/{task}', [IdeaController::class, 'destroy'])->name('ideas.destroy');
+
+    // Task Comments
+    Route::post('/ideas/{task}/comments', [TaskCommentController::class, 'store'])->name('ideas.comments.store');
+    Route::delete('/ideas/{task}/comments/{comment}', [TaskCommentController::class, 'destroy'])->name('ideas.comments.destroy');
 
     // Categories
     Route::post('/categories', [\App\Http\Controllers\CategoryController::class, 'store'])->name('categories.store');

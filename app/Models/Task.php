@@ -58,6 +58,11 @@ class Task extends Model
         return $this->hasMany(TaskReaction::class);
     }
 
+    public function comments(): HasMany
+    {
+        return $this->hasMany(TaskComment::class)->orderBy('created_at', 'asc');
+    }
+
     public function getCategoryEmojiAttribute(): string
     {
         if ($this->categoryRelation) {

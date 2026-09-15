@@ -147,6 +147,16 @@ return [
     'join_btn' => 'Pievienoties Darbavietai 🚀',
     'copy_invite_link' => 'Kopēt saiti',
     'or_join_existing' => 'Vai vēlies pievienoties esošai komandai?',
-    'invalid_invite_code' => 'Ielūguma kods nav atrasts vai ir nederīgs.',
     'already_member' => 'Tu jau esi šīs darbavietas dalībnieks!',
+
+    // Comments
+    'comments' => 'Komentāri',
+    'comments_count' => ':count komentāri',
+    'comments_count_single' => ':count komentārs',
+    'add_comment' => 'Pievienot komentāru',
+    'write_comment_placeholder' => 'Uzraksti komentāru vai piezīmi...',
+    'post_comment_btn' => 'Pievienot 💬',
+    'no_comments' => 'Pagaidām nav komentāru. Esi pirmais, kas komentē!',
+    'delete_comment' => 'Dzēst komentāru',
+    'delete_comment_confirm' => 'Vai tiešām vēlies dzēst šo komentāru?',
 ];
