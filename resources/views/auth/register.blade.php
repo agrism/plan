@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="lv" class="h-full bg-slate-50 text-slate-800">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Reģistrēties - Plānotājs</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['"Plus Jakarta Sans"', 'sans-serif'] },
+                }
+            }
+        }
+    </script>
+</head>
+<body class="min-h-full bg-slate-50 flex items-center justify-center p-4">
+    <div class="w-full max-w-md bg-white border border-slate-200/90 rounded-3xl p-6 sm:p-8 shadow-xl space-y-6">
+        
+        <!-- Header -->
+        <div class="text-center space-y-2">
+            <span class="text-4xl">💼</span>
+            <h1 class="text-2xl font-extrabold text-slate-900">Jauna Darbavieta</h1>
+            <p class="text-xs text-slate-500">Izveido savas organizācijas vai komandas plānotāju</p>
+        </div>
+
+        <form action="{{ route('register') }}" method="POST" class="space-y-4">
+            @csrf
+            <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Darbavietas / Komandas nosaukums</label>
+                <input type="text" name="workspace_name" value="{{ old('workspace_name') }}" required placeholder="Piem., Acme Komanda 🚀"
+                       class="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 text-sm focus:border-amber-500 focus:bg-white focus:ring-1 focus:ring-amber-500">
+                @error('workspace_name') <p class="text-xs text-rose-600 mt-1">{{ $message }}</p> @enderror
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Tavs vārds un uzvārds</label>
+                <input type="text" name="name" value="{{ old('name') }}" required placeholder="Jānis Bērziņš"
+                       class="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 text-sm focus:border-amber-500 focus:bg-white focus:ring-1 focus:ring-amber-500">
+                @error('name') <p class="text-xs text-rose-600 mt-1">{{ $message }}</p> @enderror
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">E-pasts</label>
+                <input type="email" name="email" value="{{ old('email') }}" required placeholder="janis@uznemums.lv"
+                       class="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 text-sm focus:border-amber-500 focus:bg-white focus:ring-1 focus:ring-amber-500">
+                @error('email') <p class="text-xs text-rose-600 mt-1">{{ $message }}</p> @enderror
+            </div>
+
+            <div class="grid grid-cols-2 gap-2">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Parole</label>
+                    <input type="password" name="password" required
+                           class="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 text-sm focus:border-amber-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Atkārtot paroli</label>
+                    <input type="password" name="password_confirmation" required
+                           class="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 text-sm focus:border-amber-500">
+                </div>
+            </div>
+            @error('password') <p class="text-xs text-rose-600 mt-1">{{ $message }}</p> @enderror
+
+            <button type="submit" class="w-full py-3 bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 text-slate-950 font-bold text-sm rounded-xl shadow-md shadow-amber-500/20 active:scale-[0.98] transition">
+                Izveidot & Sākt Plānot 🚀
+            </button>
+        </form>
+
+        <div class="text-center pt-2 border-t border-slate-100">
+            <p class="text-xs text-slate-500">Jau ir konts? <a href="{{ route('login') }}" class="text-amber-600 font-bold hover:underline">Pieslēgties</a></p>
+        </div>
+    </div>
+</body>
+</html>
