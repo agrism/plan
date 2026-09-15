@@ -111,7 +111,7 @@ class TenantJoinTest extends TestCase
         $this->assertEquals($personalTenant->id, session('current_tenant_id'));
     }
 
-    public function test_owner_leaving_workspace_transfers_ownership_to_remaining_member(): void
+    public function test_owner_cannot_leave_workspace_while_other_members_exist(): void
     {
         $this->tenant->users()->attach($this->member->id, ['role' => 'member']);
 
@@ -119,13 +119,69 @@ class TenantJoinTest extends TestCase
             ->withSession(['current_tenant_id' => $this->tenant->id])
             ->post(route('tenants.leave', $this->tenant->id));
 
+        $response->assertStatus(403);
+        $this->assertTrue($this->tenant->users()->where('users.id', $this->owner->id)->exists());
+    }
+
+    public function test_owner_can_transfer_ownership_to_another_member_and_become_regular_member(): void
+    {
+        $this->tenant->users()->attach($this->member->id, ['role' => 'member']);
+
+        $response = $this->actingAs($this->owner)
+            ->withSession(['current_tenant_id' => $this->tenant->id])
+            ->post(route('tenants.transfer_ownership', [$this->tenant->id, $this->member->id]));
+
         $response->assertRedirect(route('ideas.index'));
-        $this->assertFalse($this->tenant->users()->where('users.id', $this->owner->id)->exists());
 
         // Refresh tenant
         $this->tenant->refresh();
         $this->assertEquals($this->member->id, $this->tenant->owner_id);
+
+        // New owner is admin
         $this->assertEquals('admin', $this->tenant->users()->where('users.id', $this->member->id)->first()->pivot->role);
+
+        // Previous owner is now regular member
+        $this->assertEquals('member', $this->tenant->users()->where('users.id', $this->owner->id)->first()->pivot->role);
+
+        // Now previous owner (as regular member) can leave
+        $leaveResponse = $this->actingAs($this->owner)
+            ->withSession(['current_tenant_id' => $this->tenant->id])
+            ->post(route('tenants.leave', $this->tenant->id));
+
+        $leaveResponse->assertRedirect(route('ideas.index'));
+        $this->assertFalse($this->tenant->users()->where('users.id', $this->owner->id)->exists());
+    }
+
+    public function test_non_owner_cannot_transfer_ownership(): void
+    {
+        $this->tenant->users()->attach($this->member->id, ['role' => 'admin']);
+
+        $otherUser = User::factory()->create(['email' => 'other@komanda.lv']);
+        $this->tenant->users()->attach($otherUser->id, ['role' => 'member']);
+
+        $response = $this->actingAs($this->member)
+            ->withSession(['current_tenant_id' => $this->tenant->id])
+            ->post(route('tenants.transfer_ownership', [$this->tenant->id, $otherUser->id]));
+
+        $response->assertStatus(403);
+        $this->tenant->refresh();
+        $this->assertEquals($this->owner->id, $this->tenant->owner_id);
+    }
+
+    public function test_owner_can_leave_when_sole_member(): void
+    {
+        // Owner is the only member in this workspace
+        $response = $this->actingAs($this->owner)
+            ->withSession(['current_tenant_id' => $this->tenant->id])
+            ->post(route('tenants.leave', $this->tenant->id));
+
+        $response->assertRedirect(route('ideas.index'));
+        $this->assertDatabaseMissing('tenants', ['id' => $this->tenant->id]);
+
+        // A new default workspace should have been created for the user
+        $newTenant = $this->owner->tenants()->first();
+        $this->assertNotNull($newTenant);
+        $this->assertEquals($newTenant->id, session('current_tenant_id'));
     }
 
     public function test_leaving_only_workspace_creates_default_workspace(): void

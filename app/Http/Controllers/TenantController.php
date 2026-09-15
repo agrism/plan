@@ -135,18 +135,17 @@ class TenantController extends Controller
             abort(403);
         }
 
-        // Detach user from workspace
-        $tenant->users()->detach($user->id);
-
-        // If the user was the owner and other members exist, transfer ownership
+        // Owner cannot leave while other members exist; they must transfer ownership first
         if ($tenant->owner_id === $user->id) {
-            $remainingMember = $tenant->users()->first();
-            if ($remainingMember) {
-                $tenant->update(['owner_id' => $remainingMember->id]);
-                $tenant->users()->updateExistingPivot($remainingMember->id, ['role' => 'admin']);
-            } else {
-                $tenant->delete();
+            $otherMembersCount = $tenant->users()->where('users.id', '!=', $user->id)->count();
+            if ($otherMembersCount > 0) {
+                abort(403, __('app.owner_cannot_leave_must_transfer'));
             }
+            // If sole member, deleting the workspace
+            $tenant->delete();
+        } else {
+            // Detach regular user from workspace
+            $tenant->users()->detach($user->id);
         }
 
         // Switch to remaining workspace or create fresh default workspace
@@ -162,6 +161,46 @@ class TenantController extends Controller
         session(['current_tenant_id' => $nextTenant->id]);
 
         return redirect()->route('ideas.index');
+    }
+
+    public function transferOwnership(Request $request, Tenant $tenant, User $user)
+    {
+        $currentUser = auth()->user();
+
+        // Ensure current user is in the tenant
+        if (!$tenant->users()->where('users.id', $currentUser->id)->exists()) {
+            abort(403);
+        }
+
+        // Only the owner can transfer ownership
+        if ($tenant->owner_id !== $currentUser->id) {
+            abort(403, __('app.only_owner_can_transfer'));
+        }
+
+        // Ensure target user is a member of the tenant
+        if (!$tenant->users()->where('users.id', $user->id)->exists()) {
+            abort(404, __('app.not_a_member'));
+        }
+
+        // Cannot transfer to yourself
+        if ($user->id === $currentUser->id) {
+            return redirect()->route('ideas.index');
+        }
+
+        // Transfer ownership
+        $tenant->update(['owner_id' => $user->id]);
+
+        // Promote new owner to admin
+        $tenant->users()->updateExistingPivot($user->id, ['role' => 'admin']);
+
+        // Demote previous owner to regular member as requested
+        $tenant->users()->updateExistingPivot($currentUser->id, ['role' => 'member']);
+
+        if ($request->header('HX-Request')) {
+            return redirect()->route('ideas.index');
+        }
+
+        return redirect()->route('ideas.index')->with('status', __('app.ownership_transferred_success', ['name' => $user->name]));
     }
 
     public function removeMember(Request $request, Tenant $tenant, User $user)

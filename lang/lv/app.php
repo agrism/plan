@@ -175,6 +175,14 @@ return [
     'owner' => 'Īpašnieks',
     'you' => 'Tu',
     'not_a_member' => 'Lietotājs nav šīs darbavietas dalībnieks.',
+    'make_owner' => 'Nodot vadību',
+    'transfer_ownership' => 'Nodot īpašumtiesības',
+    'transfer_ownership_confirm' => 'Vai tiešām vēlies nodot darbavietas īpašumtiesības lietotājam :name? Tu kļūsi par parastu dalībnieku.',
+    'only_owner_can_transfer' => 'Tikai darbavietas īpašnieks var nodot īpašumtiesības citam dalībniekam.',
+    'ownership_transferred_success' => 'Darbavietas īpašumtiesības veiksmīgi nodotas lietotājam :name.',
+    'owner_cannot_leave_must_transfer' => 'Darbavietas īpašnieks nevar pamest darbavietu, kamēr tajā ir citi dalībnieki. Vispirms nododiet īpašumtiesības citam dalībniekam.',
+    'owner_leave_notice_title' => 'Īpašnieka darbavietas pamešana',
+    'owner_leave_notice_desc' => 'Kā darbavietas īpašnieks tu nevari pamest darbavietu, kamēr tajā ir citi dalībnieki. Lai pamestu šo darbavietu, dalībnieku sarakstā nodod vadību kādam citam dalībniekam.',
 
     // Forgot & Reset Password
     'forgot_password' => 'Aizmirsi paroli?',

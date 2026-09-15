@@ -176,6 +176,14 @@ return [
     'owner' => 'Owner',
     'you' => 'You',
     'not_a_member' => 'User is not a member of this workspace.',
+    'make_owner' => 'Make Owner',
+    'transfer_ownership' => 'Transfer Ownership',
+    'transfer_ownership_confirm' => 'Are you sure you want to transfer workspace ownership to :name? You will become a regular member.',
+    'only_owner_can_transfer' => 'Only the workspace owner can transfer ownership to another member.',
+    'ownership_transferred_success' => 'Workspace ownership successfully transferred to :name.',
+    'owner_cannot_leave_must_transfer' => 'Workspace owner cannot leave while other members exist. Transfer ownership to another member first.',
+    'owner_leave_notice_title' => 'Workspace Owner Status',
+    'owner_leave_notice_desc' => 'As the workspace owner, you cannot leave while other members are present. Transfer ownership to another member in the list above before leaving.',
 
     // Forgot & Reset Password
     'forgot_password' => 'Forgot password?',

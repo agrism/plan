@@ -258,24 +258,42 @@
                                 </span>
 
                                 @if($member->id === $user->id)
-                                    <form action="{{ route('tenants.leave', $tenant->id) }}" method="POST"
-                                          onsubmit="return confirm('{{ __('app.leave_workspace_confirm', ['name' => addslashes($tenant->name)]) }}')">
-                                        @csrf
-                                        <button type="submit"
+                                    @if(!$isOwner || $tenant->users->count() <= 1)
+                                        <form action="{{ route('tenants.leave', $tenant->id) }}" method="POST"
+                                              onsubmit="return confirm('{{ __('app.leave_workspace_confirm', ['name' => addslashes($tenant->name)]) }}')">
+                                            @csrf
+                                            <button type="submit"
+                                                    class="px-2 py-1 bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-bold rounded flex items-center gap-1 transition"
+                                                    title="{{ __('app.leave_workspace') }}">
+                                                <span>🚪</span>
+                                                <span class="hidden sm:inline">{{ __('app.leave') }}</span>
+                                            </button>
+                                        </form>
+                                    @endif
+                                @else
+                                    @if($isOwner)
+                                        <!-- Transfer Ownership Button -->
+                                        <form action="{{ route('tenants.transfer_ownership', [$tenant->id, $member->id]) }}" method="POST"
+                                              onsubmit="return confirm('{{ __('app.transfer_ownership_confirm', ['name' => addslashes($member->name)]) }}')">
+                                            @csrf
+                                            <button type="submit"
+                                                    class="px-2 py-1 bg-amber-50 hover:bg-amber-100 text-amber-900 text-xs font-bold rounded flex items-center gap-1 transition"
+                                                    title="{{ __('app.transfer_ownership') }}">
+                                                <span>👑</span>
+                                                <span class="hidden sm:inline">{{ __('app.make_owner') }}</span>
+                                            </button>
+                                        </form>
+                                    @endif
+
+                                    @if($isAdmin && $member->id !== $tenant->owner_id)
+                                        <button type="button"
+                                                @click="window.openMathDeleteConfirm('{{ __('app.member_prefix', ['name' => addslashes($member->name)]) }}', '{{ route('tenants.members.destroy', [$tenant->id, $member->id]) }}')"
                                                 class="px-2 py-1 bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-bold rounded flex items-center gap-1 transition"
-                                                title="{{ __('app.leave_workspace') }}">
-                                            <span>🚪</span>
-                                            <span class="hidden sm:inline">{{ __('app.leave') }}</span>
+                                                title="{{ __('app.remove_member') }}">
+                                            <span>🗑️</span>
+                                            <span class="hidden sm:inline">{{ __('app.remove_member_btn') }}</span>
                                         </button>
-                                    </form>
-                                @elseif($isAdmin && $member->id !== $tenant->owner_id)
-                                    <button type="button"
-                                            @click="window.openMathDeleteConfirm('{{ __('app.member_prefix', ['name' => addslashes($member->name)]) }}', '{{ route('tenants.members.destroy', [$tenant->id, $member->id]) }}')"
-                                            class="px-2 py-1 bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-bold rounded flex items-center gap-1 transition"
-                                            title="{{ __('app.remove_member') }}">
-                                        <span>🗑️</span>
-                                        <span class="hidden sm:inline">{{ __('app.remove_member_btn') }}</span>
-                                    </button>
+                                    @endif
                                 @endif
                             </div>
                         </div>
@@ -284,24 +302,34 @@
             </div>
 
             <!-- Leave Workspace Section -->
-            <div class="p-4 rounded-md bg-rose-50/50 border border-rose-200/80 space-y-2">
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                    <div>
-                        <h4 class="text-xs font-bold text-rose-900">{{ __('app.leave_workspace') }}</h4>
-                        <p class="text-[11px] text-rose-600/90">{{ __('app.leave_workspace_hint') }}</p>
+            @if($isOwner && $tenant->users->count() > 1)
+                <div class="p-4 rounded-md bg-amber-50/70 border border-amber-200/80 space-y-1.5">
+                    <div class="flex items-center gap-2">
+                        <span class="text-base">👑</span>
+                        <h4 class="text-xs font-bold text-amber-950">{{ __('app.owner_leave_notice_title') }}</h4>
                     </div>
-
-                    <form action="{{ route('tenants.leave', $tenant->id) }}" method="POST"
-                          onsubmit="return confirm('{{ __('app.leave_workspace_confirm', ['name' => addslashes($tenant->name)]) }}')">
-                        @csrf
-                        <button type="submit"
-                                class="px-4 py-2 bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs rounded-md transition shadow-sm active:scale-95 flex items-center gap-1.5 whitespace-nowrap">
-                            <span>🚪</span>
-                            <span>{{ __('app.leave_workspace_btn') }}</span>
-                        </button>
-                    </form>
+                    <p class="text-[11px] text-amber-800 leading-relaxed">{{ __('app.owner_leave_notice_desc') }}</p>
                 </div>
-            </div>
+            @else
+                <div class="p-4 rounded-md bg-rose-50/50 border border-rose-200/80 space-y-2">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div>
+                            <h4 class="text-xs font-bold text-rose-900">{{ __('app.leave_workspace') }}</h4>
+                            <p class="text-[11px] text-rose-600/90">{{ __('app.leave_workspace_hint') }}</p>
+                        </div>
+
+                        <form action="{{ route('tenants.leave', $tenant->id) }}" method="POST"
+                              onsubmit="return confirm('{{ __('app.leave_workspace_confirm', ['name' => addslashes($tenant->name)]) }}')">
+                            @csrf
+                            <button type="submit"
+                                    class="px-4 py-2 bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs rounded-md transition shadow-sm active:scale-95 flex items-center gap-1.5 whitespace-nowrap">
+                                <span>🚪</span>
+                                <span>{{ __('app.leave_workspace_btn') }}</span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            @endif
 
         </div>
 
