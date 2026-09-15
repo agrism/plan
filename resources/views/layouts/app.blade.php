@@ -54,7 +54,7 @@
     </style>
 </head>
 <body class="h-full font-sans antialiased flex flex-col bg-slate-50 text-slate-800 selection:bg-amber-400 selection:text-slate-950 pb-20 md:pb-0"
-      x-data="{ mobileTab: 'ideas', showAddModal: false, showTenantModal: false }">
+      x-data="{ mobileTab: 'ideas', showAddModal: false, showTenantModal: false, showCategoryModal: false }">
 
     <!-- Top Navigation Bar -->
     <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200/90 px-4 py-3 sm:px-6 shadow-sm">
@@ -224,32 +224,28 @@
                 </div>
 
                 <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1.5">Kategorija</label>
-                    <div class="grid grid-cols-3 gap-2 text-xs">
-                        <label class="flex items-center gap-1.5 p-2 rounded-xl bg-slate-50 border border-slate-200 cursor-pointer hover:border-blue-500/50 has-[:checked]:border-blue-500 has-[:checked]:bg-blue-50 has-[:checked]:text-blue-900">
-                            <input type="radio" name="category" value="projekti" checked class="hidden">
-                            <span>💼</span> <span class="font-semibold">Projekti</span>
-                        </label>
-                        <label class="flex items-center gap-1.5 p-2 rounded-xl bg-slate-50 border border-slate-200 cursor-pointer hover:border-rose-500/50 has-[:checked]:border-rose-500 has-[:checked]:bg-rose-50 has-[:checked]:text-rose-900">
-                            <input type="radio" name="category" value="steidzami" class="hidden">
-                            <span>⚡</span> <span class="font-semibold">Steidzami</span>
-                        </label>
-                        <label class="flex items-center gap-1.5 p-2 rounded-xl bg-slate-50 border border-slate-200 cursor-pointer hover:border-purple-500/50 has-[:checked]:border-purple-500 has-[:checked]:bg-purple-50 has-[:checked]:text-purple-900">
-                            <input type="radio" name="category" value="attistiba" class="hidden">
-                            <span>🚀</span> <span class="font-semibold">Attīstība</span>
-                        </label>
-                        <label class="flex items-center gap-1.5 p-2 rounded-xl bg-slate-50 border border-slate-200 cursor-pointer hover:border-amber-500/50 has-[:checked]:border-amber-500 has-[:checked]:bg-amber-50 has-[:checked]:text-amber-900">
-                            <input type="radio" name="category" value="sanaksmes" class="hidden">
-                            <span>👥</span> <span class="font-semibold">Sanāksmes</span>
-                        </label>
-                        <label class="flex items-center gap-1.5 p-2 rounded-xl bg-slate-50 border border-slate-200 cursor-pointer hover:border-emerald-500/50 has-[:checked]:border-emerald-500 has-[:checked]:bg-emerald-50 has-[:checked]:text-emerald-900">
-                            <input type="radio" name="category" value="ikdienas" class="hidden">
-                            <span>📋</span> <span class="font-semibold">Ikdienas</span>
-                        </label>
-                        <label class="flex items-center gap-1.5 p-2 rounded-xl bg-slate-50 border border-slate-200 cursor-pointer hover:border-slate-500/50 has-[:checked]:border-slate-600 has-[:checked]:bg-slate-100 has-[:checked]:text-slate-900">
-                            <input type="radio" name="category" value="citi" class="hidden">
-                            <span>✨</span> <span class="font-semibold">Citi</span>
-                        </label>
+                    <div class="flex items-center justify-between mb-1.5">
+                        <label class="block text-xs font-bold text-slate-700">Kategorija</label>
+                        <button type="button" @click="showCategoryModal = true" class="text-[11px] font-bold text-amber-700 hover:text-amber-800 flex items-center gap-1">
+                            <span>➕</span> Jauna kategorija
+                        </button>
+                    </div>
+                    <div class="grid grid-cols-3 gap-2 text-xs max-h-36 overflow-y-auto p-0.5">
+                        @if(isset($tenant) && $tenant->categories)
+                            @foreach($tenant->categories as $idx => $cat)
+                                <label class="flex items-center gap-1.5 p-2 rounded-xl bg-slate-50 border border-slate-200 cursor-pointer hover:border-amber-400 has-[:checked]:border-amber-500 has-[:checked]:bg-amber-50 has-[:checked]:text-amber-950 font-semibold truncate transition">
+                                    <input type="radio" name="category_id" value="{{ $cat->id }}" {{ $idx === 0 ? 'checked' : '' }} class="hidden">
+                                    <span class="text-sm flex-shrink-0">{{ $cat->emoji }}</span>
+                                    <span class="truncate">{{ $cat->name }}</span>
+                                </label>
+                            @endforeach
+                        @else
+                            <label class="flex items-center gap-1.5 p-2 rounded-xl bg-slate-50 border border-slate-200 cursor-pointer hover:border-amber-400 has-[:checked]:border-amber-500 has-[:checked]:bg-amber-50 has-[:checked]:text-amber-950 font-semibold truncate transition">
+                                <input type="radio" name="category" value="citi" checked class="hidden">
+                                <span class="text-sm flex-shrink-0">✨</span>
+                                <span class="truncate">Citi</span>
+                            </label>
+                        @endif
                     </div>
                 </div>
 
@@ -320,6 +316,78 @@
                 <div class="flex gap-2 justify-end">
                     <button type="button" @click="showTenantModal = false" class="px-4 py-2 text-xs font-semibold text-slate-500 hover:text-slate-800">Atcelt</button>
                     <button type="submit" class="px-4 py-2 text-xs font-bold bg-amber-500 text-slate-950 rounded-xl hover:bg-amber-400">Izveidot</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Create Category Modal -->
+    <div x-show="showCategoryModal" x-cloak class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
+        <div @click.outside="showCategoryModal = false" class="w-full max-w-md bg-white border border-slate-200 rounded-3xl p-6 shadow-2xl space-y-4"
+             x-data="{ selectedEmoji: '📁', selectedColor: 'blue' }">
+            <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+                <div class="flex items-center gap-2">
+                    <span class="text-2xl" x-text="selectedEmoji"></span>
+                    <h3 class="text-lg font-bold text-slate-900">Izveidot jaunu kategoriju</h3>
+                </div>
+                <button type="button" @click="showCategoryModal = false" class="p-1.5 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-100">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+
+            <form action="{{ route('categories.store') }}" method="POST"
+                  hx-post="{{ route('categories.store') }}"
+                  hx-target="body"
+                  @htmx:after-request="showCategoryModal = false"
+                  class="space-y-4">
+                @csrf
+                
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Kategorijas nosaukums</label>
+                    <input type="text" name="name" required placeholder="Piem., Mārketings, Loģistika, Finanses..."
+                           class="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 text-sm focus:border-amber-500 font-semibold">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1.5">Ikona (Emoji)</label>
+                    <input type="hidden" name="emoji" :value="selectedEmoji">
+                    <div class="flex flex-wrap gap-2 text-base p-2 bg-slate-50 border border-slate-200 rounded-2xl max-h-28 overflow-y-auto">
+                        <template x-for="em in ['💼', '⚡', '🚀', '👥', '📋', '🎯', '🎨', '📊', '🛠️', '💡', '💰', '🔒', '📦', '🏷️', '📢', '💻', '🍕', '✨', '📝', '🛒', '🔧', '📈', '🤝', '⚙️']">
+                            <button type="button" @click="selectedEmoji = em"
+                                    class="w-8 h-8 rounded-xl flex items-center justify-center transition text-base"
+                                    :class="selectedEmoji === em ? 'bg-amber-400 scale-110 shadow-sm' : 'hover:bg-slate-200'">
+                                <span x-text="em"></span>
+                            </button>
+                        </template>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1.5">Krāsa</label>
+                    <input type="hidden" name="color" :value="selectedColor">
+                    <div class="flex flex-wrap gap-2.5 p-2 bg-slate-50 border border-slate-200 rounded-2xl">
+                        <template x-for="c in [
+                            { id: 'blue', bg: 'bg-blue-500' },
+                            { id: 'rose', bg: 'bg-rose-500' },
+                            { id: 'purple', bg: 'bg-purple-500' },
+                            { id: 'amber', bg: 'bg-amber-500' },
+                            { id: 'emerald', bg: 'bg-emerald-500' },
+                            { id: 'indigo', bg: 'bg-indigo-500' },
+                            { id: 'cyan', bg: 'bg-cyan-500' },
+                            { id: 'slate', bg: 'bg-slate-500' }
+                        ]">
+                            <button type="button" @click="selectedColor = c.id"
+                                    class="w-7 h-7 rounded-full transition flex items-center justify-center ring-offset-2"
+                                    :class="[c.bg, selectedColor === c.id ? 'ring-2 ring-slate-800 scale-110' : 'opacity-80 hover:opacity-100']">
+                                <span x-show="selectedColor === c.id" class="text-white text-xs font-bold">✓</span>
+                            </button>
+                        </template>
+                    </div>
+                </div>
+
+                <div class="flex gap-2 justify-end pt-2 border-t border-slate-100">
+                    <button type="button" @click="showCategoryModal = false" class="px-4 py-2 text-xs font-semibold text-slate-500 hover:text-slate-800">Atcelt</button>
+                    <button type="submit" class="px-5 py-2 text-xs font-bold bg-amber-500 text-slate-950 rounded-xl hover:bg-amber-400 shadow-sm active:scale-95 transition">Izveidot kategoriju ✨</button>
                 </div>
             </form>
         </div>

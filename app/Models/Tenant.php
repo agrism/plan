@@ -44,4 +44,18 @@ class Tenant extends Model
     {
         return $this->hasMany(Task::class);
     }
+
+    public function categories(): HasMany
+    {
+        return $this->hasMany(Category::class);
+    }
+
+    public function ensureDefaultCategories(): void
+    {
+        if ($this->categories()->count() === 0) {
+            foreach (Category::defaultCategories() as $cat) {
+                $this->categories()->create($cat);
+            }
+        }
+    }
 }

@@ -184,4 +184,50 @@ class TaskFeatureTest extends TestCase
         $response->assertStatus(200);
         $response->assertSee('HTMX Testa uzdevums');
     }
+
+    public function test_it_does_not_attach_image_automatically(): void
+    {
+        $response = $this->actingAs($this->user)->post(route('ideas.store'), [
+            'title' => 'Uzdevums bez bildes',
+            'category' => 'projekti',
+        ]);
+
+        $response->assertRedirect(route('ideas.index'));
+
+        $task = Task::where('title', 'Uzdevums bez bildes')->first();
+        $this->assertNotNull($task);
+        $this->assertNull($task->image_url, 'Image URL must remain null when no image is uploaded');
+    }
+
+    public function test_it_creates_custom_category(): void
+    {
+        $response = $this->actingAs($this->user)->post(route('categories.store'), [
+            'name' => 'Mārketings',
+            'emoji' => '📢',
+            'color' => 'indigo',
+        ]);
+
+        $response->assertRedirect(route('ideas.index'));
+
+        $this->assertDatabaseHas('categories', [
+            'tenant_id' => $this->tenant->id,
+            'name' => 'Mārketings',
+            'emoji' => '📢',
+            'color' => 'indigo',
+        ]);
+
+        $cat = \App\Models\Category::where('name', 'Mārketings')->first();
+
+        // Create a task with this category
+        $this->actingAs($this->user)->post(route('ideas.store'), [
+            'title' => 'Sociālo tīklu kampaņa',
+            'category_id' => $cat->id,
+        ]);
+
+        $task = Task::where('title', 'Sociālo tīklu kampaņa')->first();
+        $this->assertEquals($cat->id, $task->category_id);
+        $this->assertEquals('📢', $task->category_emoji);
+        $this->assertEquals('Mārketings', $task->category_name);
+        $this->assertStringContainsString('indigo', $task->category_badge_class);
+    }
 }

@@ -26,6 +26,10 @@ Route::middleware(['auth', EnsureCurrentTenant::class])->group(function () {
     Route::post('/ideas/{task}/react', [IdeaController::class, 'react'])->name('ideas.react');
     Route::delete('/ideas/{task}', [IdeaController::class, 'destroy'])->name('ideas.destroy');
 
+    // Categories
+    Route::post('/categories', [\App\Http\Controllers\CategoryController::class, 'store'])->name('categories.store');
+    Route::delete('/categories/{category}', [\App\Http\Controllers\CategoryController::class, 'destroy'])->name('categories.destroy');
+
     // Tenant Switch & Create
     Route::post('/tenants/switch/{id}', [TenantController::class, 'switchTenant'])->name('tenants.switch');
     Route::get('/tenants/create', [TenantController::class, 'create'])->name('tenants.create');

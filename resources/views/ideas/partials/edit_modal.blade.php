@@ -51,31 +51,22 @@
             <!-- Category -->
             <div>
                 <label class="block text-xs font-bold text-slate-700 mb-1.5">Kategorija</label>
-                <div class="grid grid-cols-3 gap-2 text-xs">
-                    <label class="flex items-center gap-1.5 p-2 rounded-xl bg-slate-50 border border-slate-200 cursor-pointer hover:border-blue-500/50 has-[:checked]:border-blue-500 has-[:checked]:bg-blue-50 has-[:checked]:text-blue-900">
-                        <input type="radio" name="category" value="projekti" {{ $task->category === 'projekti' ? 'checked' : '' }} class="hidden">
-                        <span>💼</span> <span class="font-semibold">Projekti</span>
-                    </label>
-                    <label class="flex items-center gap-1.5 p-2 rounded-xl bg-slate-50 border border-slate-200 cursor-pointer hover:border-rose-500/50 has-[:checked]:border-rose-500 has-[:checked]:bg-rose-50 has-[:checked]:text-rose-900">
-                        <input type="radio" name="category" value="steidzami" {{ $task->category === 'steidzami' ? 'checked' : '' }} class="hidden">
-                        <span>⚡</span> <span class="font-semibold">Steidzami</span>
-                    </label>
-                    <label class="flex items-center gap-1.5 p-2 rounded-xl bg-slate-50 border border-slate-200 cursor-pointer hover:border-purple-500/50 has-[:checked]:border-purple-500 has-[:checked]:bg-purple-50 has-[:checked]:text-purple-900">
-                        <input type="radio" name="category" value="attistiba" {{ $task->category === 'attistiba' ? 'checked' : '' }} class="hidden">
-                        <span>🚀</span> <span class="font-semibold">Attīstība</span>
-                    </label>
-                    <label class="flex items-center gap-1.5 p-2 rounded-xl bg-slate-50 border border-slate-200 cursor-pointer hover:border-amber-500/50 has-[:checked]:border-amber-500 has-[:checked]:bg-amber-50 has-[:checked]:text-amber-900">
-                        <input type="radio" name="category" value="sanaksmes" {{ $task->category === 'sanaksmes' ? 'checked' : '' }} class="hidden">
-                        <span>👥</span> <span class="font-semibold">Sanāksmes</span>
-                    </label>
-                    <label class="flex items-center gap-1.5 p-2 rounded-xl bg-slate-50 border border-slate-200 cursor-pointer hover:border-emerald-500/50 has-[:checked]:border-emerald-500 has-[:checked]:bg-emerald-50 has-[:checked]:text-emerald-900">
-                        <input type="radio" name="category" value="ikdienas" {{ $task->category === 'ikdienas' ? 'checked' : '' }} class="hidden">
-                        <span>📋</span> <span class="font-semibold">Ikdienas</span>
-                    </label>
-                    <label class="flex items-center gap-1.5 p-2 rounded-xl bg-slate-50 border border-slate-200 cursor-pointer hover:border-slate-500/50 has-[:checked]:border-slate-600 has-[:checked]:bg-slate-100 has-[:checked]:text-slate-900">
-                        <input type="radio" name="category" value="citi" {{ $task->category === 'citi' ? 'checked' : '' }} class="hidden">
-                        <span>✨</span> <span class="font-semibold">Citi</span>
-                    </label>
+                <div class="grid grid-cols-3 gap-2 text-xs max-h-36 overflow-y-auto p-0.5">
+                    @if(isset($categories) && count($categories) > 0)
+                        @foreach($categories as $cat)
+                            <label class="flex items-center gap-1.5 p-2 rounded-xl bg-slate-50 border border-slate-200 cursor-pointer hover:border-amber-400 has-[:checked]:border-amber-500 has-[:checked]:bg-amber-50 has-[:checked]:text-amber-950 font-semibold truncate transition">
+                                <input type="radio" name="category_id" value="{{ $cat->id }}" {{ ($task->category_id == $cat->id || $task->category === $cat->slug) ? 'checked' : '' }} class="hidden">
+                                <span class="text-sm flex-shrink-0">{{ $cat->emoji }}</span>
+                                <span class="truncate">{{ $cat->name }}</span>
+                            </label>
+                        @endforeach
+                    @else
+                        <label class="flex items-center gap-1.5 p-2 rounded-xl bg-slate-50 border border-slate-200 cursor-pointer hover:border-amber-400 has-[:checked]:border-amber-500 has-[:checked]:bg-amber-50 has-[:checked]:text-amber-950 font-semibold truncate transition">
+                            <input type="radio" name="category" value="{{ $task->category ?? 'citi' }}" checked class="hidden">
+                            <span class="text-sm flex-shrink-0">{{ $task->category_emoji }}</span>
+                            <span class="truncate">{{ $task->category_name }}</span>
+                        </label>
+                    @endif
                 </div>
             </div>
 

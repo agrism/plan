@@ -19,6 +19,9 @@ class IdeaController extends Controller
             return redirect()->route('tenants.create');
         }
 
+        $tenant->ensureDefaultCategories();
+        $categories = $tenant->categories()->get();
+
         // Calculate upcoming focus days (Friday, Saturday, Sunday)
         $now = Carbon::now();
         $friday = $now->copy()->next(Carbon::FRIDAY)->toDateString();
@@ -36,20 +39,23 @@ class IdeaController extends Controller
         // Query backlog tasks (scheduled_date is NULL)
         $categoryFilter = $request->query('category');
         $backlogQuery = $tenant->tasks()
-            ->with(['creator', 'reactions'])
+            ->with(['creator', 'reactions', 'categoryRelation'])
             ->whereNull('scheduled_date')
             ->orderBy('created_at', 'desc');
 
         if ($categoryFilter && $categoryFilter !== 'all') {
-            $backlogQuery->where('category', $categoryFilter);
+            $backlogQuery->where(function ($q) use ($categoryFilter) {
+                $q->where('category', $categoryFilter)
+                  ->orWhere('category_id', $categoryFilter);
+            });
         }
 
         $backlogIdeas = $backlogQuery->get();
 
         // Query scheduled tasks
-        $fridayTasks = $tenant->tasks()->with(['creator', 'reactions'])->whereDate('scheduled_date', $friday)->orderBy('sort_order')->get();
-        $saturdayTasks = $tenant->tasks()->with(['creator', 'reactions'])->whereDate('scheduled_date', $saturday)->orderBy('sort_order')->get();
-        $sundayTasks = $tenant->tasks()->with(['creator', 'reactions'])->whereDate('scheduled_date', $sunday)->orderBy('sort_order')->get();
+        $fridayTasks = $tenant->tasks()->with(['creator', 'reactions', 'categoryRelation'])->whereDate('scheduled_date', $friday)->orderBy('sort_order')->get();
+        $saturdayTasks = $tenant->tasks()->with(['creator', 'reactions', 'categoryRelation'])->whereDate('scheduled_date', $saturday)->orderBy('sort_order')->get();
+        $sundayTasks = $tenant->tasks()->with(['creator', 'reactions', 'categoryRelation'])->whereDate('scheduled_date', $sunday)->orderBy('sort_order')->get();
 
         $weekendTasksCount = $fridayTasks->count() + $saturdayTasks->count() + $sundayTasks->count();
         $weekendCompletedCount = $fridayTasks->where('is_completed', true)->count() 
@@ -57,16 +63,17 @@ class IdeaController extends Controller
             + $sundayTasks->where('is_completed', true)->count();
 
         if ($request->header('HX-Request') && $request->header('HX-Target') === 'backlog-container') {
-            return view('ideas.partials.backlog_list', compact('backlogIdeas', 'tenant', 'user', 'friday', 'saturday', 'sunday'));
+            return view('ideas.partials.backlog_list', compact('backlogIdeas', 'tenant', 'user', 'friday', 'saturday', 'sunday', 'categories'));
         }
 
         if ($request->header('HX-Request') && $request->header('HX-Target') === 'weekend-container') {
-            return view('ideas.partials.weekend_plan', compact('fridayTasks', 'saturdayTasks', 'sundayTasks', 'friday', 'saturday', 'sunday', 'tenant', 'user'));
+            return view('ideas.partials.weekend_plan', compact('fridayTasks', 'saturdayTasks', 'sundayTasks', 'friday', 'saturday', 'sunday', 'tenant', 'user', 'categories'));
         }
 
         return view('ideas.index', compact(
             'tenant',
             'user',
+            'categories',
             'backlogIdeas',
             'fridayTasks',
             'saturdayTasks',
@@ -85,7 +92,8 @@ class IdeaController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'nullable|string|max:2000',
-            'category' => 'nullable|string|in:projekti,steidzami,attistiba,sanaksmes,ikdienas,citi',
+            'category' => 'nullable|string|max:50',
+            'category_id' => 'nullable|integer',
             'image_url' => 'nullable|string|max:500',
             'image_file' => 'nullable|image|max:12288',
             'links' => 'nullable|array',
@@ -101,21 +109,32 @@ class IdeaController extends Controller
             return response('Darbavieta nav atrasta', 400);
         }
 
+        // Image handling: strictly only if uploaded or provided, NO automatic fallback
         $imageUrl = null;
         if ($request->hasFile('image_file')) {
             $imageUrl = $imageService->processAndUpload($request->file('image_file'), 'tasks', 1200, 82);
         } elseif (!empty($validated['image_url'])) {
             $imageUrl = $validated['image_url'];
-        } else {
-            $category = $validated['category'] ?? 'citi';
-            $imageUrl = match ($category) {
-                'projekti' => 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=600&q=80',
-                'steidzami' => 'https://images.unsplash.com/photo-1507925921958-8a62f3d1a50d?auto=format&fit=crop&w=600&q=80',
-                'attistiba' => 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=600&q=80',
-                'sanaksmes' => 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=600&q=80',
-                'ikdienas' => 'https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?auto=format&fit=crop&w=600&q=80',
-                default => null,
-            };
+        }
+
+        // Category resolution
+        $categoryId = null;
+        $categorySlug = 'citi';
+
+        if (!empty($validated['category_id'])) {
+            $cat = $tenant->categories()->find($validated['category_id']);
+            if ($cat) {
+                $categoryId = $cat->id;
+                $categorySlug = $cat->slug;
+            }
+        } elseif (!empty($validated['category'])) {
+            $cat = $tenant->categories()->where('slug', $validated['category'])->orWhere('id', $validated['category'])->first();
+            if ($cat) {
+                $categoryId = $cat->id;
+                $categorySlug = $cat->slug;
+            } else {
+                $categorySlug = $validated['category'];
+            }
         }
 
         // Clean links
@@ -127,7 +146,8 @@ class IdeaController extends Controller
             'created_by_id' => $user->id,
             'title' => $validated['title'],
             'description' => $validated['description'] ?? null,
-            'category' => $validated['category'] ?? 'citi',
+            'category' => $categorySlug,
+            'category_id' => $categoryId,
             'image_url' => $imageUrl,
             'links' => $cleanLinks,
             'scheduled_date' => $validated['scheduled_date'] ?? null,
@@ -143,7 +163,11 @@ class IdeaController extends Controller
 
     public function edit(Task $task)
     {
-        return view('ideas.partials.edit_modal', compact('task'));
+        $tenant = auth()->user()->currentTenant();
+        $tenant->ensureDefaultCategories();
+        $categories = $tenant->categories()->get();
+
+        return view('ideas.partials.edit_modal', compact('task', 'categories'));
     }
 
     public function update(Request $request, Task $task, ImageService $imageService)
@@ -151,7 +175,8 @@ class IdeaController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'nullable|string|max:2000',
-            'category' => 'nullable|string|in:projekti,steidzami,attistiba,sanaksmes,ikdienas,citi',
+            'category' => 'nullable|string|max:50',
+            'category_id' => 'nullable|integer',
             'image_url' => 'nullable|string|max:500',
             'image_file' => 'nullable|image|max:12288',
             'links' => 'nullable|array',
@@ -163,7 +188,23 @@ class IdeaController extends Controller
 
         $task->title = $validated['title'];
         $task->description = $validated['description'] ?? null;
-        $task->category = $validated['category'] ?? $task->category;
+
+        $tenant = auth()->user()->currentTenant();
+        if (!empty($validated['category_id'])) {
+            $cat = $tenant->categories()->find($validated['category_id']);
+            if ($cat) {
+                $task->category_id = $cat->id;
+                $task->category = $cat->slug;
+            }
+        } elseif (!empty($validated['category'])) {
+            $cat = $tenant->categories()->where('slug', $validated['category'])->orWhere('id', $validated['category'])->first();
+            if ($cat) {
+                $task->category_id = $cat->id;
+                $task->category = $cat->slug;
+            } else {
+                $task->category = $validated['category'];
+            }
+        }
 
         if ($request->boolean('remove_image')) {
             $task->image_url = null;

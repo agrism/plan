@@ -20,6 +20,7 @@ class Task extends Model
         'image_url',
         'links',
         'category',
+        'category_id',
         'scheduled_date',
         'scheduled_time_slot',
         'is_completed',
@@ -35,6 +36,11 @@ class Task extends Model
     public function tenant(): BelongsTo
     {
         return $this->belongsTo(Tenant::class);
+    }
+
+    public function categoryRelation(): BelongsTo
+    {
+        return $this->belongsTo(Category::class, 'category_id');
     }
 
     public function creator(): BelongsTo
@@ -54,6 +60,10 @@ class Task extends Model
 
     public function getCategoryEmojiAttribute(): string
     {
+        if ($this->categoryRelation) {
+            return $this->categoryRelation->emoji;
+        }
+
         return match ($this->category) {
             'projekti' => '💼',
             'steidzami' => '⚡',
@@ -66,6 +76,10 @@ class Task extends Model
 
     public function getCategoryNameAttribute(): string
     {
+        if ($this->categoryRelation) {
+            return $this->categoryRelation->name;
+        }
+
         return match ($this->category) {
             'projekti' => 'Projekti',
             'steidzami' => 'Steidzami',
@@ -78,6 +92,10 @@ class Task extends Model
 
     public function getCategoryBadgeClassAttribute(): string
     {
+        if ($this->categoryRelation) {
+            return $this->categoryRelation->badge_class;
+        }
+
         return match ($this->category) {
             'projekti' => 'bg-blue-50 text-blue-800 border-blue-200',
             'steidzami' => 'bg-rose-50 text-rose-800 border-rose-200',

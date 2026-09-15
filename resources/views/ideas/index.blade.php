@@ -45,7 +45,7 @@
                 </button>
             </div>
 
-            <!-- Category Pills Filter -->
+            <!-- Category Pills Filter & Dynamic Categories -->
             <div class="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs no-scrollbar">
                 <a href="{{ route('ideas.index', ['category' => 'all']) }}"
                    hx-get="{{ route('ideas.index', ['category' => 'all']) }}"
@@ -53,36 +53,23 @@
                    class="px-2.5 py-1 rounded-xl whitespace-nowrap transition {{ !$categoryFilter || $categoryFilter === 'all' ? 'bg-slate-900 text-white font-bold' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-100 hover:text-slate-900' }}">
                     Visi
                 </a>
-                <a href="{{ route('ideas.index', ['category' => 'projekti']) }}"
-                   hx-get="{{ route('ideas.index', ['category' => 'projekti']) }}"
-                   hx-target="#backlog-container"
-                   class="px-2.5 py-1 rounded-xl whitespace-nowrap transition {{ $categoryFilter === 'projekti' ? 'bg-blue-600 text-white font-bold' : 'bg-white text-slate-600 border border-slate-200 hover:border-blue-300 hover:text-blue-700' }}">
-                    💼 Projekti
-                </a>
-                <a href="{{ route('ideas.index', ['category' => 'steidzami']) }}"
-                   hx-get="{{ route('ideas.index', ['category' => 'steidzami']) }}"
-                   hx-target="#backlog-container"
-                   class="px-2.5 py-1 rounded-xl whitespace-nowrap transition {{ $categoryFilter === 'steidzami' ? 'bg-rose-600 text-white font-bold' : 'bg-white text-slate-600 border border-slate-200 hover:border-rose-300 hover:text-rose-700' }}">
-                    ⚡ Steidzami
-                </a>
-                <a href="{{ route('ideas.index', ['category' => 'attistiba']) }}"
-                   hx-get="{{ route('ideas.index', ['category' => 'attistiba']) }}"
-                   hx-target="#backlog-container"
-                   class="px-2.5 py-1 rounded-xl whitespace-nowrap transition {{ $categoryFilter === 'attistiba' ? 'bg-purple-600 text-white font-bold' : 'bg-white text-slate-600 border border-slate-200 hover:border-purple-300 hover:text-purple-700' }}">
-                    🚀 Attīstība
-                </a>
-                <a href="{{ route('ideas.index', ['category' => 'sanaksmes']) }}"
-                   hx-get="{{ route('ideas.index', ['category' => 'sanaksmes']) }}"
-                   hx-target="#backlog-container"
-                   class="px-2.5 py-1 rounded-xl whitespace-nowrap transition {{ $categoryFilter === 'sanaksmes' ? 'bg-amber-500 text-slate-950 font-bold' : 'bg-white text-slate-600 border border-slate-200 hover:border-amber-300 hover:text-amber-700' }}">
-                    👥 Sanāksmes
-                </a>
-                <a href="{{ route('ideas.index', ['category' => 'ikdienas']) }}"
-                   hx-get="{{ route('ideas.index', ['category' => 'ikdienas']) }}"
-                   hx-target="#backlog-container"
-                   class="px-2.5 py-1 rounded-xl whitespace-nowrap transition {{ $categoryFilter === 'ikdienas' ? 'bg-emerald-600 text-white font-bold' : 'bg-white text-slate-600 border border-slate-200 hover:border-emerald-300 hover:text-emerald-700' }}">
-                    📋 Ikdienas
-                </a>
+                @foreach($categories as $cat)
+                    <a href="{{ route('ideas.index', ['category' => $cat->slug]) }}"
+                       hx-get="{{ route('ideas.index', ['category' => $cat->slug]) }}"
+                       hx-target="#backlog-container"
+                       class="px-2.5 py-1 rounded-xl whitespace-nowrap transition flex items-center gap-1 {{ $categoryFilter === $cat->slug || $categoryFilter == $cat->id ? 'bg-amber-500 text-slate-950 font-bold shadow-sm' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-100 hover:text-slate-900' }}">
+                        <span>{{ $cat->emoji }}</span>
+                        <span>{{ $cat->name }}</span>
+                    </a>
+                @endforeach
+
+                <!-- Add New Category Button -->
+                <button @click="showCategoryModal = true"
+                        type="button"
+                        class="px-2.5 py-1 rounded-xl whitespace-nowrap transition flex items-center gap-1 bg-slate-100 hover:bg-amber-100 border border-slate-200 hover:border-amber-300 text-slate-600 hover:text-amber-900 font-bold"
+                        title="Izveidot jaunu kategoriju">
+                    <span>➕</span> Jauna
+                </button>
             </div>
 
             <!-- Backlog Cards Container -->
