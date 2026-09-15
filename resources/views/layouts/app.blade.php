@@ -195,28 +195,14 @@
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path></svg>
         </button>
 
-        <!-- Tab 3: Quick Switch Member -->
-        <div class="relative" x-data="{ memberMenu: false }">
-            <button @click="memberMenu = !memberMenu"
-                    class="flex flex-col items-center gap-1 py-1 px-3 rounded-xl tap-highlight-transparent text-slate-500 hover:text-slate-800">
-                <span class="text-xl">{{ auth()->user()->avatar ?? '👥' }}</span>
-                <span class="text-[10px] font-semibold">{{ explode(' ', auth()->user()->name)[0] }}</span>
-            </button>
-
-            <!-- Member Switcher Popup -->
-            <div x-show="memberMenu" @click.outside="memberMenu = false" x-cloak
-                 class="absolute bottom-14 right-0 w-52 bg-white border border-slate-200 rounded-2xl shadow-xl p-2 z-50 space-y-1">
-                <div class="text-[10px] font-bold uppercase text-slate-400 px-2 py-1">{{ __('app.switch_user') }}:</div>
-                @if(isset($tenant))
-                    @foreach($tenant->users as $member)
-                        <a href="{{ route('login.quick', $member->id) }}" class="flex items-center gap-2 px-2.5 py-1.5 text-xs rounded-xl text-slate-700 hover:bg-slate-100 transition {{ auth()->id() === $member->id ? 'bg-amber-50 text-amber-800 font-bold' : '' }}">
-                            <span>{{ $member->avatar }}</span>
-                            <span>{{ $member->name }}</span>
-                        </a>
-                    @endforeach
-                @endif
-            </div>
-        </div>
+        <!-- Tab 3: Settings & Workspace -->
+        <button hx-get="{{ route('tenants.settings') }}"
+                hx-target="#settings-modal-slot"
+                hx-swap="innerHTML"
+                class="flex flex-col items-center gap-1 py-1 px-3 rounded-xl tap-highlight-transparent text-slate-500 hover:text-slate-800">
+            <span class="text-xl">{{ auth()->user()->avatar ?? '⚙️' }}</span>
+            <span class="text-[10px] font-semibold">{{ __('app.settings') }}</span>
+        </button>
     </nav>
 
     <!-- Slide-Up Bottom Sheet Modal for Adding Tasks -->

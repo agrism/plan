@@ -46,18 +46,24 @@
             </div>
 
             <!-- Category Pills Filter & Dynamic Categories -->
-            <div class="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs no-scrollbar">
+            <div x-data="{ activeCategory: '{{ $categoryFilter ?: 'all' }}' }" class="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs no-scrollbar">
                 <a href="{{ route('ideas.index', ['category' => 'all']) }}"
                    hx-get="{{ route('ideas.index', ['category' => 'all']) }}"
                    hx-target="#backlog-container"
-                   class="px-2.5 py-1 rounded-xl whitespace-nowrap transition {{ !$categoryFilter || $categoryFilter === 'all' ? 'bg-slate-900 text-white font-bold' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-100 hover:text-slate-900' }}">
+                   hx-push-url="true"
+                   @click="activeCategory = 'all'"
+                   class="px-2.5 py-1 rounded-xl whitespace-nowrap transition cursor-pointer"
+                   :class="activeCategory === 'all' ? 'bg-slate-900 text-white font-bold shadow-sm' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-100 hover:text-slate-900'">
                     {{ __('app.all') }}
                 </a>
                 @foreach($categories as $cat)
                     <a href="{{ route('ideas.index', ['category' => $cat->slug]) }}"
                        hx-get="{{ route('ideas.index', ['category' => $cat->slug]) }}"
                        hx-target="#backlog-container"
-                       class="px-2.5 py-1 rounded-xl whitespace-nowrap transition flex items-center gap-1 {{ $categoryFilter === $cat->slug || $categoryFilter == $cat->id ? 'bg-amber-500 text-slate-950 font-bold shadow-sm' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-100 hover:text-slate-900' }}">
+                       hx-push-url="true"
+                       @click="activeCategory = '{{ $cat->slug }}'"
+                       class="px-2.5 py-1 rounded-xl whitespace-nowrap transition flex items-center gap-1 cursor-pointer"
+                       :class="activeCategory === '{{ $cat->slug }}' || activeCategory === '{{ $cat->id }}' ? 'bg-amber-500 text-slate-950 font-bold shadow-sm border border-amber-400' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-100 hover:text-slate-900'">
                         <span>{{ $cat->emoji }}</span>
                         <span>{{ $cat->name }}</span>
                     </a>
