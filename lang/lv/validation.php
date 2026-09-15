@@ -1,0 +1,196 @@
+<?php
+
+return [
+
+    /*
+    |--------------------------------------------------------------------------
+    | Validation Language Lines (Latvian)
+    |--------------------------------------------------------------------------
+    */
+
+    'accepted' => 'Laukam :attribute jābūt apstiprinātam.',
+    'accepted_if' => 'Laukam :attribute jābūt apstiprinātam, ja :other ir :value.',
+    'active_url' => 'Lauks :attribute nav derīga saite.',
+    'after' => 'Laukam :attribute jābūt datumam pēc :date.',
+    'after_or_equal' => 'Laukam :attribute jābūt datumam pēc vai vienādam ar :date.',
+    'alpha' => 'Lauks :attribute drīkst saturēt tikai burtus.',
+    'alpha_dash' => 'Lauks :attribute drīkst saturēt tikai burtus, ciparus, domuzīmes un pasvītras.',
+    'alpha_num' => 'Lauks :attribute drīkst saturēt tikai burtus un ciparus.',
+    'any_of' => 'Laukam :attribute jābūt vienai no vērtībām.',
+    'array' => 'Laukam :attribute jābūt sarakstam (masīvam).',
+    'ascii' => 'Lauks :attribute drīkst saturēt tikai vienbaita burtciparu rakstzīmes un simbolus.',
+    'before' => 'Laukam :attribute jābūt datumam pirms :date.',
+    'before_or_equal' => 'Laukam :attribute jābūt datumam pirms vai vienādam ar :date.',
+    'between' => [
+        'array' => 'Laukam :attribute jāsatur no :min līdz :max elementiem.',
+        'file' => 'Faila :attribute izmēram jābūt starp :min un :max kilobaitiem.',
+        'numeric' => 'Lauka :attribute vērtībai jābūt starp :min un :max.',
+        'string' => 'Lauka :attribute garumam jābūt no :min līdz :max rakstzīmēm.',
+    ],
+    'boolean' => 'Laukam :attribute jābūt patiesam vai aplamam.',
+    'can' => 'Lauks :attribute satur neatļautu vērtību.',
+    'confirmed' => 'Lauka :attribute apstiprinājums nesakrīt.',
+    'contains' => 'Laukā :attribute trūkst obligātas vērtības.',
+    'current_password' => 'Ievadītā parole nav pareiza.',
+    'date' => 'Lauks :attribute nav derīgs datums.',
+    'date_equals' => 'Laukam :attribute jābūt datumam, kas vienāds ar :date.',
+    'date_format' => 'Lauks :attribute neatbilst formātam :format.',
+    'decimal' => 'Laukam :attribute jābūt ar :decimal decimālzīmēm.',
+    'declined' => 'Laukam :attribute jābūt noraidītam.',
+    'declined_if' => 'Laukam :attribute jābūt noraidītam, ja :other ir :value.',
+    'different' => 'Laukiem :attribute un :other ir jābūt atšķirīgiem.',
+    'digits' => 'Laukam :attribute jāsatur :digits cipari.',
+    'digits_between' => 'Laukam :attribute jāsatur no :min līdz :max cipariem.',
+    'dimensions' => 'Lauka :attribute attēlam ir nederīgi izmēri.',
+    'distinct' => 'Laukam :attribute ir dublēta vērtība.',
+    'doesnt_end_with' => 'Lauks :attribute nedrīkst beigties ar kādu no šiem: :values.',
+    'doesnt_start_with' => 'Lauks :attribute nedrīkst sākties ar kādu no šiem: :values.',
+    'email' => 'Laukam :attribute jābūt derīgai e-pasta adresei.',
+    'ends_with' => 'Laukam :attribute jābeidzas ar kādu no šiem: :values.',
+    'enum' => 'Izvēlētais :attribute nav derīgs.',
+    'exists' => 'Izvēlētā :attribute vērtība nav atrasta.',
+    'extensions' => 'Laukam :attribute jābūt ar kādu no šiem paplašinājumiem: :values.',
+    'file' => 'Laukam :attribute jābūt failam.',
+    'filled' => 'Laukam :attribute jābūt aizpildītam.',
+    'gt' => [
+        'array' => 'Laukam :attribute jāsatur vairāk nekā :value elementi.',
+        'file' => 'Faila :attribute izmēram jābūt lielākam par :value kilobaitiem.',
+        'numeric' => 'Lauka :attribute vērtībai jābūt lielākai par :value.',
+        'string' => 'Lauka :attribute garumam jābūt lielākam par :value rakstzīmēm.',
+    ],
+    'gte' => [
+        'array' => 'Laukam :attribute jāsatur vismaz :value elementi.',
+        'file' => 'Faila :attribute izmēram jābūt vismaz :value kilobaitiem.',
+        'numeric' => 'Lauka :attribute vērtībai jābūt vismaz :value.',
+        'string' => 'Lauka :attribute garumam jābūt vismaz :value rakstzīmēm.',
+    ],
+    'hex_color' => 'Laukam :attribute jābūt derīgam heksadecimālās krāsas kodam.',
+    'image' => 'Laukam :attribute jābūt attēlam.',
+    'in' => 'Izvēlētais :attribute nav derīgs.',
+    'in_array' => 'Laukam :attribute jābūt starp :other vērtībām.',
+    'integer' => 'Laukam :attribute jābūt veselam skaitlim.',
+    'ip' => 'Laukam :attribute jābūt derīgai IP adresei.',
+    'ipv4' => 'Laukam :attribute jābūt derīgai IPv4 adresei.',
+    'ipv6' => 'Laukam :attribute jābūt derīgai IPv6 adresei.',
+    'json' => 'Laukam :attribute jābūt derīgai JSON virknei.',
+    'list' => 'Laukam :attribute jābūt sarakstam.',
+    'lowercase' => 'Laukam :attribute jābūt ar mazajiem burtiem.',
+    'lt' => [
+        'array' => 'Laukam :attribute jāsatur mazāk par :value elementiem.',
+        'file' => 'Faila :attribute izmēram jābūt mazākam par :value kilobaitiem.',
+        'numeric' => 'Lauka :attribute vērtībai jābūt mazākai par :value.',
+        'string' => 'Lauka :attribute garumam jābūt mazākam par :value rakstzīmēm.',
+    ],
+    'lte' => [
+        'array' => 'Laukam :attribute nedrīkst būt vairāk par :value elementiem.',
+        'file' => 'Faila :attribute izmērs nedrīkst pārsniegt :value kilobaitus.',
+        'numeric' => 'Lauka :attribute vērtība nedrīkst pārsniegt :value.',
+        'string' => 'Lauka :attribute garums nedrīkst pārsniegt :value rakstzīmes.',
+    ],
+    'mac_address' => 'Laukam :attribute jābūt derīgai MAC adresei.',
+    'max' => [
+        'array' => 'Lauks :attribute nedrīkst saturēt vairāk par :max elementiem.',
+        'file' => 'Faila :attribute izmērs nedrīkst pārsniegt :max kilobaitus.',
+        'numeric' => 'Lauka :attribute vērtība nedrīkst būt lielāka par :max.',
+        'string' => 'Lauka :attribute garums nedrīkst pārsniegt :max rakstzīmes.',
+    ],
+    'max_digits' => 'Lauks :attribute nedrīkst saturēt vairāk par :max cipariem.',
+    'mimes' => 'Lauka :attribute faila tipam jābūt: :values.',
+    'mimetypes' => 'Lauka :attribute faila tipam jābūt: :values.',
+    'min' => [
+        'array' => 'Laukam :attribute jāsatur vismaz :min elementi.',
+        'file' => 'Faila :attribute izmēram jābūt vismaz :min kilobaitiem.',
+        'numeric' => 'Lauka :attribute vērtībai jābūt vismaz :min.',
+        'string' => 'Lauka :attribute garumam jābūt vismaz :min rakstzīmēm.',
+    ],
+    'min_digits' => 'Laukam :attribute jāsatur vismaz :min cipari.',
+    'missing' => 'Lauks :attribute nedrīkst būt norādīts.',
+    'missing_if' => 'Lauks :attribute nedrīkst būt norādīts, ja :other ir :value.',
+    'missing_unless' => 'Lauks :attribute nedrīkst būt norādīts, izņemot ja :other ir :value.',
+    'missing_with' => 'Lauks :attribute nedrīkst būt norādīts, ja ir norādīts :values.',
+    'missing_with_all' => 'Lauks :attribute nedrīkst būt norādīts, ja ir norādīti :values.',
+    'multiple_of' => 'Lauka :attribute vērtībai jādalās ar :value bez atlikuma.',
+    'not_in' => 'Izvēlētais :attribute nav derīgs.',
+    'not_regex' => 'Lauka :attribute formāts nav derīgs.',
+    'numeric' => 'Laukam :attribute jābūt skaitlim.',
+    'password' => [
+        'letters' => 'Laukam :attribute jāsatur vismaz viens burts.',
+        'mixed' => 'Laukam :attribute jāsatur vismaz viens lielais un viens mazais burts.',
+        'numbers' => 'Laukam :attribute jāsatur vismaz viens cipars.',
+        'symbols' => 'Laukam :attribute jāsatur vismaz viens simbols.',
+        'uncompromised' => 'Norādītā :attribute vērtība ir bijusi iesaistīta datu noplūdē. Lūdzu, izvēlieties citu.',
+    ],
+    'present' => 'Laukam :attribute jābūt klātesošam.',
+    'present_if' => 'Laukam :attribute jābūt klātesošam, ja :other ir :value.',
+    'present_unless' => 'Laukam :attribute jābūt klātesošam, izņemot ja :other ir :value.',
+    'present_with' => 'Laukam :attribute jābūt klātesošam, ja ir norādīts :values.',
+    'present_with_all' => 'Laukam :attribute jābūt klātesošam, ja ir norādīti :values.',
+    'prohibited' => 'Lauks :attribute ir aizliegts.',
+    'prohibited_if' => 'Lauks :attribute ir aizliegts, ja :other ir :value.',
+    'prohibited_if_accepted' => 'Lauks :attribute ir aizliegts, ja :other ir apstiprināts.',
+    'prohibited_if_declined' => 'Lauks :attribute ir aizliegts, ja :other ir noraidīts.',
+    'prohibited_unless' => 'Lauks :attribute ir aizliegts, izņemot ja :other ir starp :values.',
+    'prohibits' => 'Lauks :attribute aizliedz norādīt :other.',
+    'regex' => 'Lauka :attribute formāts nav derīgs.',
+    'required' => 'Lauks :attribute ir obligāts.',
+    'required_array_keys' => 'Laukam :attribute jāsatur šādi ieraksti: :values.',
+    'required_if' => 'Lauks :attribute ir obligāts, ja :other ir :value.',
+    'required_if_accepted' => 'Lauks :attribute ir obligāts, ja :other ir apstiprināts.',
+    'required_if_declined' => 'Lauks :attribute ir obligāts, ja :other ir noraidīts.',
+    'required_unless' => 'Lauks :attribute ir obligāts, izņemot ja :other ir :values.',
+    'required_with' => 'Lauks :attribute ir obligāts, ja ir norādīts :values.',
+    'required_with_all' => 'Lauks :attribute ir obligāts, ja ir norādīti :values.',
+    'required_without' => 'Lauks :attribute ir obligāts, ja nav norādīts :values.',
+    'required_without_all' => 'Lauks :attribute ir obligāts, ja nav norādīts neviens no :values.',
+    'same' => 'Laukiem :attribute un :other ir jāsakrīt.',
+    'size' => [
+        'array' => 'Laukam :attribute jāsatur :size elementi.',
+        'file' => 'Faila :attribute izmēram jābūt :size kilobaitiem.',
+        'numeric' => 'Lauka :attribute vērtībai jābūt :size.',
+        'string' => 'Lauka :attribute garumam jābūt :size rakstzīmēm.',
+    ],
+    'starts_with' => 'Laukam :attribute jāsākas ar kādu no šiem: :values.',
+    'string' => 'Laukam :attribute jābūt tekstam.',
+    'timezone' => 'Laukam :attribute jābūt derīgai laika zonai.',
+    'unique' => 'Šāda :attribute vērtība jau ir aizņemta.',
+    'uploaded' => 'Neizdevās augšupielādēt :attribute.',
+    'uppercase' => 'Laukam :attribute jābūt ar lielajiem burtiem.',
+    'url' => 'Laukam :attribute jābūt derīgai saitei.',
+    'ulid' => 'Laukam :attribute jābūt derīgam ULID.',
+    'uuid' => 'Laukam :attribute jābūt derīgam UUID.',
+
+    /*
+    |--------------------------------------------------------------------------
+    | Custom Validation Language Lines
+    |--------------------------------------------------------------------------
+    */
+
+    'custom' => [
+        'password' => [
+            'min' => 'Paroles garumam jābūt vismaz :min rakstzīmēm.',
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Custom Validation Attributes
+    |--------------------------------------------------------------------------
+    */
+
+    'attributes' => [
+        'name' => 'Vārds',
+        'email' => 'E-pasts',
+        'password' => 'Parole',
+        'password_confirmation' => 'Paroles apstiprinājums',
+        'workspace_name' => 'Darbavietas nosaukums',
+        'title' => 'Nosaukums',
+        'content' => 'Saturs',
+        'category' => 'Kategorija',
+        'category_id' => 'Kategorija',
+        'invite_code' => 'Ielūguma kods',
+        'scheduled_date' => 'Datums',
+        'color' => 'Krāsa',
+        'emoji' => 'Emocijzīme',
+    ],
+
+];

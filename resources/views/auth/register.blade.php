@@ -68,13 +68,13 @@
             <div class="grid grid-cols-2 gap-2">
                 <div>
                     <label class="block text-xs font-bold text-slate-700 mb-1">{{ __('app.password') }}</label>
-                    <input type="password" name="password" required
-                           class="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 text-sm focus:border-amber-500">
+                    <input type="password" name="password" required minlength="5"
+                           class="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 text-sm focus:border-amber-500 focus:bg-white focus:ring-1 focus:ring-amber-500">
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-slate-700 mb-1">{{ __('app.password_confirmation') }}</label>
-                    <input type="password" name="password_confirmation" required
-                           class="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 text-sm focus:border-amber-500">
+                    <input type="password" name="password_confirmation" required minlength="5"
+                           class="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 text-sm focus:border-amber-500 focus:bg-white focus:ring-1 focus:ring-amber-500">
                 </div>
             </div>
             @error('password') <p class="text-xs text-rose-600 mt-1">{{ $message }}</p> @enderror

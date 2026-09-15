@@ -102,4 +102,50 @@ class LocalizationTest extends TestCase
         $enResponse->assertSee('Planner');
         $enResponse->assertSee('Sign In');
     }
+
+    public function test_registration_validation_messages_are_localized_in_latvian(): void
+    {
+        $response = $this->withSession(['locale' => 'lv'])->post(route('register'), [
+            'name' => 'Agris',
+            'email' => 'agris@test.lv',
+            'password' => '1234', // 4 chars (less than min 5)
+            'password_confirmation' => '1234',
+        ]);
+
+        $response->assertSessionHasErrors('password');
+        $errors = session('errors')->get('password');
+        $this->assertNotEmpty($errors);
+        $this->assertStringNotContainsString('validation.min.string', $errors[0]);
+        $this->assertStringContainsString('5', $errors[0]);
+    }
+
+    public function test_registration_accepts_five_character_password(): void
+    {
+        $response = $this->post(route('register'), [
+            'name' => 'Agris Pieci',
+            'email' => 'agris.pieci@test.lv',
+            'password' => '12345',
+            'password_confirmation' => '12345',
+            'workspace_name' => 'Pieci Darbavieta',
+        ]);
+
+        $response->assertRedirect(route('ideas.index'));
+        $this->assertDatabaseHas('users', ['email' => 'agris.pieci@test.lv']);
+    }
+
+    public function test_registration_validation_messages_are_localized_in_english(): void
+    {
+        $response = $this->withSession(['locale' => 'en'])->post(route('register'), [
+            'name' => 'John',
+            'email' => 'john@test.com',
+            'password' => '1234',
+            'password_confirmation' => '1234',
+        ]);
+
+        $response->assertSessionHasErrors('password');
+        $errors = session('errors')->get('password');
+        $this->assertNotEmpty($errors);
+        $this->assertStringNotContainsString('validation.min.string', $errors[0]);
+        $this->assertStringContainsString('at least 5 characters', $errors[0]);
+    }
 }
