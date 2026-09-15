@@ -277,9 +277,9 @@
                     </button>
                 </div>
 
-                <!-- Optional Image Upload to Hetzner S3 -->
+                <!-- Optional Image Upload -->
                 <div x-data="{ imagePreview: null }">
-                    <label class="block text-xs font-bold text-slate-700 mb-1">Pievienot attēlu (Hetzner S3)</label>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Pievienot attēlu</label>
                     <div class="flex items-center gap-3">
                         <label class="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-slate-50 border border-dashed border-slate-300 hover:border-amber-500 rounded-xl cursor-pointer text-xs font-semibold text-slate-600 hover:text-slate-900 transition">
                             <span>📷</span>

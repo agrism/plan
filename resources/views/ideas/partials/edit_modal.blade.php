@@ -103,9 +103,9 @@
                 </button>
             </div>
 
-            <!-- Image Management (Hetzner S3) -->
+            <!-- Image Management -->
             <div>
-                <label class="block text-xs font-bold text-slate-700 mb-1">Attēls (Hetzner S3)</label>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Attēls</label>
                 
                 @if($task->image_url)
                     <div x-show="!removeImage" class="relative rounded-2xl overflow-hidden bg-slate-100 border border-slate-200 mb-2 p-2 flex items-center justify-between gap-3">
