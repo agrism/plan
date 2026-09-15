@@ -415,8 +415,9 @@
             return parseInt(this.userAnswer, 10) === (this.num1 + this.num2);
         },
         generateMath() {
-            this.num1 = Math.floor(Math.random() * 8) + 2; // 2 to 9
-            this.num2 = Math.floor(Math.random() * 8) + 1; // 1 to 8
+            this.num1 = Math.floor(Math.random() * 7) + 1; // 1 to 7
+            const maxNum2 = 9 - this.num1; // ensures sum <= 9
+            this.num2 = Math.floor(Math.random() * maxNum2) + 1; // 1 to maxNum2
             this.userAnswer = '';
         },
         init() {
@@ -485,7 +486,7 @@
                     </div>
                     
                     <p class="text-[11px] text-amber-800">
-                        Lai novērstu nejaušu dzēšanu, lūdzu, ievadi pareizo aprēķina rezultātu:
+                        Lai novērstu nejaušu dzēšanu, lūdzu, ievadi viena cipara rezultātu:
                     </p>
 
                     <form @submit.prevent="submitDelete()">
@@ -497,13 +498,16 @@
                                 <span class="mx-1 text-slate-400">=</span>
                             </div>
 
-                            <input type="number"
+                            <input type="text"
+                                   inputmode="numeric"
+                                   pattern="[0-9]*"
+                                   maxlength="1"
                                    x-ref="mathInput"
                                    x-model="userAnswer"
                                    placeholder="?"
                                    autofocus
                                    required
-                                   class="w-24 px-3 py-2 text-center text-lg font-bold bg-white border rounded-xl focus:outline-none transition shadow-sm"
+                                   class="w-20 px-3 py-2 text-center text-xl font-bold bg-white border rounded-xl focus:outline-none transition shadow-sm"
                                    :class="{
                                        'border-emerald-500 ring-2 ring-emerald-400 text-emerald-700 bg-emerald-50/40': isCorrect,
                                        'border-rose-400 text-rose-700 ring-2 ring-rose-200': userAnswer !== '' && !isCorrect,
@@ -518,10 +522,10 @@
                                     </span>
                                 </template>
                                 <template x-if="userAnswer !== '' && !isCorrect">
-                                    <span class="text-[11px] font-semibold text-rose-600 leading-tight block">Nepareizs rezultāts</span>
+                                    <span class="text-[11px] font-semibold text-rose-600 leading-tight block">Nepareizs cipars</span>
                                 </template>
                                 <template x-if="userAnswer === ''">
-                                    <span class="text-[11px] text-amber-700/80 leading-tight block">Ievadi atbildi</span>
+                                    <span class="text-[11px] text-amber-700/80 leading-tight block">Ievadi 1 ciparu</span>
                                 </template>
                             </div>
                         </div>
