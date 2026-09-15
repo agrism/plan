@@ -18,22 +18,22 @@
 </head>
 <body class="min-h-full bg-slate-50 flex items-center justify-center p-4 relative">
     <!-- Language Switcher in Top Right -->
-    <div class="absolute top-4 right-4 flex items-center bg-white/80 backdrop-blur-sm border border-slate-200 rounded-full p-0.5 shadow-sm">
+    <div class="absolute top-4 right-4 flex items-center bg-white/80 backdrop-blur-sm border border-slate-200 rounded-lg p-0.5 shadow-sm">
         <a href="{{ route('locale.switch', 'lv') }}"
-           class="px-2.5 py-1 rounded-full text-xs font-bold transition flex items-center gap-1 {{ app()->getLocale() === 'lv' ? 'bg-amber-500 text-slate-950 shadow-sm' : 'text-slate-500 hover:text-slate-900' }}"
+           class="px-2.5 py-1 rounded-md text-xs font-bold transition flex items-center gap-1 {{ app()->getLocale() === 'lv' ? 'bg-amber-500 text-slate-950 shadow-sm' : 'text-slate-500 hover:text-slate-900' }}"
            title="Latviešu">
             <span>🇱🇻</span>
             <span>LV</span>
         </a>
         <a href="{{ route('locale.switch', 'en') }}"
-           class="px-2.5 py-1 rounded-full text-xs font-bold transition flex items-center gap-1 {{ app()->getLocale() === 'en' ? 'bg-amber-500 text-slate-950 shadow-sm' : 'text-slate-500 hover:text-slate-900' }}"
+           class="px-2.5 py-1 rounded-md text-xs font-bold transition flex items-center gap-1 {{ app()->getLocale() === 'en' ? 'bg-amber-500 text-slate-950 shadow-sm' : 'text-slate-500 hover:text-slate-900' }}"
            title="English">
             <span>🇬🇧</span>
             <span>EN</span>
         </a>
     </div>
 
-    <div class="w-full max-w-md bg-white border border-slate-200/90 rounded-3xl p-6 sm:p-8 shadow-xl space-y-6">
+    <div class="w-full max-w-md bg-white border border-slate-200/90 rounded-2xl p-6 sm:p-8 shadow-xl space-y-6">
         
         <!-- Header -->
         <div class="text-center space-y-2">
@@ -44,12 +44,12 @@
 
         <!-- Quick One-Click Login for Demo/Team Members -->
         @if(isset($demoUsers) && $demoUsers->isNotEmpty())
-            <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2.5">
+            <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2.5">
                 <div class="text-[11px] font-bold uppercase tracking-wider text-amber-700 text-center">{{ __('app.quick_login_demo') }}</div>
                 <div class="grid grid-cols-2 gap-2">
                     @foreach($demoUsers as $du)
                         <a href="{{ route('login.quick', $du->id) }}"
-                           class="flex items-center gap-2 p-2.5 rounded-xl bg-white border border-slate-200 hover:border-amber-400 hover:bg-amber-50/50 text-xs font-bold text-slate-800 shadow-sm transition">
+                           class="flex items-center gap-2 p-2.5 rounded-lg bg-white border border-slate-200 hover:border-amber-400 hover:bg-amber-50/50 text-xs font-bold text-slate-800 shadow-sm transition">
                             <span class="text-lg">{{ $du->avatar ?? '👤' }}</span>
                             <span class="truncate">{{ $du->name }}</span>
                         </a>
@@ -60,7 +60,7 @@
 
         <!-- Flash Status Message -->
         @if (session('status'))
-            <div class="p-3.5 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold rounded-2xl flex items-center gap-2">
+            <div class="p-3.5 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold rounded-lg flex items-center gap-2">
                 <span>✓</span>
                 <span>{{ session('status') }}</span>
             </div>
@@ -72,7 +72,7 @@
             <div>
                 <label class="block text-xs font-bold text-slate-700 mb-1">{{ __('app.email') }}</label>
                 <input type="email" name="email" value="{{ old('email', app()->environment('local') ? 'janis@komanda.lv' : '') }}" required
-                       class="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 text-sm focus:border-amber-500 focus:bg-white focus:ring-1 focus:ring-amber-500">
+                       class="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 rounded-lg text-slate-900 text-sm focus:border-amber-500 focus:bg-white focus:ring-1 focus:ring-amber-500">
                 @error('email') <p class="text-xs text-rose-600 mt-1">{{ $message }}</p> @enderror
             </div>
 
@@ -84,10 +84,10 @@
                     </a>
                 </div>
                 <input type="password" name="password" value="{{ app()->environment('local') ? 'password' : '' }}" required
-                       class="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 text-sm focus:border-amber-500 focus:bg-white focus:ring-1 focus:ring-amber-500">
+                       class="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 rounded-lg text-slate-900 text-sm focus:border-amber-500 focus:bg-white focus:ring-1 focus:ring-amber-500">
             </div>
 
-            <button type="submit" class="w-full py-3 bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 text-slate-950 font-bold text-sm rounded-xl shadow-md shadow-amber-500/20 active:scale-[0.98] transition">
+            <button type="submit" class="w-full py-3 bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 text-slate-950 font-bold text-sm rounded-lg shadow-md shadow-amber-500/20 active:scale-[0.98] transition">
                 {{ __('app.sign_in') }}
             </button>
         </form>

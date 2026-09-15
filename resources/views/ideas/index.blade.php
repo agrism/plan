@@ -4,18 +4,18 @@
 <div class="space-y-6">
 
     <!-- Mobile Segmented Tabs -->
-    <div class="flex md:hidden p-1 bg-slate-200/80 rounded-2xl border border-slate-300">
+    <div class="flex md:hidden p-1 bg-slate-200/80 rounded-xl border border-slate-300">
         <button @click="mobileTab = 'ideas'"
-                class="flex-1 py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5"
+                class="flex-1 py-2 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5"
                 :class="mobileTab === 'ideas' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600 hover:text-slate-900'">
             <span>💡 {{ __('app.task_backlog') }}</span>
-            <span class="px-1.5 py-0.5 rounded-full text-[10px]" :class="mobileTab === 'ideas' ? 'bg-amber-100 text-amber-900 font-extrabold' : 'bg-slate-300 text-slate-700'">{{ $backlogIdeas->count() }}</span>
+            <span class="px-1.5 py-0.5 rounded-md text-[10px]" :class="mobileTab === 'ideas' ? 'bg-amber-100 text-amber-900 font-extrabold' : 'bg-slate-300 text-slate-700'">{{ $backlogIdeas->count() }}</span>
         </button>
         <button @click="mobileTab = 'weekend'"
-                class="flex-1 py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5"
+                class="flex-1 py-2 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5"
                 :class="mobileTab === 'weekend' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600 hover:text-slate-900'">
             <span>📅 {{ __('app.daily_plan') }}</span>
-            <span class="px-1.5 py-0.5 rounded-full text-[10px]" :class="mobileTab === 'weekend' ? 'bg-amber-100 text-amber-900 font-extrabold' : 'bg-slate-300 text-slate-700'">{{ $weekendTasksCount }}</span>
+            <span class="px-1.5 py-0.5 rounded-md text-[10px]" :class="mobileTab === 'weekend' ? 'bg-amber-100 text-amber-900 font-extrabold' : 'bg-slate-300 text-slate-700'">{{ $weekendTasksCount }}</span>
         </button>
     </div>
 
@@ -32,7 +32,7 @@
                     <h2 class="text-xl font-extrabold text-slate-900 flex items-center gap-2">
                         <span>💡</span>
                         <span>{{ __('app.task_backlog') }}</span>
-                        <span class="text-xs font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-300">
+                        <span class="text-xs font-bold px-2 py-0.5 rounded-md bg-amber-100 text-amber-800 border border-amber-300">
                             {{ $backlogIdeas->count() }}
                         </span>
                     </h2>
@@ -40,7 +40,7 @@
                 </div>
                 
                 <button @click="showAddModal = true"
-                        class="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs shadow-sm shadow-amber-500/20 transition">
+                        class="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs shadow-sm shadow-amber-500/20 transition">
                     <span>➕</span> {{ __('app.add') }}
                 </button>
             </div>
@@ -52,7 +52,7 @@
                    hx-target="#backlog-container"
                    hx-push-url="true"
                    @click="activeCategory = 'all'"
-                   class="px-2.5 py-1 rounded-xl whitespace-nowrap transition cursor-pointer"
+                   class="px-2.5 py-1 rounded-lg whitespace-nowrap transition cursor-pointer"
                    :class="activeCategory === 'all' ? 'bg-slate-900 text-white font-bold shadow-sm' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-100 hover:text-slate-900'">
                     {{ __('app.all') }}
                 </a>
@@ -62,7 +62,7 @@
                        hx-target="#backlog-container"
                        hx-push-url="true"
                        @click="activeCategory = '{{ $cat->slug }}'"
-                       class="px-2.5 py-1 rounded-xl whitespace-nowrap transition flex items-center gap-1 cursor-pointer"
+                       class="px-2.5 py-1 rounded-lg whitespace-nowrap transition flex items-center gap-1 cursor-pointer"
                        :class="activeCategory === '{{ $cat->slug }}' || activeCategory === '{{ $cat->id }}' ? 'bg-amber-500 text-slate-950 font-bold shadow-sm border border-amber-400' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-100 hover:text-slate-900'">
                         <span>{{ $cat->emoji }}</span>
                         <span>{{ $cat->name }}</span>
@@ -72,7 +72,7 @@
                 <!-- Add New Category Button -->
                 <button @click="showCategoryModal = true"
                         type="button"
-                        class="px-2.5 py-1 rounded-xl whitespace-nowrap transition flex items-center gap-1 bg-slate-100 hover:bg-amber-100 border border-slate-200 hover:border-amber-300 text-slate-600 hover:text-amber-900 font-bold"
+                        class="px-2.5 py-1 rounded-lg whitespace-nowrap transition flex items-center gap-1 bg-slate-100 hover:bg-amber-100 border border-slate-200 hover:border-amber-300 text-slate-600 hover:text-amber-900 font-bold"
                         title="{{ __('app.create_new_category') }}">
                     <span>➕</span> {{ __('app.new') }}
                 </button>
@@ -82,7 +82,7 @@
                         hx-target="#settings-modal-slot"
                         hx-swap="innerHTML"
                         type="button"
-                        class="px-2.5 py-1 rounded-xl whitespace-nowrap transition flex items-center gap-1 bg-slate-100 hover:bg-amber-100 border border-slate-200 hover:border-amber-300 text-slate-600 hover:text-amber-900 font-bold"
+                        class="px-2.5 py-1 rounded-lg whitespace-nowrap transition flex items-center gap-1 bg-slate-100 hover:bg-amber-100 border border-slate-200 hover:border-amber-300 text-slate-600 hover:text-amber-900 font-bold"
                         title="{{ __('app.workspace_and_categories') }}">
                     <span>⚙️</span> {{ __('app.manage') }}
                 </button>
@@ -109,7 +109,7 @@
                 </div>
 
                 <!-- Progress Pill -->
-                <div class="flex items-center gap-2 px-3 py-1 rounded-xl bg-white border border-slate-200 shadow-sm text-xs">
+                <div class="flex items-center gap-2 px-3 py-1 rounded-lg bg-white border border-slate-200 shadow-sm text-xs">
                     <span class="text-slate-500">{{ __('app.completed') }}:</span>
                     <span class="font-bold text-amber-600">{{ $weekendCompletedCount }} / {{ $weekendTasksCount }}</span>
                 </div>

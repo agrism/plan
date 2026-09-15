@@ -9,7 +9,7 @@
             $totalCount = $tasksForDay->count();
         @endphp
 
-        <div class="rounded-3xl bg-white border border-slate-200/90 p-4 sm:p-5 shadow-sm">
+        <div class="rounded-xl bg-white border border-slate-200/90 p-4 sm:p-5 shadow-sm">
             <!-- Day Header -->
             <div class="flex items-center justify-between mb-3">
                 <div class="flex items-center gap-2.5">
@@ -29,7 +29,7 @@
                     </div>
                 </div>
 
-                <span class="text-xs font-bold text-slate-600 bg-slate-100 px-2.5 py-1 rounded-xl">
+                <span class="text-xs font-bold text-slate-600 bg-slate-100 px-2.5 py-1 rounded-md">
                     {{ $completedCount }} / {{ $totalCount }}
                 </span>
             </div>
@@ -53,7 +53,7 @@
                             }
                         @endphp
 
-                        <div class="p-3.5 rounded-2xl bg-slate-50/80 border border-slate-200/80 hover:border-slate-300 hover:bg-white transition space-y-2.5 {{ $task->is_completed ? 'opacity-65 bg-slate-100/60' : '' }}"
+                        <div class="p-3.5 rounded-xl bg-slate-50/80 border border-slate-200/80 hover:border-slate-300 hover:bg-white transition space-y-2.5 {{ $task->is_completed ? 'opacity-65 bg-slate-100/60' : '' }}"
                              x-data="{ expanded: false }">
                             
                             <!-- Top row: Checkbox, Title, Badges, Calendar Reschedule, Edit & Unschedule -->
@@ -63,7 +63,7 @@
                                             hx-target="body"
                                             @click.stop
                                             type="button"
-                                            class="mt-0.5 w-5 h-5 rounded-lg border flex-shrink-0 flex items-center justify-center transition {{ $task->is_completed ? 'bg-emerald-500 border-emerald-500 text-white font-bold' : 'border-slate-300 hover:border-amber-500 bg-white' }}">
+                                            class="mt-0.5 w-5 h-5 rounded-md border flex-shrink-0 flex items-center justify-center transition {{ $task->is_completed ? 'bg-emerald-500 border-emerald-500 text-white font-bold' : 'border-slate-300 hover:border-amber-500 bg-white' }}">
                                         @if($task->is_completed)
                                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
                                         @endif
@@ -71,7 +71,7 @@
 
                                     <div @click="{{ $hasDetails ? 'expanded = !expanded' : '' }}"
                                          class="min-w-0 flex-1 space-y-1 {{ $hasDetails ? 'cursor-pointer select-none' : '' }}">
-                                        <span class="text-xs sm:text-sm font-semibold {{ $task->is_completed ? 'line-through text-slate-400' : 'text-slate-900' }} leading-snug block">
+                                         <span class="text-xs sm:text-sm font-semibold {{ $task->is_completed ? 'line-through text-slate-400' : 'text-slate-900' }} leading-snug block">
                                             {{ $task->title }}
                                         </span>
                                         
@@ -116,7 +116,7 @@
                                             hx-swap="innerHTML"
                                             type="button"
                                             title="{{ __('app.edit_task') }}"
-                                            class="p-1 rounded-lg text-slate-400 hover:text-amber-600 hover:bg-amber-50 transition text-xs">
+                                            class="p-1 rounded-md text-slate-400 hover:text-amber-600 hover:bg-amber-50 transition text-xs">
                                         ✏️
                                     </button>
 
@@ -124,7 +124,7 @@
                                     <button type="button"
                                             @click.stop="window.openMathDeleteConfirm('{{ addslashes($task->title) }}', '{{ route('ideas.destroy', $task->id) }}')"
                                             title="{{ __('app.delete') }}"
-                                            class="p-1 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition text-xs">
+                                            class="p-1 rounded-md text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition text-xs">
                                         🗑️
                                     </button>
 
@@ -132,7 +132,7 @@
                                     <button @click.stop="window.openScheduleModal({{ $task->id }}, '{{ addslashes($task->title) }}', '{{ $task->scheduled_date ? $task->scheduled_date->toDateString() : '' }}', '{{ route('ideas.schedule', $task->id) }}', true)"
                                             type="button"
                                             title="{{ __('app.reschedule') }}"
-                                            class="p-1 rounded-lg text-slate-400 hover:text-amber-600 hover:bg-amber-50 transition text-xs">
+                                            class="p-1 rounded-md text-slate-400 hover:text-amber-600 hover:bg-amber-50 transition text-xs">
                                         📅
                                     </button>
 
@@ -143,7 +143,7 @@
                                         @csrf
                                         @method('PATCH')
                                         <input type="hidden" name="scheduled_date" value="null">
-                                        <button type="submit" title="{{ __('app.move_to_backlog_tooltip') }}" class="text-slate-400 hover:text-amber-600 p-1 text-xs transition rounded-lg hover:bg-slate-100">
+                                        <button type="submit" title="{{ __('app.move_to_backlog_tooltip') }}" class="text-slate-400 hover:text-amber-600 p-1 text-xs transition rounded-md hover:bg-slate-100">
                                             ↩️
                                         </button>
                                     </form>
@@ -152,7 +152,7 @@
                                     @if($hasDetails)
                                         <button type="button" @click.stop="expanded = !expanded"
                                                 title="{{ __('app.description') }}"
-                                                class="p-1 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100 transition">
+                                                class="p-1 text-slate-400 hover:text-slate-600 rounded-md hover:bg-slate-100 transition">
                                             <svg class="w-3.5 h-3.5 transition-transform duration-200" :class="expanded ? 'rotate-180 text-amber-600' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                                             </svg>
@@ -166,14 +166,14 @@
                                 <div x-show="expanded" x-collapse x-cloak class="space-y-2.5 pt-2 border-t border-slate-200/60" @click.stop>
                                     <!-- Optional Image -->
                                     @if($task->image_url)
-                                        <div class="w-full h-36 rounded-xl overflow-hidden bg-slate-100 border border-slate-100">
+                                        <div class="w-full h-36 rounded-lg overflow-hidden bg-slate-100 border border-slate-100">
                                             <img src="{{ $task->image_url }}" alt="{{ $task->title }}" class="w-full h-full object-cover">
                                         </div>
                                     @endif
 
                                     <!-- Optional Description -->
                                     @if($task->description)
-                                        <div class="text-xs text-slate-600 leading-relaxed whitespace-pre-line bg-white p-3 rounded-xl border border-slate-200/80">
+                                        <div class="text-xs text-slate-600 leading-relaxed whitespace-pre-line bg-white p-3 rounded-lg border border-slate-200/80">
                                             {{ $task->description }}
                                         </div>
                                     @endif
@@ -183,7 +183,7 @@
                                         <div class="space-y-2 pt-0.5">
                                             @foreach($task->processed_links as $linkItem)
                                                 @if($linkItem['embed_url'])
-                                                    <div class="rounded-xl overflow-hidden border border-slate-200 bg-black aspect-video w-full shadow-sm">
+                                                    <div class="rounded-lg overflow-hidden border border-slate-200 bg-black aspect-video w-full shadow-sm">
                                                         <iframe src="{{ $linkItem['embed_url'] }}"
                                                                 title="YouTube video"
                                                                 class="w-full h-full"
@@ -196,7 +196,7 @@
 
                                                 <div class="flex items-center gap-1.5 text-xs">
                                                     <a href="{{ $linkItem['url'] }}" target="_blank" rel="noopener noreferrer"
-                                                       class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white hover:bg-slate-100 text-slate-700 hover:text-slate-900 border border-slate-200 font-medium truncate max-w-full transition">
+                                                       class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-white hover:bg-slate-100 text-slate-700 hover:text-slate-900 border border-slate-200 font-medium truncate max-w-full transition">
                                                         <span>{{ $linkItem['youtube_id'] ? '▶️' : '🔗' }}</span>
                                                         <span class="truncate">{{ $linkItem['domain'] }}</span>
                                                         <svg class="w-3 h-3 text-slate-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
@@ -219,7 +219,7 @@
             @endif
         </div>
     @empty
-        <div class="p-8 text-center rounded-3xl bg-white border border-dashed border-slate-300 text-slate-500 shadow-sm">
+        <div class="p-8 text-center rounded-xl bg-white border border-dashed border-slate-300 text-slate-500 shadow-sm">
             <span class="text-3xl block mb-2">📅</span>
             <p class="text-sm font-bold text-slate-800">{{ __('app.no_scheduled_tasks_empty') }}</p>
             <p class="text-xs text-slate-500 mt-1">{{ __('app.no_scheduled_tasks_hint') }}</p>
