@@ -60,10 +60,19 @@ Built with **Laravel 12**, **PHP 8.3**, **MySQL**, **HTMX**, **Alpine.js**, **He
 
 ---
 
-## 👥 Demo Lietotāji Testēšanai
+## 🚢 Produkcijas Izvietošana (Production Deployment)
 
-Pieslēdzoties [http://localhost:8085/login](http://localhost:8085/login), pieejamas 1-klikšķa ātrās pieslēgšanās pogas:
-- 👨‍💼 **Jānis Bērziņš (Vadītājs)** — `janis@komanda.lv` (parole: `password`)
-- 👩‍🎨 **Anna Ozola (Dizainere)** — `anna@komanda.lv`
-- 👨‍💻 **Kārlis Kalniņš (Izstrādātājs)** — `karlis@komanda.lv`
-- 👩‍💼 **Laura Liepiņa (Mārketings)** — `laura@komanda.lv`
+Produkcijas vidē datubāzes sagatavošanai un atjaunināšanai **netiek laisti nekādi seederi**:
+
+```bash
+# 1. Izpildīt tikai datubāzes migrācijas bez seederiem
+php artisan migrate --force
+
+# 2. Kešot konfigurāciju, maršrutus un skatus veiktspējai
+php artisan config:cache
+php artisan route:cache
+php artisan view:cache
+```
+
+> [!NOTE]
+> Produkcijas vidē (`APP_ENV=production`) sistēma automātiski slēpj visus demo lietotājus no pieslēgšanās loga.

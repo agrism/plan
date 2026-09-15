@@ -12,7 +12,7 @@ class AuthController extends Controller
 {
     public function showLogin()
     {
-        $demoUsers = User::all();
+        $demoUsers = app()->environment('local') ? User::all() : collect();
         return view('auth.login', compact('demoUsers'));
     }
 
