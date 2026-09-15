@@ -26,6 +26,10 @@ class Tenant extends Model
                 $tenant->invite_code = Str::random(16);
             }
         });
+
+        static::created(function ($tenant) {
+            $tenant->ensureDefaultCategories();
+        });
     }
 
     public function owner(): BelongsTo
