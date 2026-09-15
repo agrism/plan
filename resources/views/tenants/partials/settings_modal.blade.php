@@ -198,7 +198,7 @@
 
             <!-- Team Invite Code -->
             <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2.5"
-                 x-data="{ copied: false }">
+                 x-data="{ copiedCode: false, copiedLink: false }">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-2">
                         <span class="text-lg">🔑</span>
@@ -207,14 +207,21 @@
                     <span class="text-[10px] text-slate-400 font-medium">{{ __('app.invite_code_hint') }}</span>
                 </div>
 
-                <div class="flex items-center gap-2">
+                <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
                     <input type="text" readonly value="{{ $tenant->invite_code }}"
                            class="flex-1 px-3.5 py-2 bg-white border border-slate-300 rounded-xl text-xs font-mono font-bold text-slate-800 select-all">
-                    <button type="button"
-                            @click="navigator.clipboard.writeText('{{ $tenant->invite_code }}'); copied = true; setTimeout(() => copied = false, 2000)"
-                            class="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-800 text-xs font-bold rounded-xl transition flex items-center gap-1.5">
-                        <span x-text="copied ? '✓ {{ __('app.copied') }}' : '{{ __('app.copy_code') }}'"></span>
-                    </button>
+                    <div class="flex items-center gap-1.5">
+                        <button type="button"
+                                @click="navigator.clipboard.writeText('{{ $tenant->invite_code }}'); copiedCode = true; setTimeout(() => copiedCode = false, 2000)"
+                                class="flex-1 sm:flex-initial px-3.5 py-2 bg-slate-200 hover:bg-slate-300 text-slate-800 text-xs font-bold rounded-xl transition flex items-center justify-center gap-1.5">
+                            <span x-text="copiedCode ? '✓ {{ __('app.copied') }}' : '{{ __('app.copy_code') }}'"></span>
+                        </button>
+                        <button type="button"
+                                @click="navigator.clipboard.writeText('{{ url('/join/' . $tenant->invite_code) }}'); copiedLink = true; setTimeout(() => copiedLink = false, 2000)"
+                                class="flex-1 sm:flex-initial px-3.5 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold rounded-xl transition flex items-center justify-center gap-1.5 shadow-sm">
+                            <span x-text="copiedLink ? '✓ {{ __('app.copied') }}' : '🔗 {{ __('app.copy_invite_link') }}'"></span>
+                        </button>
+                    </div>
                 </div>
             </div>
 

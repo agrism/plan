@@ -14,6 +14,9 @@ Route::get('/locale/{locale}', function (string $locale) {
     return back();
 })->name('locale.switch');
 
+// Direct Invite Route
+Route::get('/join/{code}', [TenantController::class, 'joinByCode'])->name('tenants.join_code');
+
 // Auth Routes
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);

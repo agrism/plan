@@ -26,6 +26,18 @@ class AuthController extends Controller
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
             $user = Auth::user();
+            
+            // Check if there is a pending invite code
+            if ($pendingCode = session()->pull('pending_invite_code')) {
+                if ($inviteTenant = Tenant::where('invite_code', $pendingCode)->first()) {
+                    if (!$inviteTenant->users()->where('users.id', $user->id)->exists()) {
+                        $inviteTenant->users()->attach($user->id, ['role' => 'member']);
+                    }
+                    session(['current_tenant_id' => $inviteTenant->id]);
+                    return redirect()->route('ideas.index');
+                }
+            }
+
             if ($tenant = $user->tenants()->first()) {
                 session(['current_tenant_id' => $tenant->id]);
             }
@@ -41,6 +53,17 @@ class AuthController extends Controller
     {
         Auth::login($user);
         request()->session()->regenerate();
+
+        if ($pendingCode = session()->pull('pending_invite_code')) {
+            if ($inviteTenant = Tenant::where('invite_code', $pendingCode)->first()) {
+                if (!$inviteTenant->users()->where('users.id', $user->id)->exists()) {
+                    $inviteTenant->users()->attach($user->id, ['role' => 'member']);
+                }
+                session(['current_tenant_id' => $inviteTenant->id]);
+                return redirect()->route('ideas.index');
+            }
+        }
+
         if ($tenant = $user->tenants()->first()) {
             session(['current_tenant_id' => $tenant->id]);
         }
@@ -58,7 +81,7 @@ class AuthController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:6|confirmed',
-            'workspace_name' => 'required|string|max:255',
+            'workspace_name' => 'nullable|string|max:255',
         ]);
 
         $user = User::create([
@@ -68,16 +91,24 @@ class AuthController extends Controller
             'password' => Hash::make($validated['password']),
         ]);
 
-        // Create initial workspace tenant
-        $tenant = Tenant::create([
-            'name' => $validated['workspace_name'],
-            'owner_id' => $user->id,
-        ]);
+        $pendingCode = session()->pull('pending_invite_code');
+        $inviteTenant = $pendingCode ? Tenant::where('invite_code', $pendingCode)->first() : null;
 
-        $tenant->users()->attach($user->id, ['role' => 'admin']);
+        if ($inviteTenant) {
+            $inviteTenant->users()->attach($user->id, ['role' => 'member']);
+            $currentTenantId = $inviteTenant->id;
+        } else {
+            // Create initial workspace tenant
+            $tenant = Tenant::create([
+                'name' => $validated['workspace_name'] ?: ($user->name . ' Komanda'),
+                'owner_id' => $user->id,
+            ]);
+            $tenant->users()->attach($user->id, ['role' => 'admin']);
+            $currentTenantId = $tenant->id;
+        }
 
         Auth::login($user);
-        session(['current_tenant_id' => $tenant->id]);
+        session(['current_tenant_id' => $currentTenantId]);
 
         return redirect()->route('ideas.index');
     }

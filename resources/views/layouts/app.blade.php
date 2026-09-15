@@ -54,7 +54,7 @@
     </style>
 </head>
 <body class="h-full font-sans antialiased flex flex-col bg-slate-50 text-slate-800 selection:bg-amber-400 selection:text-slate-950 pb-20 md:pb-0"
-      x-data="{ mobileTab: 'ideas', showAddModal: false, showTenantModal: false, showCategoryModal: false }">
+      x-data="{ mobileTab: 'ideas', showAddModal: false, showTenantModal: false, showCategoryModal: false, showJoinModal: false }">
 
     <!-- Top Navigation Bar -->
     <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200/90 px-4 py-3 sm:px-6 shadow-sm">
@@ -96,6 +96,9 @@
                                 type="button"
                                 class="w-full text-left flex items-center gap-2 px-3 py-2 text-xs font-bold text-slate-700 hover:bg-amber-50 hover:text-amber-900 rounded-xl transition">
                             <span>⚙️</span> {{ __('app.workspace_and_categories') }}
+                        </button>
+                        <button @click="open = false; showJoinModal = true" class="w-full text-left flex items-center gap-2 px-3 py-2 text-xs font-bold text-amber-800 hover:bg-amber-50 rounded-xl transition">
+                            <span>🔑</span> {{ __('app.join_workspace') }}
                         </button>
                         <button @click="open = false; showTenantModal = true" class="w-full text-left flex items-center gap-2 px-3 py-2 text-xs font-bold text-amber-600 hover:bg-amber-50 rounded-xl transition">
                             <span>➕</span> {{ __('app.create_workspace') }}
@@ -362,6 +365,37 @@
                 <div class="flex gap-2 justify-end">
                     <button type="button" @click="showTenantModal = false" class="px-4 py-2 text-xs font-semibold text-slate-500 hover:text-slate-800">{{ __('app.cancel') }}</button>
                     <button type="submit" class="px-4 py-2 text-xs font-bold bg-amber-500 text-slate-950 rounded-xl hover:bg-amber-400">{{ __('app.create') }}</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Join Workspace Modal -->
+    <div x-show="showJoinModal" x-cloak class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
+        <div @click.outside="showJoinModal = false" class="w-full max-w-md bg-white border border-slate-200 rounded-3xl p-6 shadow-2xl space-y-4">
+            <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+                <div class="flex items-center gap-2.5">
+                    <span class="text-2xl">🔑</span>
+                    <div>
+                        <h3 class="text-lg font-bold text-slate-900">{{ __('app.join_workspace_title') }}</h3>
+                        <p class="text-xs text-slate-500">{{ __('app.join_workspace_subtitle') }}</p>
+                    </div>
+                </div>
+                <button type="button" @click="showJoinModal = false" class="p-1.5 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-100">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            
+            <form action="{{ route('tenants.join') }}" method="POST" class="space-y-4">
+                @csrf
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">{{ __('app.enter_invite_code') }}</label>
+                    <input type="text" name="invite_code" required autofocus placeholder="{{ __('app.invite_code_placeholder') }}"
+                           class="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 focus:border-amber-500 focus:bg-white rounded-xl text-slate-900 font-mono font-bold text-sm">
+                </div>
+                <div class="flex gap-2 justify-end pt-1">
+                    <button type="button" @click="showJoinModal = false" class="px-4 py-2 text-xs font-semibold text-slate-500 hover:text-slate-800">{{ __('app.cancel') }}</button>
+                    <button type="submit" class="px-5 py-2.5 text-xs font-bold bg-amber-500 text-slate-950 rounded-xl hover:bg-amber-400 shadow-sm active:scale-95 transition">{{ __('app.join_btn') }}</button>
                 </div>
             </form>
         </div>

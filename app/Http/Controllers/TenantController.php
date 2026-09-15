@@ -86,10 +86,11 @@ class TenantController extends Controller
             'invite_code' => 'required|string',
         ]);
 
-        $tenant = Tenant::where('invite_code', $validated['invite_code'])->first();
+        $code = trim($validated['invite_code']);
+        $tenant = Tenant::where('invite_code', $code)->first();
 
         if (!$tenant) {
-            return back()->withErrors(['invite_code' => 'Kods nav atrasts vai ir derīgums beidzies.']);
+            return back()->withErrors(['invite_code' => __('app.invalid_invite_code')]);
         }
 
         $user = auth()->user();
@@ -100,5 +101,28 @@ class TenantController extends Controller
         session(['current_tenant_id' => $tenant->id]);
 
         return redirect()->route('ideas.index');
+    }
+
+    public function joinByCode(string $code)
+    {
+        $code = trim($code);
+        $tenant = Tenant::where('invite_code', $code)->first();
+
+        if (!$tenant) {
+            return redirect()->route('login')->withErrors(['invite_code' => __('app.invalid_invite_code')]);
+        }
+
+        if (auth()->check()) {
+            $user = auth()->user();
+            if (!$tenant->users()->where('users.id', $user->id)->exists()) {
+                $tenant->users()->attach($user->id, ['role' => 'member']);
+            }
+            session(['current_tenant_id' => $tenant->id]);
+            return redirect()->route('ideas.index');
+        }
+
+        session(['pending_invite_code' => $code]);
+
+        return redirect()->route('register')->with('info', __('app.join_workspace_subtitle'));
     }
 }
