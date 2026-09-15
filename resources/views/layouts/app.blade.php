@@ -486,11 +486,13 @@
     <!-- Workspace & Category Settings Modal Target Slot for HTMX -->
     <div id="settings-modal-slot"></div>
 
-    <!-- Dynamic Math Delete Confirmation Modal -->
+    <!-- Dynamic Math Delete & Leave Confirmation Modal -->
     <div x-data="{
         showModal: false,
         itemTitle: '',
         actionUrl: '',
+        btnLabel: '{{ __('app.confirm') }}',
+        modalIcon: '🗑️',
         num1: 1,
         num2: 2,
         userAnswer: '',
@@ -507,14 +509,18 @@
             window.addEventListener('open-math-delete-confirm', (e) => {
                 this.itemTitle = e.detail?.title || '{{ __('app.task_title') }}';
                 this.actionUrl = e.detail?.actionUrl || '';
+                this.btnLabel = e.detail?.btnLabel || '{{ __('app.confirm') }}';
+                this.modalIcon = e.detail?.icon || '🗑️';
                 this.generateMath();
                 this.showModal = true;
                 this.$nextTick(() => {
                     this.$refs.mathInput?.focus();
                 });
             });
-            window.openMathDeleteConfirm = (title, actionUrl) => {
-                window.dispatchEvent(new CustomEvent('open-math-delete-confirm', { detail: { title, actionUrl } }));
+            window.openMathDeleteConfirm = (title, actionUrl, btnLabel = null, icon = '🗑️') => {
+                window.dispatchEvent(new CustomEvent('open-math-delete-confirm', { 
+                    detail: { title, actionUrl, btnLabel, icon } 
+                }));
             };
         },
         submitDelete() {
@@ -522,6 +528,7 @@
             htmx.ajax('DELETE', this.actionUrl, { target: 'body' });
             this.showModal = false;
             document.getElementById('edit-modal-wrapper')?.remove();
+            document.getElementById('settings-modal-wrapper')?.remove();
         }
     }">
         <div x-show="showModal" x-cloak
@@ -545,13 +552,13 @@
                 
                 <!-- Icon & Header -->
                 <div class="flex items-start gap-3.5">
-                    <div class="w-11 h-11 rounded-md bg-rose-50 border border-rose-200 flex items-center justify-center text-xl flex-shrink-0">
+                    <div class="w-11 h-11 rounded-md bg-rose-50 border border-rose-200 flex items-center justify-center text-xl flex-shrink-0" x-text="modalIcon">
                         🗑️
                     </div>
                     <div class="flex-1">
                         <h3 class="text-base font-extrabold text-slate-900">{{ __('app.delete_confirmation') }}</h3>
                         <p class="text-xs text-slate-500 mt-0.5">
-                            {{ __('app.delete_confirm_text', ['title' => '']) }} <span class="font-bold text-slate-800" x-text="'«' + itemTitle + '»'"></span>?
+                            {{ __('app.confirm_action_prompt') }} <span class="font-bold text-slate-800" x-text="'«' + itemTitle + '»'"></span>?
                         </p>
                     </div>
                 </div>
@@ -627,8 +634,8 @@
                             :disabled="!isCorrect"
                             class="px-5 py-2 rounded-md font-bold text-xs shadow-sm transition flex items-center gap-1.5"
                             :class="isCorrect ? 'bg-rose-600 hover:bg-rose-700 text-white shadow-rose-500/30 cursor-pointer active:scale-95' : 'bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed'">
-                        <span>🗑️</span>
-                        <span>{{ __('app.delete_task_btn') }}</span>
+                        <span x-text="modalIcon"></span>
+                        <span x-text="btnLabel || '{{ __('app.confirm') }}'"></span>
                     </button>
                 </div>
 

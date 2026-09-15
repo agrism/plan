@@ -111,6 +111,25 @@ class TenantJoinTest extends TestCase
         $this->assertEquals($personalTenant->id, session('current_tenant_id'));
     }
 
+    public function test_member_can_leave_workspace_via_delete_method(): void
+    {
+        $this->tenant->users()->attach($this->member->id, ['role' => 'member']);
+
+        $personalTenant = Tenant::create([
+            'name' => 'Annas Personīgā Darbavieta',
+            'owner_id' => $this->member->id,
+        ]);
+        $personalTenant->users()->attach($this->member->id, ['role' => 'admin']);
+
+        $response = $this->actingAs($this->member)
+            ->withSession(['current_tenant_id' => $this->tenant->id])
+            ->delete(route('tenants.leave', $this->tenant->id));
+
+        $response->assertRedirect(route('ideas.index'));
+        $this->assertFalse($this->tenant->users()->where('users.id', $this->member->id)->exists());
+        $this->assertEquals($personalTenant->id, session('current_tenant_id'));
+    }
+
     public function test_owner_cannot_leave_workspace_while_other_members_exist(): void
     {
         $this->tenant->users()->attach($this->member->id, ['role' => 'member']);

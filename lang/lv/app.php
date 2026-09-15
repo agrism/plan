@@ -82,16 +82,18 @@ return [
     'wednesday' => 'Trešdiena',
     'thursday' => 'Ceturtdiena',
 
-    // Math Delete Confirmation
-    'delete_confirmation' => 'Dzēšanas apstiprinājums',
-    'delete_confirm_text' => 'Vai tiešām vēlies neatgriezeniski dzēst uzdevumu :title?',
+    // Math Delete & Leave Confirmation
+    'delete_confirmation' => 'Drošības apstiprinājums',
+    'delete_confirm_text' => 'Vai tiešām vēlies veikt šo darbību ar :title?',
+    'confirm_action_prompt' => 'Vai tiešām vēlies veikt šo darbību ierakstam',
     'security_math_calc' => 'Drošības aprēķins:',
     'another_example' => 'Cits piemērs',
-    'math_hint' => 'Lai novērstu nejaušu dzēšanu, lūdzu, ievadi viena cipara rezultātu:',
+    'math_hint' => 'Lai novērstu nejaušu dzēšanu vai pamešanu, lūdzu, ievadi viena cipara rezultātu:',
     'correct' => 'Pareizi!',
     'incorrect_digit' => 'Nepareizs cipars',
     'enter_1_digit' => 'Ievadi 1 ciparu',
     'delete_task_btn' => 'Dzēst uzdevumu',
+    'confirm' => 'Apstiprināt',
 
     // Workspace & Categories Management
     'workspace_and_categories' => 'Darbavietas un Kategoriju Pārvaldība',
@@ -165,6 +167,7 @@ return [
     'leave_workspace_hint' => 'Tu vairs neredzēsi šīs komandas uzdevumus un plānus.',
     'leave_workspace_btn' => 'Pamest darbavietu 🚪',
     'leave_workspace_confirm' => 'Vai tiešām vēlies pamest darbavietu \':name\'?',
+    'leave_workspace_prefix' => 'Darbavietas pamešana: :name',
     'member_prefix' => 'Dalībnieks: :name',
     'remove_member' => 'Izņemt dalībnieku',
     'remove_member_btn' => 'Izņemt',

@@ -82,16 +82,18 @@ return [
     'wednesday' => 'Wednesday',
     'thursday' => 'Thursday',
 
-    // Math Delete Confirmation
-    'delete_confirmation' => 'Deletion Confirmation',
-    'delete_confirm_text' => 'Are you sure you want to permanently delete task :title?',
+    // Math Delete & Leave Confirmation
+    'delete_confirmation' => 'Security Confirmation',
+    'delete_confirm_text' => 'Are you sure you want to perform this action for :title?',
+    'confirm_action_prompt' => 'Are you sure you want to perform this action for',
     'security_math_calc' => 'Security Challenge:',
     'another_example' => 'Another challenge',
-    'math_hint' => 'To prevent accidental deletion, please enter the single-digit result:',
+    'math_hint' => 'To prevent accidental deletion or leaving, please enter the single-digit result:',
     'correct' => 'Correct!',
     'incorrect_digit' => 'Incorrect digit',
     'enter_1_digit' => 'Enter 1 digit',
     'delete_task_btn' => 'Delete Task',
+    'confirm' => 'Confirm',
 
     // Workspace & Categories Management
     'workspace_and_categories' => 'Workspace & Category Management',
@@ -166,6 +168,7 @@ return [
     'leave_workspace_hint' => 'You will no longer have access to this team\'s tasks and plans.',
     'leave_workspace_btn' => 'Leave Workspace 🚪',
     'leave_workspace_confirm' => 'Are you sure you want to leave workspace \':name\'?',
+    'leave_workspace_prefix' => 'Leave Workspace: :name',
     'member_prefix' => 'Member: :name',
     'remove_member' => 'Remove Member',
     'remove_member_btn' => 'Remove',

@@ -87,7 +87,7 @@
 
                                 <!-- Delete Category with Single Digit Math Confirmation -->
                                 <button type="button"
-                                        @click="window.openMathDeleteConfirm('{{ __('app.category_prefix', ['name' => addslashes($cat->name)]) }}', '{{ route('categories.destroy', $cat->id) }}')"
+                                        @click="window.openMathDeleteConfirm('{{ __('app.category_prefix', ['name' => addslashes($cat->name)]) }}', '{{ route('categories.destroy', $cat->id) }}', '{{ __('app.delete') }}', '🗑️')"
                                         title="{{ __('app.delete') }}"
                                         class="px-2.5 py-1.5 rounded-md bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-semibold transition flex items-center gap-1">
                                     <span>🗑️</span>
@@ -259,16 +259,13 @@
 
                                 @if($member->id === $user->id)
                                     @if(!$isOwner || $tenant->users->count() <= 1)
-                                        <form action="{{ route('tenants.leave', $tenant->id) }}" method="POST"
-                                              onsubmit="return confirm('{{ __('app.leave_workspace_confirm', ['name' => addslashes($tenant->name)]) }}')">
-                                            @csrf
-                                            <button type="submit"
-                                                    class="px-2 py-1 bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-bold rounded flex items-center gap-1 transition"
-                                                    title="{{ __('app.leave_workspace') }}">
-                                                <span>🚪</span>
-                                                <span class="hidden sm:inline">{{ __('app.leave') }}</span>
-                                            </button>
-                                        </form>
+                                        <button type="button"
+                                                @click="window.openMathDeleteConfirm('{{ __('app.leave_workspace_prefix', ['name' => addslashes($tenant->name)]) }}', '{{ route('tenants.leave', $tenant->id) }}', '{{ __('app.leave_workspace_btn') }}', '🚪')"
+                                                class="px-2 py-1 bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-bold rounded flex items-center gap-1 transition"
+                                                title="{{ __('app.leave_workspace') }}">
+                                            <span>🚪</span>
+                                            <span class="hidden sm:inline">{{ __('app.leave') }}</span>
+                                        </button>
                                     @endif
                                 @else
                                     @if($isOwner)
@@ -287,7 +284,7 @@
 
                                     @if($isAdmin && $member->id !== $tenant->owner_id)
                                         <button type="button"
-                                                @click="window.openMathDeleteConfirm('{{ __('app.member_prefix', ['name' => addslashes($member->name)]) }}', '{{ route('tenants.members.destroy', [$tenant->id, $member->id]) }}')"
+                                                @click="window.openMathDeleteConfirm('{{ __('app.member_prefix', ['name' => addslashes($member->name)]) }}', '{{ route('tenants.members.destroy', [$tenant->id, $member->id]) }}', '{{ __('app.remove_member_btn') }}', '🗑️')"
                                                 class="px-2 py-1 bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-bold rounded flex items-center gap-1 transition"
                                                 title="{{ __('app.remove_member') }}">
                                             <span>🗑️</span>
@@ -318,15 +315,12 @@
                             <p class="text-[11px] text-rose-600/90">{{ __('app.leave_workspace_hint') }}</p>
                         </div>
 
-                        <form action="{{ route('tenants.leave', $tenant->id) }}" method="POST"
-                              onsubmit="return confirm('{{ __('app.leave_workspace_confirm', ['name' => addslashes($tenant->name)]) }}')">
-                            @csrf
-                            <button type="submit"
-                                    class="px-4 py-2 bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs rounded-md transition shadow-sm active:scale-95 flex items-center gap-1.5 whitespace-nowrap">
-                                <span>🚪</span>
-                                <span>{{ __('app.leave_workspace_btn') }}</span>
-                            </button>
-                        </form>
+                        <button type="button"
+                                @click="window.openMathDeleteConfirm('{{ __('app.leave_workspace_prefix', ['name' => addslashes($tenant->name)]) }}', '{{ route('tenants.leave', $tenant->id) }}', '{{ __('app.leave_workspace_btn') }}', '🚪')"
+                                class="px-4 py-2 bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs rounded-md transition shadow-sm active:scale-95 flex items-center gap-1.5 whitespace-nowrap">
+                            <span>🚪</span>
+                            <span>{{ __('app.leave_workspace_btn') }}</span>
+                        </button>
                     </div>
                 </div>
             @endif

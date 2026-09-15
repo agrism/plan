@@ -77,7 +77,7 @@ Route::middleware(['auth', EnsureCurrentTenant::class])->group(function () {
     Route::post('/tenants/{tenant}/update', [TenantController::class, 'update'])->name('tenants.update');
     Route::match(['put', 'patch'], '/tenants/{tenant}', [TenantController::class, 'update'])->name('tenants.patch_update');
     Route::post('/tenants/join', [TenantController::class, 'join'])->name('tenants.join');
-    Route::post('/tenants/{tenant}/leave', [TenantController::class, 'leave'])->name('tenants.leave');
+    Route::match(['delete', 'post'], '/tenants/{tenant}/leave', [TenantController::class, 'leave'])->name('tenants.leave');
     Route::post('/tenants/{tenant}/transfer-ownership/{user}', [TenantController::class, 'transferOwnership'])->name('tenants.transfer_ownership');
     Route::match(['delete', 'post'], '/tenants/{tenant}/members/{user}', [TenantController::class, 'removeMember'])->name('tenants.members.destroy');
     
