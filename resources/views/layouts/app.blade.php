@@ -403,6 +403,152 @@
     <!-- Edit Modal Target Slot for HTMX -->
     <div id="edit-modal-slot"></div>
 
+    <!-- Dynamic Math Delete Confirmation Modal -->
+    <div x-data="{
+        showModal: false,
+        itemTitle: '',
+        actionUrl: '',
+        num1: 1,
+        num2: 2,
+        userAnswer: '',
+        get isCorrect() {
+            return parseInt(this.userAnswer, 10) === (this.num1 + this.num2);
+        },
+        generateMath() {
+            this.num1 = Math.floor(Math.random() * 8) + 2; // 2 to 9
+            this.num2 = Math.floor(Math.random() * 8) + 1; // 1 to 8
+            this.userAnswer = '';
+        },
+        init() {
+            window.addEventListener('open-math-delete-confirm', (e) => {
+                this.itemTitle = e.detail?.title || 'šo uzdevumu';
+                this.actionUrl = e.detail?.actionUrl || '';
+                this.generateMath();
+                this.showModal = true;
+                this.$nextTick(() => {
+                    this.$refs.mathInput?.focus();
+                });
+            });
+            window.openMathDeleteConfirm = (title, actionUrl) => {
+                window.dispatchEvent(new CustomEvent('open-math-delete-confirm', { detail: { title, actionUrl } }));
+            };
+        },
+        submitDelete() {
+            if (!this.isCorrect) return;
+            htmx.ajax('DELETE', this.actionUrl, { target: 'body' });
+            this.showModal = false;
+            document.getElementById('edit-modal-wrapper')?.remove();
+        }
+    }">
+        <div x-show="showModal" x-cloak
+             class="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm"
+             x-transition:enter="transition ease-out duration-200"
+             x-transition:enter-start="opacity-0"
+             x-transition:enter-end="opacity-100"
+             x-transition:leave="transition ease-in duration-150"
+             x-transition:leave-start="opacity-100"
+             x-transition:leave-end="opacity-0">
+            
+            <div @click.outside="showModal = false"
+                 x-show="showModal"
+                 x-transition:enter="transition ease-out duration-200 transform"
+                 x-transition:enter-start="scale-95 opacity-0"
+                 x-transition:enter-end="scale-100 opacity-100"
+                 x-transition:leave="transition ease-in duration-150 transform"
+                 x-transition:leave-start="scale-100 opacity-100"
+                 x-transition:leave-end="scale-95 opacity-0"
+                 class="w-full max-w-md bg-white border border-rose-100 rounded-3xl p-6 shadow-2xl space-y-5">
+                
+                <!-- Icon & Header -->
+                <div class="flex items-start gap-3.5">
+                    <div class="w-12 h-12 rounded-2xl bg-rose-50 border border-rose-200 flex items-center justify-center text-2xl flex-shrink-0">
+                        🗑️
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="text-base font-extrabold text-slate-900">Dzēšanas apstiprinājums</h3>
+                        <p class="text-xs text-slate-500 mt-0.5">
+                            Vai tiešām vēlies neatgriezeniski dzēst uzdevumu <span class="font-bold text-slate-800" x-text="'«' + itemTitle + '»'"></span>?
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Math Challenge Box -->
+                <div class="p-4 rounded-2xl bg-amber-50/70 border border-amber-200/80 space-y-2.5">
+                    <div class="flex items-center justify-between">
+                        <label class="text-xs font-bold text-amber-950 flex items-center gap-1.5">
+                            <span>🧮</span>
+                            <span>Drošības aprēķins:</span>
+                        </label>
+                        <button type="button" @click="generateMath(); $nextTick(() => $refs.mathInput?.focus())" class="text-[11px] font-semibold text-amber-700 hover:text-amber-900 hover:underline flex items-center gap-1">
+                            <span>🔄</span> Cits piemērs
+                        </button>
+                    </div>
+                    
+                    <p class="text-[11px] text-amber-800">
+                        Lai novērstu nejaušu dzēšanu, lūdzu, ievadi pareizo aprēķina rezultātu:
+                    </p>
+
+                    <form @submit.prevent="submitDelete()">
+                        <div class="flex items-center gap-3 pt-1">
+                            <div class="px-4 py-2 bg-white rounded-xl border border-amber-300 font-extrabold text-base sm:text-lg text-slate-800 shadow-inner flex items-center justify-center min-w-[90px] select-none tracking-wider">
+                                <span x-text="num1"></span>
+                                <span class="mx-1 text-amber-600">+</span>
+                                <span x-text="num2"></span>
+                                <span class="mx-1 text-slate-400">=</span>
+                            </div>
+
+                            <input type="number"
+                                   x-ref="mathInput"
+                                   x-model="userAnswer"
+                                   placeholder="?"
+                                   autofocus
+                                   required
+                                   class="w-24 px-3 py-2 text-center text-lg font-bold bg-white border rounded-xl focus:outline-none transition shadow-sm"
+                                   :class="{
+                                       'border-emerald-500 ring-2 ring-emerald-400 text-emerald-700 bg-emerald-50/40': isCorrect,
+                                       'border-rose-400 text-rose-700 ring-2 ring-rose-200': userAnswer !== '' && !isCorrect,
+                                       'border-amber-300 focus:border-amber-500 text-slate-900': userAnswer === ''
+                                   }">
+
+                            <div class="flex-1 text-xs">
+                                <template x-if="isCorrect">
+                                    <span class="inline-flex items-center gap-1 text-emerald-600 font-bold">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+                                        Pareizi!
+                                    </span>
+                                </template>
+                                <template x-if="userAnswer !== '' && !isCorrect">
+                                    <span class="text-[11px] font-semibold text-rose-600 leading-tight block">Nepareizs rezultāts</span>
+                                </template>
+                                <template x-if="userAnswer === ''">
+                                    <span class="text-[11px] text-amber-700/80 leading-tight block">Ievadi atbildi</span>
+                                </template>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Footer Buttons -->
+                <div class="flex items-center justify-end gap-2.5 pt-1">
+                    <button type="button" @click="showModal = false"
+                            class="px-4 py-2.5 text-xs font-bold text-slate-600 hover:text-slate-800 hover:bg-slate-100 rounded-xl transition">
+                        Atcelt
+                    </button>
+                    
+                    <button type="button"
+                            @click="submitDelete()"
+                            :disabled="!isCorrect"
+                            class="px-5 py-2.5 rounded-xl font-bold text-xs shadow-sm transition flex items-center gap-1.5"
+                            :class="isCorrect ? 'bg-rose-600 hover:bg-rose-700 text-white shadow-rose-500/30 cursor-pointer active:scale-95' : 'bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed'">
+                        <span>🗑️</span>
+                        <span>Dzēst uzdevumu</span>
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
     <!-- Configure HTMX CSRF & Calendar Picker -->
     <script>
         document.body.addEventListener('htmx:configRequest', (event) => {

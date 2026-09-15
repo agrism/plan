@@ -117,6 +117,14 @@
                                         ✏️
                                     </button>
 
+                                    <!-- Delete Button with Math Confirmation -->
+                                    <button type="button"
+                                            @click.stop="window.openMathDeleteConfirm('{{ addslashes($task->title) }}', '{{ route('ideas.destroy', $task->id) }}')"
+                                            title="Dzēst uzdevumu"
+                                            class="p-1 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition text-xs">
+                                        🗑️
+                                    </button>
+
                                     <!-- Reschedule Calendar Picker Dropdown -->
                                     <div class="relative" x-data="{ schedMenu: false }">
                                         <button @click="schedMenu = !schedMenu"
@@ -215,7 +223,7 @@
                                                 </div>
                                             </div>
 
-                                            <!-- Move back to Backlog from modal -->
+                                            <!-- Move back to Backlog from modal & Delete -->
                                             <div class="border-t border-slate-100 pt-2 flex items-center justify-between text-xs">
                                                 <form action="{{ route('ideas.schedule', $task->id) }}" method="POST"
                                                       hx-patch="{{ route('ideas.schedule', $task->id) }}"
@@ -228,9 +236,17 @@
                                                     </button>
                                                 </form>
 
-                                                <button type="button" @click="schedMenu = false" class="px-2 py-1 text-slate-400 hover:text-slate-600 text-[11px]">
-                                                    Aizvērt
-                                                </button>
+                                                <div class="flex items-center gap-2">
+                                                    <button type="button"
+                                                            @click.stop="schedMenu = false; window.openMathDeleteConfirm('{{ addslashes($task->title) }}', '{{ route('ideas.destroy', $task->id) }}')"
+                                                            class="px-2 py-1 text-rose-600 hover:bg-rose-50 rounded-lg text-[11px] font-semibold transition flex items-center gap-1">
+                                                        <span>🗑️</span> Dzēst
+                                                    </button>
+
+                                                    <button type="button" @click="schedMenu = false" class="px-2 py-1 text-slate-400 hover:text-slate-600 text-[11px]">
+                                                        Aizvērt
+                                                    </button>
+                                                </div>
                                             </div>
 
                                         </div>

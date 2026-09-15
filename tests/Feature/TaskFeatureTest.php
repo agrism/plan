@@ -266,4 +266,21 @@ class TaskFeatureTest extends TestCase
         $task->refresh();
         $this->assertNull($task->scheduled_date);
     }
+
+    public function test_it_deletes_task_successfully(): void
+    {
+        $task = Task::create([
+            'tenant_id' => $this->tenant->id,
+            'created_by_id' => $this->user->id,
+            'title' => 'Uzdevums dzēšanai',
+            'category' => 'ikdienas',
+        ]);
+
+        $this->assertDatabaseHas('tasks', ['id' => $task->id]);
+
+        $response = $this->actingAs($this->user)->delete(route('ideas.destroy', $task->id));
+
+        $response->assertRedirect(route('ideas.index'));
+        $this->assertDatabaseMissing('tasks', ['id' => $task->id]);
+    }
 }

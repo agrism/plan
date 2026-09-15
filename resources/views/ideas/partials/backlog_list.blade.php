@@ -45,6 +45,14 @@
                             class="p-1 rounded-lg text-slate-400 hover:text-amber-600 hover:bg-amber-50 transition text-xs">
                         ✏️
                     </button>
+
+                    <!-- Delete with Math Confirmation -->
+                    <button type="button"
+                            @click.stop="window.openMathDeleteConfirm('{{ addslashes($idea->title) }}', '{{ route('ideas.destroy', $idea->id) }}')"
+                            title="Dzēst uzdevumu"
+                            class="p-1 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition text-xs">
+                        🗑️
+                    </button>
                 </div>
             </div>
 
@@ -257,16 +265,13 @@
                                 Aizvērt
                             </button>
 
-                            <!-- Delete button -->
-                            <form action="{{ route('ideas.destroy', $idea->id) }}" method="POST"
-                                  hx-delete="{{ route('ideas.destroy', $idea->id) }}"
-                                  hx-target="body">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="px-2 py-1 text-rose-600 hover:bg-rose-50 rounded-lg text-[11px] font-semibold transition">
-                                    🗑️ Dzēst
-                                </button>
-                            </form>
+                            <!-- Delete button with Math Confirmation -->
+                            <button type="button"
+                                    @click.stop="schedMenu = false; window.openMathDeleteConfirm('{{ addslashes($idea->title) }}', '{{ route('ideas.destroy', $idea->id) }}')"
+                                    class="px-2 py-1 text-rose-600 hover:bg-rose-50 rounded-lg text-[11px] font-semibold transition flex items-center gap-1">
+                                <span>🗑️</span>
+                                <span>Dzēst</span>
+                            </button>
                         </div>
 
                     </div>
