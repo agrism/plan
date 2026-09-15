@@ -125,4 +125,41 @@ class TenantController extends Controller
 
         return redirect()->route('register')->with('info', __('app.join_workspace_subtitle'));
     }
+
+    public function leave(Request $request, Tenant $tenant)
+    {
+        $user = auth()->user();
+
+        if (!$tenant->users()->where('users.id', $user->id)->exists()) {
+            abort(403);
+        }
+
+        // Detach user from workspace
+        $tenant->users()->detach($user->id);
+
+        // If the user was the owner and other members exist, transfer ownership
+        if ($tenant->owner_id === $user->id) {
+            $remainingMember = $tenant->users()->first();
+            if ($remainingMember) {
+                $tenant->update(['owner_id' => $remainingMember->id]);
+                $tenant->users()->updateExistingPivot($remainingMember->id, ['role' => 'admin']);
+            } else {
+                $tenant->delete();
+            }
+        }
+
+        // Switch to remaining workspace or create fresh default workspace
+        $nextTenant = $user->tenants()->first();
+        if (!$nextTenant) {
+            $nextTenant = Tenant::create([
+                'name' => __('app.default_workspace_name', ['name' => $user->name]),
+                'owner_id' => $user->id,
+            ]);
+            $nextTenant->users()->attach($user->id, ['role' => 'admin']);
+        }
+
+        session(['current_tenant_id' => $nextTenant->id]);
+
+        return redirect()->route('ideas.index');
+    }
 }

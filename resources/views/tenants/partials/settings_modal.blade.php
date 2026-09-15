@@ -246,6 +246,26 @@
                 </div>
             </div>
 
+            <!-- Leave Workspace Section -->
+            <div class="p-4 rounded-2xl bg-rose-50/50 border border-rose-200/80 space-y-2">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div>
+                        <h4 class="text-xs font-bold text-rose-900">{{ __('app.leave_workspace') }}</h4>
+                        <p class="text-[11px] text-rose-600/90">{{ __('app.leave_workspace_hint') }}</p>
+                    </div>
+
+                    <form action="{{ route('tenants.leave', $tenant->id) }}" method="POST"
+                          onsubmit="return confirm('{{ __('app.leave_workspace_confirm', ['name' => addslashes($tenant->name)]) }}')">
+                        @csrf
+                        <button type="submit"
+                                class="px-4 py-2 bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs rounded-xl transition shadow-sm active:scale-95 flex items-center gap-1.5 whitespace-nowrap">
+                            <span>🚪</span>
+                            <span>{{ __('app.leave_workspace_btn') }}</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+
         </div>
 
     </div>

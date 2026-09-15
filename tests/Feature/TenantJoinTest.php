@@ -90,4 +90,58 @@ class TenantJoinTest extends TestCase
         $this->assertTrue($this->tenant->users()->where('users.id', $newUser->id)->exists());
         $this->assertEquals($this->tenant->id, session('current_tenant_id'));
     }
+
+    public function test_member_can_leave_workspace(): void
+    {
+        $this->tenant->users()->attach($this->member->id, ['role' => 'member']);
+
+        // User also has personal workspace
+        $personalTenant = Tenant::create([
+            'name' => 'Annas Personīgā Darbavieta',
+            'owner_id' => $this->member->id,
+        ]);
+        $personalTenant->users()->attach($this->member->id, ['role' => 'admin']);
+
+        $response = $this->actingAs($this->member)
+            ->withSession(['current_tenant_id' => $this->tenant->id])
+            ->post(route('tenants.leave', $this->tenant->id));
+
+        $response->assertRedirect(route('ideas.index'));
+        $this->assertFalse($this->tenant->users()->where('users.id', $this->member->id)->exists());
+        $this->assertEquals($personalTenant->id, session('current_tenant_id'));
+    }
+
+    public function test_owner_leaving_workspace_transfers_ownership_to_remaining_member(): void
+    {
+        $this->tenant->users()->attach($this->member->id, ['role' => 'member']);
+
+        $response = $this->actingAs($this->owner)
+            ->withSession(['current_tenant_id' => $this->tenant->id])
+            ->post(route('tenants.leave', $this->tenant->id));
+
+        $response->assertRedirect(route('ideas.index'));
+        $this->assertFalse($this->tenant->users()->where('users.id', $this->owner->id)->exists());
+
+        // Refresh tenant
+        $this->tenant->refresh();
+        $this->assertEquals($this->member->id, $this->tenant->owner_id);
+        $this->assertEquals('admin', $this->tenant->users()->where('users.id', $this->member->id)->first()->pivot->role);
+    }
+
+    public function test_leaving_only_workspace_creates_default_workspace(): void
+    {
+        $this->tenant->users()->attach($this->member->id, ['role' => 'member']);
+
+        $response = $this->actingAs($this->member)
+            ->withSession(['current_tenant_id' => $this->tenant->id])
+            ->post(route('tenants.leave', $this->tenant->id));
+
+        $response->assertRedirect(route('ideas.index'));
+        $this->assertFalse($this->tenant->users()->where('users.id', $this->member->id)->exists());
+
+        // A new default workspace should have been created for the user
+        $newTenant = $this->member->tenants()->first();
+        $this->assertNotNull($newTenant);
+        $this->assertEquals($newTenant->id, session('current_tenant_id'));
+    }
 }

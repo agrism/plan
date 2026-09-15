@@ -159,4 +159,10 @@ return [
     'no_comments' => 'Pagaidām nav komentāru. Esi pirmais, kas komentē!',
     'delete_comment' => 'Dzēst komentāru',
     'delete_comment_confirm' => 'Vai tiešām vēlies dzēst šo komentāru?',
+
+    // Leave Workspace
+    'leave_workspace' => 'Pamest darbavietu',
+    'leave_workspace_hint' => 'Tu vairs neredzēsi šīs komandas uzdevumus un plānus.',
+    'leave_workspace_btn' => 'Pamest darbavietu 🚪',
+    'leave_workspace_confirm' => 'Vai tiešām vēlies pamest darbavietu \':name\'?',
 ];
