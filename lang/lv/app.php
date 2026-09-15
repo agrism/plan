@@ -165,4 +165,33 @@ return [
     'leave_workspace_hint' => 'Tu vairs neredzēsi šīs komandas uzdevumus un plānus.',
     'leave_workspace_btn' => 'Pamest darbavietu 🚪',
     'leave_workspace_confirm' => 'Vai tiešām vēlies pamest darbavietu \':name\'?',
+
+    // Forgot & Reset Password
+    'forgot_password' => 'Aizmirsi paroli?',
+    'forgot_password_title' => 'Paroles atjaunošana',
+    'forgot_password_subtitle' => 'Ievadi savu e-pastu, un mēs nosūtīsim paroles atiestatīšanas saiti.',
+    'send_reset_link' => 'Nosūtīt saiti ✉️',
+    'back_to_login' => 'Atpakaļ uz pieslēgšanos',
+    'reset_password_title' => 'Jauna parole',
+    'reset_password_subtitle' => 'Ievadi savu jauno paroli zemāk.',
+    'new_password' => 'Jaunā parole',
+    'confirm_new_password' => 'Atkārtot jauno paroli',
+    'reset_password_btn' => 'Atjaunot paroli 🔒',
+    'reset_password_mail_subject' => 'Paroles atiestatīšanas pieprasījums - Plānotājs',
+    'reset_password_mail_greeting' => 'Sveiki, :name!',
+    'reset_password_mail_line1' => 'Jūs saņemat šo e-pastu, jo tika pieprasīta jūsu konta paroles atiestatīšana.',
+    'reset_password_mail_line2' => 'Šī saite būs derīga :count minūtes.',
+    'reset_password_mail_line3' => 'Ja jūs nepieprasījāt paroles atiestatīšanu, nekādas papildu darbības nav nepieciešamas.',
+    'mail_salutation' => 'Ar cieņu,\nPlānotājs komanda',
+
+    // Profile Management
+    'profile' => 'Profils',
+    'profile_settings' => 'Lietotāja Profils',
+    'edit_profile' => 'Labot profilu',
+    'avatar' => 'Profila ikona (Emoji)',
+    'current_password' => 'Pašreizējā parole',
+    'current_password_hint' => 'Nepieciešama tikai tad, ja vēlies mainīt paroli',
+    'change_password_section' => 'Paroles maiņa (pēc izvēles)',
+    'current_password_incorrect' => 'Norādītā pašreizējā parole nav pareiza.',
+    'profile_updated_successfully' => 'Profila dati veiksmīgi saglabāti!',
 ];

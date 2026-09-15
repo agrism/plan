@@ -166,4 +166,33 @@ return [
     'leave_workspace_hint' => 'You will no longer have access to this team\'s tasks and plans.',
     'leave_workspace_btn' => 'Leave Workspace 🚪',
     'leave_workspace_confirm' => 'Are you sure you want to leave workspace \':name\'?',
+
+    // Forgot & Reset Password
+    'forgot_password' => 'Forgot password?',
+    'forgot_password_title' => 'Reset Password',
+    'forgot_password_subtitle' => 'Enter your email address and we will send you a password reset link.',
+    'send_reset_link' => 'Send Reset Link ✉️',
+    'back_to_login' => 'Back to Sign In',
+    'reset_password_title' => 'Set New Password',
+    'reset_password_subtitle' => 'Enter your new password below.',
+    'new_password' => 'New Password',
+    'confirm_new_password' => 'Confirm New Password',
+    'reset_password_btn' => 'Reset Password 🔒',
+    'reset_password_mail_subject' => 'Reset Password Notification - Planner',
+    'reset_password_mail_greeting' => 'Hello, :name!',
+    'reset_password_mail_line1' => 'You are receiving this email because we received a password reset request for your account.',
+    'reset_password_mail_line2' => 'This password reset link will expire in :count minutes.',
+    'reset_password_mail_line3' => 'If you did not request a password reset, no further action is required.',
+    'mail_salutation' => "Regards,\nPlanner Team",
+
+    // Profile Management
+    'profile' => 'Profile',
+    'profile_settings' => 'User Profile',
+    'edit_profile' => 'Edit Profile',
+    'avatar' => 'Profile Icon (Emoji)',
+    'current_password' => 'Current Password',
+    'current_password_hint' => 'Only required if you want to change your password',
+    'change_password_section' => 'Change Password (Optional)',
+    'current_password_incorrect' => 'The provided current password does not match your current password.',
+    'profile_updated_successfully' => 'Profile updated successfully!',
 ];

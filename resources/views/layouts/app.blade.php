@@ -151,10 +151,15 @@
                     </a>
                 </div>
 
-                <div class="flex items-center gap-2 text-right">
+                <button hx-get="{{ route('profile.edit') }}"
+                        hx-target="#profile-modal-slot"
+                        hx-swap="innerHTML"
+                        type="button"
+                        title="{{ __('app.profile_settings') }}"
+                        class="flex items-center gap-2 text-right p-1.5 rounded-xl hover:bg-slate-100 hover:text-amber-900 border border-transparent hover:border-slate-200 transition cursor-pointer">
                     <span class="text-xl">{{ auth()->user()->avatar ?? '👤' }}</span>
                     <span class="hidden md:inline text-xs font-bold text-slate-800">{{ auth()->user()->name }}</span>
-                </div>
+                </button>
                 
                 <form action="{{ route('logout') }}" method="POST">
                     @csrf
@@ -460,6 +465,9 @@
 
     <!-- Edit Modal Target Slot for HTMX -->
     <div id="edit-modal-slot"></div>
+
+    <!-- Profile Modal Target Slot for HTMX -->
+    <div id="profile-modal-slot"></div>
 
     <!-- Workspace & Category Settings Modal Target Slot for HTMX -->
     <div id="settings-modal-slot"></div>

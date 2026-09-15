@@ -97,4 +97,9 @@ class User extends Authenticatable
         }
         return "https://api.dicebear.com/7.x/bottts/svg?seed=" . urlencode($this->name);
     }
+
+    public function sendPasswordResetNotification($token): void
+    {
+        $this->notify(new \App\Notifications\ResetPasswordNotification($token));
+    }
 }

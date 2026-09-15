@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>{{ __('app.sign_in') }} - {{ __('app.planner') }}</title>
+    <title>{{ __('app.reset_password_title') }} - {{ __('app.planner') }}</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -16,7 +16,7 @@
         }
     </script>
 </head>
-<body class="min-h-full bg-slate-50 flex items-center justify-center p-4 relative">
+<body class="min-h-full bg-slate-50 flex items-center justify-center p-4 relative font-sans">
     <!-- Language Switcher in Top Right -->
     <div class="absolute top-4 right-4 flex items-center bg-white/80 backdrop-blur-sm border border-slate-200 rounded-full p-0.5 shadow-sm">
         <a href="{{ route('locale.switch', 'lv') }}"
@@ -34,66 +34,48 @@
     </div>
 
     <div class="w-full max-w-md bg-white border border-slate-200/90 rounded-3xl p-6 sm:p-8 shadow-xl space-y-6">
-        
         <!-- Header -->
         <div class="text-center space-y-2">
-            <span class="text-4xl">💼</span>
-            <h1 class="text-2xl font-extrabold text-slate-900">{{ __('app.planner') }}</h1>
-            <p class="text-xs text-slate-500">{{ __('app.login_subtitle') }}</p>
+            <span class="text-4xl">🔒</span>
+            <h1 class="text-2xl font-extrabold text-slate-900">{{ __('app.reset_password_title') }}</h1>
+            <p class="text-xs text-slate-500">{{ __('app.reset_password_subtitle') }}</p>
         </div>
 
-        <!-- Quick One-Click Login for Demo/Team Members -->
-        @if(isset($demoUsers) && $demoUsers->isNotEmpty())
-            <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2.5">
-                <div class="text-[11px] font-bold uppercase tracking-wider text-amber-700 text-center">{{ __('app.quick_login_demo') }}</div>
-                <div class="grid grid-cols-2 gap-2">
-                    @foreach($demoUsers as $du)
-                        <a href="{{ route('login.quick', $du->id) }}"
-                           class="flex items-center gap-2 p-2.5 rounded-xl bg-white border border-slate-200 hover:border-amber-400 hover:bg-amber-50/50 text-xs font-bold text-slate-800 shadow-sm transition">
-                            <span class="text-lg">{{ $du->avatar ?? '👤' }}</span>
-                            <span class="truncate">{{ $du->name }}</span>
-                        </a>
-                    @endforeach
-                </div>
-            </div>
-        @endif
-
-        <!-- Flash Status Message -->
-        @if (session('status'))
-            <div class="p-3.5 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold rounded-2xl flex items-center gap-2">
-                <span>✓</span>
-                <span>{{ session('status') }}</span>
-            </div>
-        @endif
-
-        <!-- Standard Login Form -->
-        <form action="{{ route('login') }}" method="POST" class="space-y-4">
+        <!-- Form -->
+        <form action="{{ route('password.update') }}" method="POST" class="space-y-4">
             @csrf
+            <input type="hidden" name="token" value="{{ $token }}">
+
             <div>
                 <label class="block text-xs font-bold text-slate-700 mb-1">{{ __('app.email') }}</label>
-                <input type="email" name="email" value="{{ old('email', app()->environment('local') ? 'janis@komanda.lv' : '') }}" required
+                <input type="email" name="email" value="{{ old('email', $email) }}" required autofocus
                        class="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 text-sm focus:border-amber-500 focus:bg-white focus:ring-1 focus:ring-amber-500">
                 @error('email') <p class="text-xs text-rose-600 mt-1">{{ $message }}</p> @enderror
             </div>
 
             <div>
-                <div class="flex items-center justify-between mb-1">
-                    <label class="block text-xs font-bold text-slate-700">{{ __('app.password') }}</label>
-                    <a href="{{ route('password.request') }}" class="text-xs font-semibold text-amber-600 hover:underline">
-                        {{ __('app.forgot_password') }}
-                    </a>
-                </div>
-                <input type="password" name="password" value="{{ app()->environment('local') ? 'password' : '' }}" required
+                <label class="block text-xs font-bold text-slate-700 mb-1">{{ __('app.new_password') }}</label>
+                <input type="password" name="password" required minlength="5" placeholder="•••••"
+                       class="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 text-sm focus:border-amber-500 focus:bg-white focus:ring-1 focus:ring-amber-500">
+                @error('password') <p class="text-xs text-rose-600 mt-1">{{ $message }}</p> @enderror
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">{{ __('app.confirm_new_password') }}</label>
+                <input type="password" name="password_confirmation" required minlength="5" placeholder="•••••"
                        class="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 text-sm focus:border-amber-500 focus:bg-white focus:ring-1 focus:ring-amber-500">
             </div>
 
             <button type="submit" class="w-full py-3 bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 text-slate-950 font-bold text-sm rounded-xl shadow-md shadow-amber-500/20 active:scale-[0.98] transition">
-                {{ __('app.sign_in') }}
+                {{ __('app.reset_password_btn') }}
             </button>
         </form>
 
         <div class="text-center pt-2 border-t border-slate-100">
-            <p class="text-xs text-slate-500">{{ __('app.no_account') }} <a href="{{ route('register') }}" class="text-amber-600 font-bold hover:underline">{{ __('app.register_workspace_link') }}</a></p>
+            <a href="{{ route('login') }}" class="text-xs font-bold text-amber-600 hover:underline flex items-center justify-center gap-1">
+                <span>←</span>
+                <span>{{ __('app.back_to_login') }}</span>
+            </a>
         </div>
     </div>
 </body>

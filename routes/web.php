@@ -3,6 +3,8 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\IdeaController;
+use App\Http\Controllers\PasswordResetController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TaskCommentController;
 use App\Http\Controllers\TenantController;
 use App\Http\Middleware\EnsureCurrentTenant;
@@ -26,6 +28,14 @@ Route::get('/login/as/{user}', [AuthController::class, 'quickLogin'])->name('log
 Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+// Password Reset Routes (Guests)
+Route::middleware('guest')->group(function () {
+    Route::get('/forgot-password', [PasswordResetController::class, 'showForgotPassword'])->name('password.request');
+    Route::post('/forgot-password', [PasswordResetController::class, 'sendResetLinkEmail'])->name('password.email');
+    Route::get('/reset-password/{token}', [PasswordResetController::class, 'showResetPassword'])->name('password.reset');
+    Route::post('/reset-password', [PasswordResetController::class, 'resetPassword'])->name('password.update');
+});
 
 // Protected Routes
 Route::middleware(['auth', EnsureCurrentTenant::class])->group(function () {
@@ -59,4 +69,8 @@ Route::middleware(['auth', EnsureCurrentTenant::class])->group(function () {
     Route::match(['put', 'patch'], '/tenants/{tenant}', [TenantController::class, 'update'])->name('tenants.patch_update');
     Route::post('/tenants/join', [TenantController::class, 'join'])->name('tenants.join');
     Route::post('/tenants/{tenant}/leave', [TenantController::class, 'leave'])->name('tenants.leave');
+    
+    // Profile Management
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::post('/profile', [ProfileController::class, 'update'])->name('profile.update');
 });
