@@ -283,4 +283,53 @@ class TaskFeatureTest extends TestCase
         $response->assertRedirect(route('ideas.index'));
         $this->assertDatabaseMissing('tasks', ['id' => $task->id]);
     }
+
+    public function test_it_manages_workspace_and_categories(): void
+    {
+        // 1. View settings modal
+        $settingsResponse = $this->actingAs($this->user)->get(route('tenants.settings'));
+        $settingsResponse->assertStatus(200);
+        $settingsResponse->assertSee('Darbavietas un Kategoriju Pārvaldība');
+        $settingsResponse->assertSee($this->tenant->name);
+
+        // 2. Update workspace name
+        $updateTenantResponse = $this->actingAs($this->user)->post(route('tenants.update', $this->tenant->id), [
+            'name' => 'Jaunais Komandas Nosaukums',
+        ]);
+        $updateTenantResponse->assertRedirect(route('ideas.index'));
+        $this->tenant->refresh();
+        $this->assertEquals('Jaunais Komandas Nosaukums', $this->tenant->name);
+
+        // 3. Create a category
+        $this->actingAs($this->user)->post(route('categories.store'), [
+            'name' => 'Dizains',
+            'emoji' => '🎨',
+            'color' => 'purple',
+        ]);
+        $cat = \App\Models\Category::where('name', 'Dizains')->first();
+        $this->assertNotNull($cat);
+
+        // 4. Edit category modal
+        $editCatResponse = $this->actingAs($this->user)->get(route('categories.edit', $cat->id));
+        $editCatResponse->assertStatus(200);
+        $editCatResponse->assertSee('Labot kategoriju');
+        $editCatResponse->assertSee('Dizains');
+
+        // 5. Update category
+        $updateCatResponse = $this->actingAs($this->user)->post(route('categories.update', $cat->id), [
+            'name' => 'Produkta Dizains',
+            'emoji' => '🎯',
+            'color' => 'cyan',
+        ]);
+        $updateCatResponse->assertRedirect(route('ideas.index'));
+        $cat->refresh();
+        $this->assertEquals('Produkta Dizains', $cat->name);
+        $this->assertEquals('🎯', $cat->emoji);
+        $this->assertEquals('cyan', $cat->color);
+
+        // 6. Delete category
+        $deleteCatResponse = $this->actingAs($this->user)->delete(route('categories.destroy', $cat->id));
+        $deleteCatResponse->assertRedirect(route('ideas.index'));
+        $this->assertDatabaseMissing('categories', ['id' => $cat->id]);
+    }
 }

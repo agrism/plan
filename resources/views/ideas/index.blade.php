@@ -70,6 +70,16 @@
                         title="Izveidot jaunu kategoriju">
                     <span>➕</span> Jauna
                 </button>
+
+                <!-- Manage All Categories & Workspace Button -->
+                <button hx-get="{{ route('tenants.settings') }}"
+                        hx-target="#settings-modal-slot"
+                        hx-swap="innerHTML"
+                        type="button"
+                        class="px-2.5 py-1 rounded-xl whitespace-nowrap transition flex items-center gap-1 bg-slate-100 hover:bg-amber-100 border border-slate-200 hover:border-amber-300 text-slate-600 hover:text-amber-900 font-bold"
+                        title="Pārvaldīt un labot kategorijas">
+                    <span>⚙️</span> Pārvaldīt
+                </button>
             </div>
 
             <!-- Backlog Cards Container -->

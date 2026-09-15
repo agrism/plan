@@ -60,38 +60,59 @@
     <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200/90 px-4 py-3 sm:px-6 shadow-sm">
         <div class="max-w-7xl mx-auto flex items-center justify-between gap-4">
             
-            <!-- Left: Workspace Switcher Dropdown -->
-            <div class="relative" x-data="{ open: false }">
-                <button @click="open = !open" type="button" class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200/80 border border-slate-200 transition text-sm font-bold text-slate-800">
-                    <span class="text-base">💼</span>
-                    <span class="truncate max-w-[140px] sm:max-w-[200px] text-amber-700">{{ $tenant->name ?? 'Darbavieta' }}</span>
-                    <svg class="w-4 h-4 text-slate-500 transition" :class="{'rotate-180': open}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                    </svg>
-                </button>
-
-                <!-- Dropdown Menu -->
-                <div x-show="open" @click.outside="open = false" x-cloak
-                     class="absolute left-0 mt-2 w-64 bg-white border border-slate-200 rounded-2xl shadow-xl p-2 z-50">
-                    <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400 px-3 py-1.5">Tavas Darbavietas</div>
-                    @if(auth()->check())
-                        @foreach(auth()->user()->tenants as $t)
-                            <form action="{{ route('tenants.switch', $t->id) }}" method="POST">
-                                @csrf
-                                <button type="submit" class="w-full text-left flex items-center justify-between px-3 py-2 rounded-xl text-sm transition {{ $tenant->id === $t->id ? 'bg-amber-50 text-amber-900 font-bold border border-amber-200' : 'text-slate-700 hover:bg-slate-100' }}">
-                                    <span class="truncate">{{ $t->name }}</span>
-                                    @if($tenant->id === $t->id)
-                                        <span class="text-amber-600 text-xs">✓ Aktīva</span>
-                                    @endif
-                                </button>
-                            </form>
-                        @endforeach
-                    @endif
-                    <div class="border-t border-slate-100 my-1"></div>
-                    <button @click="open = false; showTenantModal = true" class="w-full text-left flex items-center gap-2 px-3 py-2 text-xs font-bold text-amber-600 hover:bg-amber-50 rounded-xl transition">
-                        <span>➕</span> Izveidot jaunu darbavietu
+            <!-- Left: Workspace Switcher Dropdown & Settings Button -->
+            <div class="flex items-center gap-2">
+                <div class="relative" x-data="{ open: false }">
+                    <button @click="open = !open" type="button" class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200/80 border border-slate-200 transition text-sm font-bold text-slate-800">
+                        <span class="text-base">💼</span>
+                        <span class="truncate max-w-[140px] sm:max-w-[200px] text-amber-700">{{ $tenant->name ?? 'Darbavieta' }}</span>
+                        <svg class="w-4 h-4 text-slate-500 transition" :class="{'rotate-180': open}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
                     </button>
+
+                    <!-- Dropdown Menu -->
+                    <div x-show="open" @click.outside="open = false" x-cloak
+                         class="absolute left-0 mt-2 w-72 bg-white border border-slate-200 rounded-2xl shadow-xl p-2 z-50">
+                        <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400 px-3 py-1.5">Tavas Darbavietas</div>
+                        @if(auth()->check())
+                            @foreach(auth()->user()->tenants as $t)
+                                <form action="{{ route('tenants.switch', $t->id) }}" method="POST">
+                                    @csrf
+                                    <button type="submit" class="w-full text-left flex items-center justify-between px-3 py-2 rounded-xl text-sm transition {{ $tenant->id === $t->id ? 'bg-amber-50 text-amber-900 font-bold border border-amber-200' : 'text-slate-700 hover:bg-slate-100' }}">
+                                        <span class="truncate">{{ $t->name }}</span>
+                                        @if($tenant->id === $t->id)
+                                            <span class="text-amber-600 text-xs">✓ Aktīva</span>
+                                        @endif
+                                    </button>
+                                </form>
+                            @endforeach
+                        @endif
+                        <div class="border-t border-slate-100 my-1"></div>
+                        <button hx-get="{{ route('tenants.settings') }}"
+                                hx-target="#settings-modal-slot"
+                                hx-swap="innerHTML"
+                                @click="open = false"
+                                type="button"
+                                class="w-full text-left flex items-center gap-2 px-3 py-2 text-xs font-bold text-slate-700 hover:bg-amber-50 hover:text-amber-900 rounded-xl transition">
+                            <span>⚙️</span> Pārvaldīt kategorijas & darbavietu
+                        </button>
+                        <button @click="open = false; showTenantModal = true" class="w-full text-left flex items-center gap-2 px-3 py-2 text-xs font-bold text-amber-600 hover:bg-amber-50 rounded-xl transition">
+                            <span>➕</span> Izveidot jaunu darbavietu
+                        </button>
+                    </div>
                 </div>
+
+                <!-- Settings Quick Button -->
+                <button hx-get="{{ route('tenants.settings') }}"
+                        hx-target="#settings-modal-slot"
+                        hx-swap="innerHTML"
+                        type="button"
+                        title="Darbavietas un kategoriju iestatījumi"
+                        class="p-2 rounded-xl bg-slate-100 hover:bg-amber-100 hover:text-amber-900 text-slate-600 border border-slate-200 transition text-xs font-bold flex items-center gap-1.5">
+                    <span>⚙️</span>
+                    <span class="hidden lg:inline">Iestatījumi</span>
+                </button>
             </div>
 
             <!-- Center: Team Member Avatars & Quick Switcher -->
@@ -402,6 +423,9 @@
 
     <!-- Edit Modal Target Slot for HTMX -->
     <div id="edit-modal-slot"></div>
+
+    <!-- Workspace & Category Settings Modal Target Slot for HTMX -->
+    <div id="settings-modal-slot"></div>
 
     <!-- Dynamic Math Delete Confirmation Modal -->
     <div x-data="{

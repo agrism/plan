@@ -42,6 +42,44 @@ class TenantController extends Controller
         return redirect()->route('ideas.index');
     }
 
+    public function settings()
+    {
+        $user = auth()->user();
+        $tenant = $user->currentTenant();
+
+        if (!$tenant) {
+            return response('Darbavieta nav atrasta', 404);
+        }
+
+        $tenant->ensureDefaultCategories();
+        $categories = $tenant->categories()->withCount('tasks')->get();
+
+        return view('tenants.partials.settings_modal', compact('tenant', 'user', 'categories'));
+    }
+
+    public function update(Request $request, Tenant $tenant)
+    {
+        $user = auth()->user();
+
+        if (!$tenant->users()->where('users.id', $user->id)->exists()) {
+            abort(403);
+        }
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+        ]);
+
+        $tenant->update([
+            'name' => $validated['name'],
+        ]);
+
+        if ($request->header('HX-Request')) {
+            return redirect()->route('ideas.index');
+        }
+
+        return redirect()->route('ideas.index');
+    }
+
     public function join(Request $request)
     {
         $validated = $request->validate([

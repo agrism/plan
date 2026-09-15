@@ -28,11 +28,17 @@ Route::middleware(['auth', EnsureCurrentTenant::class])->group(function () {
 
     // Categories
     Route::post('/categories', [\App\Http\Controllers\CategoryController::class, 'store'])->name('categories.store');
+    Route::get('/categories/{category}/edit', [\App\Http\Controllers\CategoryController::class, 'edit'])->name('categories.edit');
+    Route::post('/categories/{category}/update', [\App\Http\Controllers\CategoryController::class, 'update'])->name('categories.update');
+    Route::match(['put', 'patch'], '/categories/{category}', [\App\Http\Controllers\CategoryController::class, 'update'])->name('categories.patch_update');
     Route::delete('/categories/{category}', [\App\Http\Controllers\CategoryController::class, 'destroy'])->name('categories.destroy');
 
-    // Tenant Switch & Create
+    // Tenant Switch, Create & Settings
+    Route::get('/tenants/settings', [TenantController::class, 'settings'])->name('tenants.settings');
     Route::post('/tenants/switch/{id}', [TenantController::class, 'switchTenant'])->name('tenants.switch');
     Route::get('/tenants/create', [TenantController::class, 'create'])->name('tenants.create');
     Route::post('/tenants', [TenantController::class, 'store'])->name('tenants.store');
+    Route::post('/tenants/{tenant}/update', [TenantController::class, 'update'])->name('tenants.update');
+    Route::match(['put', 'patch'], '/tenants/{tenant}', [TenantController::class, 'update'])->name('tenants.patch_update');
     Route::post('/tenants/join', [TenantController::class, 'join'])->name('tenants.join');
 });

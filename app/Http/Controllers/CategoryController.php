@@ -43,6 +43,53 @@ class CategoryController extends Controller
         return redirect()->route('ideas.index');
     }
 
+    public function edit(Category $category)
+    {
+        $user = auth()->user();
+        $tenant = $user->currentTenant();
+
+        if ($category->tenant_id !== $tenant->id) {
+            abort(403);
+        }
+
+        return view('categories.partials.edit_modal', compact('category'));
+    }
+
+    public function update(Request $request, Category $category)
+    {
+        $user = auth()->user();
+        $tenant = $user->currentTenant();
+
+        if ($category->tenant_id !== $tenant->id) {
+            abort(403);
+        }
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:50',
+            'emoji' => 'nullable|string|max:10',
+            'color' => 'nullable|string|in:blue,rose,purple,amber,emerald,indigo,cyan,slate,orange,pink,yellow,red,green',
+        ]);
+
+        $name = trim($validated['name']);
+        $slug = Str::slug($name);
+        if (empty($slug)) {
+            $slug = 'cat-' . Str::random(6);
+        }
+
+        $category->update([
+            'name' => $name,
+            'slug' => $slug,
+            'emoji' => $validated['emoji'] ?? '📁',
+            'color' => $validated['color'] ?? 'blue',
+        ]);
+
+        if ($request->header('HX-Request')) {
+            return redirect()->route('ideas.index');
+        }
+
+        return redirect()->route('ideas.index');
+    }
+
     public function destroy(Request $request, Category $category)
     {
         $user = auth()->user();
@@ -51,6 +98,12 @@ class CategoryController extends Controller
         if ($category->tenant_id !== $tenant->id) {
             abort(403);
         }
+
+        // Safely detach category from associated tasks
+        $category->tasks()->update([
+            'category_id' => null,
+            'category' => 'citi',
+        ]);
 
         $category->delete();
 
