@@ -45,13 +45,6 @@
         <form action="{{ route('register') }}" method="POST" class="space-y-4">
             @csrf
             <div>
-                <label class="block text-xs font-bold text-slate-700 mb-1">{{ __('app.workspace_team_name') }}</label>
-                <input type="text" name="workspace_name" value="{{ old('workspace_name') }}" required placeholder="{{ __('app.workspace_name_placeholder') }}"
-                       class="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 text-sm focus:border-amber-500 focus:bg-white focus:ring-1 focus:ring-amber-500">
-                @error('workspace_name') <p class="text-xs text-rose-600 mt-1">{{ $message }}</p> @enderror
-            </div>
-
-            <div>
                 <label class="block text-xs font-bold text-slate-700 mb-1">{{ __('app.name') }}</label>
                 <input type="text" name="name" value="{{ old('name') }}" required placeholder="{{ __('app.name_placeholder') }}"
                        class="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 text-sm focus:border-amber-500 focus:bg-white focus:ring-1 focus:ring-amber-500">

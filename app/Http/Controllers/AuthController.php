@@ -81,7 +81,6 @@ class AuthController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:5|confirmed',
-            'workspace_name' => 'nullable|string|max:255',
         ]);
 
         $user = User::create([
@@ -98,9 +97,10 @@ class AuthController extends Controller
             $inviteTenant->users()->attach($user->id, ['role' => 'member']);
             $currentTenantId = $inviteTenant->id;
         } else {
-            // Create initial workspace tenant
+            // Automatically create initial workspace
+            $workspaceName = __('app.default_workspace_name', ['name' => $user->name]);
             $tenant = Tenant::create([
-                'name' => $validated['workspace_name'] ?: ($user->name . ' Komanda'),
+                'name' => $workspaceName,
                 'owner_id' => $user->id,
             ]);
             $tenant->users()->attach($user->id, ['role' => 'admin']);
