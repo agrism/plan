@@ -125,132 +125,13 @@
                                         🗑️
                                     </button>
 
-                                    <!-- Reschedule Calendar Picker Dropdown -->
-                                    <div class="relative" x-data="{ schedMenu: false }">
-                                        <button @click="schedMenu = !schedMenu"
-                                                type="button"
-                                                title="{{ __('app.reschedule') }}"
-                                                class="p-1 rounded-lg text-slate-400 hover:text-amber-600 hover:bg-amber-50 transition text-xs">
-                                            📅
-                                        </button>
-
-                                        <!-- Calendar Popup -->
-                                        <div x-show="schedMenu" @click.outside="schedMenu = false" x-cloak
-                                             x-data="calendarPicker('{{ $task->scheduled_date ? $task->scheduled_date->toDateString() : '' }}')"
-                                             class="absolute right-0 top-full mt-1 w-72 sm:w-80 bg-white border border-slate-200 rounded-3xl shadow-2xl p-3.5 z-50 space-y-3">
-                                            
-                                            <!-- Header / Month navigation -->
-                                            <div class="flex items-center justify-between px-1">
-                                                <h4 class="text-xs font-extrabold text-slate-900 capitalize" x-text="monthYearString"></h4>
-                                                <div class="flex items-center gap-1">
-                                                    <button type="button" @click="prevMonth()" class="p-1 rounded-lg text-slate-500 hover:bg-slate-100 hover:text-slate-800 text-xs font-bold">◀</button>
-                                                    <button type="button" @click="nextMonth()" class="p-1 rounded-lg text-slate-500 hover:bg-slate-100 hover:text-slate-800 text-xs font-bold">▶</button>
-                                                </div>
-                                            </div>
-
-                                            <!-- Weekdays row -->
-                                            <div class="grid grid-cols-7 gap-1 text-center text-[10px] font-bold text-slate-400">
-                                                <template x-for="dn in dayNames">
-                                                    <div x-text="dn" class="py-0.5"></div>
-                                                </template>
-                                            </div>
-
-                                            <!-- Days Grid -->
-                                            <div class="grid grid-cols-7 gap-1 text-center text-xs">
-                                                <template x-for="dayObj in daysInMonth">
-                                                    <div>
-                                                        <template x-if="dayObj.isCurrentMonth">
-                                                            <form action="{{ route('ideas.schedule', $task->id) }}" method="POST"
-                                                                  hx-patch="{{ route('ideas.schedule', $task->id) }}"
-                                                                  hx-target="body">
-                                                                @csrf
-                                                                @method('PATCH')
-                                                                <input type="hidden" name="scheduled_date" :value="dayObj.dateString">
-                                                                <button type="submit"
-                                                                        class="w-full aspect-square rounded-xl text-xs font-semibold flex items-center justify-center transition"
-                                                                        :class="{
-                                                                            'bg-amber-500 text-slate-950 font-bold shadow-sm ring-2 ring-amber-400': dayObj.isSelected,
-                                                                            'border border-amber-300 font-bold text-amber-900 bg-amber-50': dayObj.isToday && !dayObj.isSelected,
-                                                                            'text-slate-700 hover:bg-amber-100 hover:text-amber-900': !dayObj.isSelected && !dayObj.isToday
-                                                                        }">
-                                                                    <span x-text="dayObj.day"></span>
-                                                                </button>
-                                                            </form>
-                                                        </template>
-                                                        <template x-if="!dayObj.isCurrentMonth">
-                                                            <span class="w-full aspect-square rounded-xl text-xs text-slate-300 flex items-center justify-center select-none" x-text="dayObj.day"></span>
-                                                        </template>
-                                                    </div>
-                                                </template>
-                                            </div>
-
-                                            <!-- Quick Shortcuts -->
-                                            <div class="pt-2 border-t border-slate-100 space-y-1">
-                                                <div class="text-[10px] font-bold uppercase text-slate-400 px-1">{{ __('app.quick_picks') }}</div>
-                                                <div class="grid grid-cols-3 gap-1.5 text-xs">
-                                                    <form action="{{ route('ideas.schedule', $task->id) }}" method="POST"
-                                                          hx-patch="{{ route('ideas.schedule', $task->id) }}"
-                                                          hx-target="body">
-                                                        @csrf
-                                                        @method('PATCH')
-                                                        <input type="hidden" name="scheduled_date" value="{{ $today ?? \Carbon\Carbon::now()->toDateString() }}">
-                                                        <button type="submit" class="w-full py-1 text-center rounded-lg bg-slate-100 hover:bg-amber-100 hover:text-amber-900 text-slate-700 font-medium text-[11px] transition">
-                                                            {{ __('app.today') }}
-                                                        </button>
-                                                    </form>
-
-                                                    <form action="{{ route('ideas.schedule', $task->id) }}" method="POST"
-                                                          hx-patch="{{ route('ideas.schedule', $task->id) }}"
-                                                          hx-target="body">
-                                                        @csrf
-                                                        @method('PATCH')
-                                                        <input type="hidden" name="scheduled_date" value="{{ $tomorrow ?? \Carbon\Carbon::tomorrow()->toDateString() }}">
-                                                        <button type="submit" class="w-full py-1 text-center rounded-lg bg-slate-100 hover:bg-amber-100 hover:text-amber-900 text-slate-700 font-medium text-[11px] transition">
-                                                            {{ __('app.tomorrow') }}
-                                                        </button>
-                                                    </form>
-
-                                                    <form action="{{ route('ideas.schedule', $task->id) }}" method="POST"
-                                                          hx-patch="{{ route('ideas.schedule', $task->id) }}"
-                                                          hx-target="body">
-                                                        @csrf
-                                                        @method('PATCH')
-                                                        <input type="hidden" name="scheduled_date" value="{{ $friday }}">
-                                                        <button type="submit" class="w-full py-1 text-center rounded-lg bg-slate-100 hover:bg-amber-100 hover:text-amber-900 text-slate-700 font-medium text-[11px] transition">
-                                                            {{ __('app.friday') }}
-                                                        </button>
-                                                    </form>
-                                                </div>
-                                            </div>
-
-                                            <!-- Move back to Backlog from modal & Delete -->
-                                            <div class="border-t border-slate-100 pt-2 flex items-center justify-between text-xs">
-                                                <form action="{{ route('ideas.schedule', $task->id) }}" method="POST"
-                                                      hx-patch="{{ route('ideas.schedule', $task->id) }}"
-                                                      hx-target="body">
-                                                    @csrf
-                                                    @method('PATCH')
-                                                    <input type="hidden" name="scheduled_date" value="null">
-                                                    <button type="submit" class="text-[11px] font-semibold text-slate-600 hover:text-amber-700 flex items-center gap-1">
-                                                        <span>↩️</span> {{ __('app.to_backlog') }}
-                                                    </button>
-                                                </form>
-
-                                                <div class="flex items-center gap-2">
-                                                    <button type="button"
-                                                            @click.stop="schedMenu = false; window.openMathDeleteConfirm('{{ addslashes($task->title) }}', '{{ route('ideas.destroy', $task->id) }}')"
-                                                            class="px-2 py-1 text-rose-600 hover:bg-rose-50 rounded-lg text-[11px] font-semibold transition flex items-center gap-1">
-                                                        <span>🗑️</span> {{ __('app.delete') }}
-                                                    </button>
-
-                                                    <button type="button" @click="schedMenu = false" class="px-2 py-1 text-slate-400 hover:text-slate-600 text-[11px]">
-                                                        {{ __('app.close') }}
-                                                    </button>
-                                                </div>
-                                            </div>
-
-                                        </div>
-                                    </div>
+                                    <!-- Reschedule Calendar Modal Trigger -->
+                                    <button @click.stop="window.openScheduleModal({{ $task->id }}, '{{ addslashes($task->title) }}', '{{ $task->scheduled_date ? $task->scheduled_date->toDateString() : '' }}', '{{ route('ideas.schedule', $task->id) }}', true)"
+                                            type="button"
+                                            title="{{ __('app.reschedule') }}"
+                                            class="p-1 rounded-lg text-slate-400 hover:text-amber-600 hover:bg-amber-50 transition text-xs">
+                                        📅
+                                    </button>
 
                                     <!-- Quick Move back to Backlog button -->
                                     <form action="{{ route('ideas.schedule', $task->id) }}" method="POST"

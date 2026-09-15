@@ -595,88 +595,256 @@
         </div>
     </div>
 
-    <!-- Configure HTMX CSRF & Calendar Picker -->
+    <!-- Global Schedule Calendar Modal (Always 100% visible, centered & responsive) -->
+    <div x-data="{
+        showModal: false,
+        taskId: null,
+        taskTitle: '',
+        selectedDate: null,
+        actionUrl: '',
+        isScheduled: false,
+        currentMonth: new Date().getMonth(),
+        currentYear: new Date().getFullYear(),
+        monthNames: '{{ app()->getLocale() }}' === 'lv' 
+            ? ['Janvāris', 'Februāris', 'Marts', 'Aprīlis', 'Maijs', 'Jūnijs', 'Jūlijs', 'Augusts', 'Septembris', 'Oktobris', 'Novembris', 'Decembris']
+            : ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+        dayNames: '{{ app()->getLocale() }}' === 'lv'
+            ? ['P', 'O', 'T', 'C', 'Pk', 'S', 'Sv']
+            : ['M', 'Tu', 'W', 'Th', 'F', 'Sa', 'Su'],
+        
+        get monthYearString() {
+            return this.monthNames[this.currentMonth] + ' ' + this.currentYear;
+        },
+        
+        get todayStr() {
+            const d = new Date();
+            return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+        },
+        get tomorrowStr() {
+            const d = new Date();
+            d.setDate(d.getDate() + 1);
+            return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+        },
+        get fridayStr() {
+            const d = new Date();
+            const day = d.getDay(); // 0: Sun, 1: Mon, ... 5: Fri
+            const diff = (day <= 5 ? 5 - day : 6);
+            d.setDate(d.getDate() + (diff === 0 ? 7 : diff));
+            return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+        },
+
+        prevMonth() {
+            if (this.currentMonth === 0) {
+                this.currentMonth = 11;
+                this.currentYear--;
+            } else {
+                this.currentMonth--;
+            }
+        },
+        nextMonth() {
+            if (this.currentMonth === 11) {
+                this.currentMonth = 0;
+                this.currentYear++;
+            } else {
+                this.currentMonth++;
+            }
+        },
+        
+        get daysInMonth() {
+            const days = [];
+            const firstDay = new Date(this.currentYear, this.currentMonth, 1).getDay();
+            const startOffset = (firstDay === 0 ? 6 : firstDay - 1);
+            
+            const prevMonthDays = new Date(this.currentYear, this.currentMonth, 0).getDate();
+            for (let i = startOffset - 1; i >= 0; i--) {
+                days.push({ day: prevMonthDays - i, isCurrentMonth: false, dateString: null });
+            }
+            
+            const totalDays = new Date(this.currentYear, this.currentMonth + 1, 0).getDate();
+            const todayStr = this.todayStr;
+            
+            for (let i = 1; i <= totalDays; i++) {
+                const m = String(this.currentMonth + 1).padStart(2, '0');
+                const d = String(i).padStart(2, '0');
+                const dStr = `${this.currentYear}-${m}-${d}`;
+                days.push({
+                    day: i,
+                    isCurrentMonth: true,
+                    dateString: dStr,
+                    isToday: dStr === todayStr,
+                    isSelected: dStr === this.selectedDate
+                });
+            }
+            
+            const remaining = (7 - (days.length % 7)) % 7;
+            for (let i = 1; i <= remaining; i++) {
+                days.push({ day: i, isCurrentMonth: false, dateString: null });
+            }
+            
+            return days;
+        },
+
+        selectDate(dateStr) {
+            if (!dateStr || !this.actionUrl) return;
+            htmx.ajax('PATCH', this.actionUrl, {
+                target: 'body',
+                values: { scheduled_date: dateStr }
+            });
+            this.showModal = false;
+        },
+
+        moveToBacklog() {
+            if (!this.actionUrl) return;
+            htmx.ajax('PATCH', this.actionUrl, {
+                target: 'body',
+                values: { scheduled_date: 'null' }
+            });
+            this.showModal = false;
+        },
+
+        init() {
+            window.addEventListener('open-schedule-modal', (e) => {
+                this.taskId = e.detail?.taskId;
+                this.taskTitle = e.detail?.taskTitle || '';
+                this.selectedDate = e.detail?.scheduledDate || null;
+                this.actionUrl = e.detail?.actionUrl || '';
+                this.isScheduled = e.detail?.isScheduled || false;
+
+                let initD = this.selectedDate ? new Date(this.selectedDate) : new Date();
+                if (isNaN(initD.getTime())) initD = new Date();
+                this.currentMonth = initD.getMonth();
+                this.currentYear = initD.getFullYear();
+
+                this.showModal = true;
+            });
+
+            window.openScheduleModal = (taskId, taskTitle, scheduledDate, actionUrl, isScheduled = false) => {
+                window.dispatchEvent(new CustomEvent('open-schedule-modal', {
+                    detail: { taskId, taskTitle, scheduledDate, actionUrl, isScheduled }
+                }));
+            };
+        }
+    }">
+        <div x-show="showModal" x-cloak
+             class="fixed inset-0 z-[65] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm"
+             x-transition:enter="transition ease-out duration-200"
+             x-transition:enter-start="opacity-0"
+             x-transition:enter-end="opacity-100"
+             x-transition:leave="transition ease-in duration-150"
+             x-transition:leave-start="opacity-100"
+             x-transition:leave-end="opacity-0">
+            
+            <div @click.outside="showModal = false"
+                 x-show="showModal"
+                 x-transition:enter="transition ease-out duration-200 transform"
+                 x-transition:enter-start="scale-95 opacity-0"
+                 x-transition:enter-end="scale-100 opacity-100"
+                 x-transition:leave="transition ease-in duration-150 transform"
+                 x-transition:leave-start="scale-100 opacity-100"
+                 x-transition:leave-end="scale-95 opacity-0"
+                 class="w-full max-w-sm bg-white border border-slate-200 rounded-3xl p-5 shadow-2xl space-y-4">
+                
+                <!-- Header -->
+                <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                    <div class="flex items-center gap-2.5 min-w-0">
+                        <span class="text-2xl flex-shrink-0">📅</span>
+                        <div class="min-w-0">
+                            <h3 class="text-base font-extrabold text-slate-900" x-text="isScheduled ? '{{ __('app.reschedule') }}' : '{{ __('app.schedule') }}'"></h3>
+                            <p class="text-xs text-slate-500 font-medium truncate" x-text="taskTitle"></p>
+                        </div>
+                    </div>
+                    <button type="button" @click="showModal = false" class="p-1.5 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-100 flex-shrink-0">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                </div>
+
+                <!-- Month Navigation -->
+                <div class="flex items-center justify-between px-1">
+                    <h4 class="text-sm font-extrabold text-slate-900 capitalize" x-text="monthYearString"></h4>
+                    <div class="flex items-center gap-1">
+                        <button type="button" @click="prevMonth()" class="w-7 h-7 rounded-lg text-slate-500 hover:bg-slate-100 hover:text-slate-900 flex items-center justify-center font-bold text-xs">◀</button>
+                        <button type="button" @click="nextMonth()" class="w-7 h-7 rounded-lg text-slate-500 hover:bg-slate-100 hover:text-slate-900 flex items-center justify-center font-bold text-xs">▶</button>
+                    </div>
+                </div>
+
+                <!-- Weekday Names -->
+                <div class="grid grid-cols-7 gap-1 text-center text-[11px] font-bold text-slate-400">
+                    <template x-for="dn in dayNames">
+                        <div x-text="dn" class="py-0.5"></div>
+                    </template>
+                </div>
+
+                <!-- Days Grid -->
+                <div class="grid grid-cols-7 gap-1 text-center text-xs">
+                    <template x-for="dayObj in daysInMonth">
+                        <div>
+                            <template x-if="dayObj.isCurrentMonth">
+                                <button type="button"
+                                        @click="selectDate(dayObj.dateString)"
+                                        class="w-full aspect-square rounded-xl text-xs font-semibold flex items-center justify-center transition"
+                                        :class="{
+                                            'bg-amber-500 text-slate-950 font-bold shadow-sm ring-2 ring-amber-400': dayObj.isSelected,
+                                            'border border-amber-300 font-bold text-amber-900 bg-amber-50': dayObj.isToday && !dayObj.isSelected,
+                                            'text-slate-700 hover:bg-amber-100 hover:text-amber-900': !dayObj.isSelected && !dayObj.isToday
+                                        }">
+                                    <span x-text="dayObj.day"></span>
+                                </button>
+                            </template>
+                            <template x-if="!dayObj.isCurrentMonth">
+                                <span class="w-full aspect-square rounded-xl text-xs text-slate-300 flex items-center justify-center select-none" x-text="dayObj.day"></span>
+                            </template>
+                        </div>
+                    </template>
+                </div>
+
+                <!-- Quick Picks -->
+                <div class="pt-3 border-t border-slate-100 space-y-1.5">
+                    <div class="text-[10px] font-extrabold uppercase text-slate-400 tracking-wider px-0.5">{{ __('app.quick_picks') }}</div>
+                    <div class="grid grid-cols-3 gap-1.5 text-xs">
+                        <button type="button" @click="selectDate(todayStr)"
+                                class="py-1.5 px-2 text-center rounded-xl bg-slate-100 hover:bg-amber-100 hover:text-amber-900 text-slate-700 font-bold text-[11px] transition">
+                            {{ __('app.today') }}
+                        </button>
+                        <button type="button" @click="selectDate(tomorrowStr)"
+                                class="py-1.5 px-2 text-center rounded-xl bg-slate-100 hover:bg-amber-100 hover:text-amber-900 text-slate-700 font-bold text-[11px] transition">
+                            {{ __('app.tomorrow') }}
+                        </button>
+                        <button type="button" @click="selectDate(fridayStr)"
+                                class="py-1.5 px-2 text-center rounded-xl bg-slate-100 hover:bg-amber-100 hover:text-amber-900 text-slate-700 font-bold text-[11px] transition">
+                            {{ __('app.friday') }}
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Footer Actions -->
+                <div class="pt-2 border-t border-slate-100 flex items-center justify-between text-xs">
+                    <template x-if="isScheduled">
+                        <button type="button" @click="moveToBacklog()"
+                                class="px-3 py-1.5 text-amber-800 hover:bg-amber-50 rounded-xl font-bold text-xs transition flex items-center gap-1">
+                            <span>↩️</span>
+                            <span>{{ __('app.to_backlog') }}</span>
+                        </button>
+                    </template>
+                    <template x-if="!isScheduled">
+                        <div></div>
+                    </template>
+
+                    <button type="button" @click="showModal = false"
+                            class="px-4 py-1.5 text-xs font-bold text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-xl transition">
+                        {{ __('app.close') }}
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Configure HTMX CSRF -->
     <script>
         document.body.addEventListener('htmx:configRequest', (event) => {
             const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
             event.detail.headers['X-CSRF-TOKEN'] = token;
         });
-
-        function calendarPicker(initialDate = null) {
-            let initD = initialDate ? new Date(initialDate) : new Date();
-            if (isNaN(initD.getTime())) initD = new Date();
-            
-            const isLv = '{{ app()->getLocale() }}' === 'lv';
-            
-            return {
-                currentMonth: initD.getMonth(),
-                currentYear: initD.getFullYear(),
-                selectedDate: initialDate,
-                monthNames: isLv 
-                    ? ['Janvāris', 'Februāris', 'Marts', 'Aprīlis', 'Maijs', 'Jūnijs', 'Jūlijs', 'Augusts', 'Septembris', 'Oktobris', 'Novembris', 'Decembris']
-                    : ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
-                dayNames: isLv
-                    ? ['P', 'O', 'T', 'C', 'Pk', 'S', 'Sv']
-                    : ['M', 'Tu', 'W', 'Th', 'F', 'Sa', 'Su'],
-                
-                get monthYearString() {
-                    return this.monthNames[this.currentMonth] + ' ' + this.currentYear;
-                },
-                
-                prevMonth() {
-                    if (this.currentMonth === 0) {
-                        this.currentMonth = 11;
-                        this.currentYear--;
-                    } else {
-                        this.currentMonth--;
-                    }
-                },
-                
-                nextMonth() {
-                    if (this.currentMonth === 11) {
-                        this.currentMonth = 0;
-                        this.currentYear++;
-                    } else {
-                        this.currentMonth++;
-                    }
-                },
-                
-                get daysInMonth() {
-                    const days = [];
-                    const firstDay = new Date(this.currentYear, this.currentMonth, 1).getDay();
-                    const startOffset = (firstDay === 0 ? 6 : firstDay - 1);
-                    
-                    const prevMonthDays = new Date(this.currentYear, this.currentMonth, 0).getDate();
-                    for (let i = startOffset - 1; i >= 0; i--) {
-                        days.push({ day: prevMonthDays - i, isCurrentMonth: false, dateString: null });
-                    }
-                    
-                    const totalDays = new Date(this.currentYear, this.currentMonth + 1, 0).getDate();
-                    const today = new Date();
-                    const todayStr = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
-                    
-                    for (let i = 1; i <= totalDays; i++) {
-                        const m = String(this.currentMonth + 1).padStart(2, '0');
-                        const d = String(i).padStart(2, '0');
-                        const dStr = `${this.currentYear}-${m}-${d}`;
-                        days.push({
-                            day: i,
-                            isCurrentMonth: true,
-                            dateString: dStr,
-                            isToday: dStr === todayStr,
-                            isSelected: dStr === this.selectedDate
-                        });
-                    }
-                    
-                    const remaining = (7 - (days.length % 7)) % 7;
-                    for (let i = 1; i <= remaining; i++) {
-                        days.push({ day: i, isCurrentMonth: false, dateString: null });
-                    }
-                    
-                    return days;
-                }
-            };
-        }
     </script>
 </body>
 </html>
