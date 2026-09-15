@@ -118,17 +118,16 @@
                 </button>
             </div>
 
-            <!-- Center: Team Member Avatars & Quick Switcher -->
+            <!-- Center: Team Member Avatars (Team Info) -->
             <div class="hidden sm:flex items-center gap-1.5 bg-slate-100 p-1.5 rounded-2xl border border-slate-200">
                 <span class="text-xs text-slate-500 font-medium pl-2 pr-1">{{ __('app.team') }}:</span>
                 @if(isset($tenant))
                     @foreach($tenant->users as $member)
-                        <a href="{{ route('login.quick', $member->id) }}"
-                           title="{{ __('app.switch_user') }}: {{ $member->name }}"
-                           class="flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-medium transition {{ auth()->id() === $member->id ? 'bg-amber-500 text-slate-950 font-bold shadow-sm' : 'text-slate-700 hover:bg-slate-200' }}">
+                        <div title="{{ $member->name }}"
+                             class="flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-medium {{ auth()->id() === $member->id ? 'bg-amber-500 text-slate-950 font-bold shadow-sm' : 'text-slate-700 bg-white/70 border border-slate-200/60' }}">
                             <span>{{ $member->avatar ?? '👤' }}</span>
                             <span>{{ explode(' ', $member->name)[0] }}</span>
-                        </a>
+                        </div>
                     @endforeach
                 @endif
             </div>

@@ -51,6 +51,10 @@ class AuthController extends Controller
 
     public function quickLogin(User $user)
     {
+        if (!app()->environment('local')) {
+            abort(403, 'Quick login is only available in local development environment.');
+        }
+
         Auth::login($user);
         request()->session()->regenerate();
 
