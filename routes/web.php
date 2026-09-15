@@ -18,6 +18,9 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::middleware(['auth', EnsureCurrentTenant::class])->group(function () {
     Route::get('/', [IdeaController::class, 'index'])->name('ideas.index');
     Route::post('/ideas', [IdeaController::class, 'store'])->name('ideas.store');
+    Route::get('/ideas/{task}/edit', [IdeaController::class, 'edit'])->name('ideas.edit');
+    Route::post('/ideas/{task}/update', [IdeaController::class, 'update'])->name('ideas.update');
+    Route::match(['put', 'patch'], '/ideas/{task}', [IdeaController::class, 'update'])->name('ideas.patch_update');
     Route::patch('/ideas/{task}/schedule', [IdeaController::class, 'schedule'])->name('ideas.schedule');
     Route::patch('/ideas/{task}/toggle', [IdeaController::class, 'toggle'])->name('ideas.toggle');
     Route::post('/ideas/{task}/react', [IdeaController::class, 'react'])->name('ideas.react');

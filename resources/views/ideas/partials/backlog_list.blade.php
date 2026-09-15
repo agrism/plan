@@ -8,22 +8,34 @@
     @foreach($backlogIdeas as $idea)
         <div class="group relative rounded-2xl bg-white border border-slate-200/90 hover:border-slate-300 transition p-4 shadow-sm hover:shadow-md flex flex-col gap-3">
             
-            <!-- Card Header: Category & Author Badge -->
+            <!-- Card Header: Category, Author Badge & Edit Button -->
             <div class="flex items-center justify-between gap-2">
                 <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg text-xs font-bold border {{ $idea->category_badge_class }}">
                     <span>{{ $idea->category_emoji }}</span>
                     <span>{{ $idea->category_name }}</span>
                 </span>
 
-                <div class="flex items-center gap-1.5 text-xs text-slate-500 font-medium" title="Izveidoja: {{ $idea->creator->name }}">
-                    <span class="text-sm">{{ $idea->creator->avatar ?? '👤' }}</span>
-                    <span class="font-bold text-slate-700">{{ explode(' ', $idea->creator->name)[0] }}</span>
+                <div class="flex items-center gap-2">
+                    <div class="flex items-center gap-1.5 text-xs text-slate-500 font-medium" title="Izveidoja: {{ $idea->creator->name }}">
+                        <span class="text-sm">{{ $idea->creator->avatar ?? '👤' }}</span>
+                        <span class="font-bold text-slate-700">{{ explode(' ', $idea->creator->name)[0] }}</span>
+                    </div>
+
+                    <!-- Edit Button -->
+                    <button hx-get="{{ route('ideas.edit', $idea->id) }}"
+                            hx-target="#edit-modal-slot"
+                            hx-swap="innerHTML"
+                            type="button"
+                            title="Labot uzdevumu"
+                            class="p-1 rounded-lg text-slate-400 hover:text-amber-600 hover:bg-amber-50 transition text-xs">
+                        ✏️
+                    </button>
                 </div>
             </div>
 
             <!-- Optional Image -->
             @if($idea->image_url)
-                <div class="w-full h-32 rounded-xl overflow-hidden bg-slate-100 border border-slate-100">
+                <div class="w-full h-36 rounded-xl overflow-hidden bg-slate-100 border border-slate-100">
                     <img src="{{ $idea->image_url }}" alt="{{ $idea->title }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
                 </div>
             @endif
@@ -32,6 +44,43 @@
             <h3 class="text-sm font-bold text-slate-900 leading-snug">
                 {{ $idea->title }}
             </h3>
+
+            <!-- Optional Description -->
+            @if($idea->description)
+                <p class="text-xs text-slate-600 leading-relaxed whitespace-pre-line bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                    {{ $idea->description }}
+                </p>
+            @endif
+
+            <!-- Dynamic Links & YouTube Video Embeds -->
+            @if(!empty($idea->processed_links))
+                <div class="space-y-2 pt-1">
+                    @foreach($idea->processed_links as $linkItem)
+                        <!-- If it's a YouTube video, render responsive embed player above the link -->
+                        @if($linkItem['embed_url'])
+                            <div class="rounded-xl overflow-hidden border border-slate-200 bg-black aspect-video w-full shadow-sm">
+                                <iframe src="{{ $linkItem['embed_url'] }}"
+                                        title="YouTube video"
+                                        class="w-full h-full"
+                                        frameborder="0"
+                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                        allowfullscreen>
+                                </iframe>
+                            </div>
+                        @endif
+
+                        <!-- Clickable Link Badge -->
+                        <div class="flex items-center gap-1.5 text-xs">
+                            <a href="{{ $linkItem['url'] }}" target="_blank" rel="noopener noreferrer"
+                               class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 font-medium truncate max-w-full transition">
+                                <span>{{ $linkItem['youtube_id'] ? '▶️' : '🔗' }}</span>
+                                <span class="truncate">{{ $linkItem['domain'] }}</span>
+                                <svg class="w-3 h-3 text-slate-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                            </a>
+                        </div>
+                    @endforeach
+                </div>
+            @endif
 
             <!-- Card Actions (Reactions & Schedule Button) -->
             <div class="flex items-center justify-between pt-2 border-t border-slate-100 mt-1">

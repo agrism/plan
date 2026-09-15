@@ -18,6 +18,7 @@ class Task extends Model
         'title',
         'description',
         'image_url',
+        'links',
         'category',
         'scheduled_date',
         'scheduled_time_slot',
@@ -28,6 +29,7 @@ class Task extends Model
     protected $casts = [
         'scheduled_date' => 'date',
         'is_completed' => 'boolean',
+        'links' => 'array',
     ];
 
     public function tenant(): BelongsTo
@@ -84,5 +86,63 @@ class Task extends Model
             'ikdienas' => 'bg-emerald-50 text-emerald-800 border-emerald-200',
             default => 'bg-slate-100 text-slate-700 border-slate-200',
         };
+    }
+
+    /**
+     * Extracts YouTube Video ID if the given URL is a YouTube video/short.
+     */
+    public static function extractYouTubeId(?string $url): ?string
+    {
+        if (empty($url)) {
+            return null;
+        }
+
+        $pattern = '/(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|youtu\.be\/|youtube\.com\/shorts\/)([a-zA-Z0-9_-]{11})/i';
+        if (preg_match($pattern, $url, $matches)) {
+            return $matches[1];
+        }
+
+        return null;
+    }
+
+    /**
+     * Returns structured list of links with YouTube embed info and domain names.
+     *
+     * @return array<array{url: string, youtube_id: ?string, embed_url: ?string, domain: string}>
+     */
+    public function getProcessedLinksAttribute(): array
+    {
+        $rawLinks = $this->links ?? [];
+        if (!is_array($rawLinks)) {
+            return [];
+        }
+
+        $processed = [];
+        foreach ($rawLinks as $link) {
+            $link = trim((string)$link);
+            if (empty($link)) {
+                continue;
+            }
+
+            // Ensure protocol
+            if (!preg_match('/^https?:\/\//i', $link)) {
+                $url = 'https://' . $link;
+            } else {
+                $url = $link;
+            }
+
+            $youtubeId = self::extractYouTubeId($url);
+            $parsedHost = parse_url($url, PHP_URL_HOST) ?? $url;
+            $domain = preg_replace('/^www\./i', '', $parsedHost);
+
+            $processed[] = [
+                'url' => $url,
+                'youtube_id' => $youtubeId,
+                'embed_url' => $youtubeId ? "https://www.youtube.com/embed/{$youtubeId}" : null,
+                'domain' => $domain,
+            ];
+        }
+
+        return $processed;
     }
 }

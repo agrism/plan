@@ -205,13 +205,21 @@
                   hx-post="{{ route('ideas.store') }}"
                   hx-target="body"
                   @htmx:after-request="showAddModal = false"
-                  class="space-y-4">
+                  class="space-y-4"
+                  x-data="{ formLinks: [''] }">
                 @csrf
 
                 <div>
                     <label class="block text-xs font-bold text-slate-700 mb-1">Uzdevuma nosaukums</label>
                     <input type="text" name="title" required autofocus placeholder="Piem., Sagatavot atskaiti, Servera atjauninājumi..."
                            class="w-full px-4 py-3 bg-slate-50 border border-slate-300 focus:border-amber-500 focus:bg-white focus:ring-1 focus:ring-amber-500 rounded-xl text-slate-900 placeholder-slate-400 text-sm">
+                </div>
+
+                <!-- Optional Description -->
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Apraksts (Pēc izvēles)</label>
+                    <textarea name="description" rows="2" placeholder="Pievieno papildu piezīmes vai aprakstu..."
+                              class="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 focus:border-amber-500 focus:bg-white rounded-xl text-slate-900 text-xs resize-none"></textarea>
                 </div>
 
                 <div>
@@ -244,11 +252,35 @@
                     </div>
                 </div>
 
+                <!-- Dynamic Links & YouTube Video Input (Infinitely addable) -->
+                <div class="space-y-2">
+                    <div class="flex items-center justify-between">
+                        <label class="block text-xs font-bold text-slate-700">Saites & YouTube video</label>
+                        <span class="text-[11px] text-slate-400">YouTube video tiks atskaņoti embed veidā</span>
+                    </div>
+                    
+                    <div class="space-y-2">
+                        <template x-for="(link, index) in formLinks" :key="index">
+                            <div class="flex items-center gap-2">
+                                <span class="text-slate-400 text-xs">🔗</span>
+                                <input type="text" :name="'links[' + index + ']'" x-model="formLinks[index]" placeholder="https://youtube.com/watch?v=... vai saite"
+                                       class="flex-1 px-3 py-2 bg-slate-50 border border-slate-300 focus:border-amber-500 focus:bg-white rounded-xl text-slate-900 text-xs">
+                                <button type="button" @click="formLinks.splice(index, 1)" class="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-rose-50 text-xs" title="Noņemt">✕</button>
+                            </div>
+                        </template>
+                    </div>
+
+                    <button type="button" @click="formLinks.push('')"
+                            class="text-xs font-bold text-amber-700 hover:text-amber-800 flex items-center gap-1 py-0.5">
+                        <span>➕</span> Pievienot vēl vienu saiti
+                    </button>
+                </div>
+
                 <!-- Optional Image Upload to Hetzner S3 -->
                 <div x-data="{ imagePreview: null }">
                     <label class="block text-xs font-bold text-slate-700 mb-1">Pievienot attēlu (Hetzner S3)</label>
                     <div class="flex items-center gap-3">
-                        <label class="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-slate-50 border border-dashed border-slate-300 hover:border-amber-500 rounded-xl cursor-pointer text-xs font-semibold text-slate-600 hover:text-slate-900 transition">
+                        <label class="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-slate-50 border border-dashed border-slate-300 hover:border-amber-500 rounded-xl cursor-pointer text-xs font-semibold text-slate-600 hover:text-slate-900 transition">
                             <span>📷</span>
                             <span x-text="imagePreview ? 'Mainīt attēlu' : 'Izvēlēties no ierīces vai nofotografēt'"></span>
                             <input type="file" name="image_file" accept="image/*" class="hidden"
@@ -291,6 +323,9 @@
             </form>
         </div>
     </div>
+
+    <!-- Edit Modal Target Slot for HTMX -->
+    <div id="edit-modal-slot"></div>
 
     <!-- Configure HTMX CSRF -->
     <script>

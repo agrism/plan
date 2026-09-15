@@ -84,9 +84,12 @@ class IdeaController extends Controller
     {
         $validated = $request->validate([
             'title' => 'required|string|max:255',
+            'description' => 'nullable|string|max:2000',
             'category' => 'nullable|string|in:projekti,steidzami,attistiba,sanaksmes,ikdienas,citi',
             'image_url' => 'nullable|string|max:500',
-            'image_file' => 'nullable|image|max:12288', // up to 12MB
+            'image_file' => 'nullable|image|max:12288',
+            'links' => 'nullable|array',
+            'links.*' => 'nullable|string|max:500',
             'scheduled_date' => 'nullable|date',
             'scheduled_time_slot' => 'nullable|string|max:50',
         ]);
@@ -99,8 +102,6 @@ class IdeaController extends Controller
         }
 
         $imageUrl = null;
-
-        // Process uploaded image file -> Convert to WebP & upload to Hetzner S3
         if ($request->hasFile('image_file')) {
             $imageUrl = $imageService->processAndUpload($request->file('image_file'), 'tasks', 1200, 82);
         } elseif (!empty($validated['image_url'])) {
@@ -117,14 +118,77 @@ class IdeaController extends Controller
             };
         }
 
+        // Clean links
+        $cleanLinks = array_values(array_filter($request->input('links', []), function ($link) {
+            return !empty(trim((string)$link));
+        }));
+
         $tenant->tasks()->create([
             'created_by_id' => $user->id,
             'title' => $validated['title'],
+            'description' => $validated['description'] ?? null,
             'category' => $validated['category'] ?? 'citi',
             'image_url' => $imageUrl,
+            'links' => $cleanLinks,
             'scheduled_date' => $validated['scheduled_date'] ?? null,
             'scheduled_time_slot' => $validated['scheduled_time_slot'] ?? null,
         ]);
+
+        if ($request->header('HX-Request')) {
+            return $this->index($request);
+        }
+
+        return redirect()->route('ideas.index');
+    }
+
+    public function edit(Task $task)
+    {
+        return view('ideas.partials.edit_modal', compact('task'));
+    }
+
+    public function update(Request $request, Task $task, ImageService $imageService)
+    {
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string|max:2000',
+            'category' => 'nullable|string|in:projekti,steidzami,attistiba,sanaksmes,ikdienas,citi',
+            'image_url' => 'nullable|string|max:500',
+            'image_file' => 'nullable|image|max:12288',
+            'links' => 'nullable|array',
+            'links.*' => 'nullable|string|max:500',
+            'scheduled_date' => 'nullable|string',
+            'scheduled_time_slot' => 'nullable|string|max:50',
+            'remove_image' => 'nullable|boolean',
+        ]);
+
+        $task->title = $validated['title'];
+        $task->description = $validated['description'] ?? null;
+        $task->category = $validated['category'] ?? $task->category;
+
+        if ($request->boolean('remove_image')) {
+            $task->image_url = null;
+        } elseif ($request->hasFile('image_file')) {
+            $task->image_url = $imageService->processAndUpload($request->file('image_file'), 'tasks', 1200, 82);
+        } elseif (!empty($validated['image_url'])) {
+            $task->image_url = $validated['image_url'];
+        }
+
+        // Clean links
+        $cleanLinks = array_values(array_filter($request->input('links', []), function ($link) {
+            return !empty(trim((string)$link));
+        }));
+        $task->links = $cleanLinks;
+
+        if (array_key_exists('scheduled_date', $validated)) {
+            $schedDate = $validated['scheduled_date'];
+            $task->scheduled_date = ($schedDate === 'null' || empty($schedDate)) ? null : Carbon::parse($schedDate)->toDateString();
+        }
+
+        if (array_key_exists('scheduled_time_slot', $validated)) {
+            $task->scheduled_time_slot = $validated['scheduled_time_slot'];
+        }
+
+        $task->save();
 
         if ($request->header('HX-Request')) {
             return $this->index($request);
